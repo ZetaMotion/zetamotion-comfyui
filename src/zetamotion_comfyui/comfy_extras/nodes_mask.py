@@ -5,6 +5,8 @@ import comfy.utils
 import node_helpers
 import folder_paths
 import random
+import torch
+import torch.nn.functional as F
 
 import nodes
 from nodes import MAX_RESOLUTION
@@ -389,6 +391,49 @@ class MaskPreview(nodes.SaveImage):
         preview = mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
         return self.save_images(preview, filename_prefix, prompt, extra_pnginfo)
 
+class GaussianBlurMask:
+    """
+    Apply Gaussian blur to a mask tensor.
+    Expects input: mask tensor of shape (B, 1, H, W) with values [0,1] or [0,255].
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "mask": ("MASK",),
+                "kernel_size": ("INT", {"default": 10, "min": 3, "max": 101, "step": 2}),
+                "sigma": ("FLOAT", {"default": 5.0, "min": 0.1, "max": 50.0, "step": 0.1}),
+            }
+        }
+
+    RETURN_TYPES = ("MASK",)
+    FUNCTION = "blur"
+    CATEGORY = "mask/blur"
+
+    def _make_gaussian_kernel(self, kernel_size: int, sigma: float, device: torch.device):
+        """Build 2D Gaussian kernel for convolution."""
+        ax = torch.arange(kernel_size, device=device) - kernel_size // 2
+        xx, yy = torch.meshgrid(ax, ax, indexing="ij")
+        kernel = torch.exp(-(xx**2 + yy**2) / (2 * sigma**2))
+        kernel = kernel / kernel.sum()
+        return kernel.view(1, 1, kernel_size, kernel_size)
+
+    def blur(self, mask: torch.Tensor, kernel_size: int, sigma: float):
+        """
+        mask: tensor (B,1,H,W) or (H,W)
+        """
+        if mask.dim() == 2:  # (H,W) → (1,1,H,W)
+            mask = mask.unsqueeze(0).unsqueeze(0)
+        elif mask.dim() == 3:  # (B,H,W) → (B,1,H,W)
+            mask = mask.unsqueeze(1)
+
+        B, C, H, W = mask.shape
+        kernel = self._make_gaussian_kernel(kernel_size, sigma, mask.device)
+        kernel = kernel.expand(C, 1, -1, -1)
+
+        blurred = F.conv2d(mask.float(), kernel, padding=kernel_size // 2, groups=C)
+        return (blurred.clamp(0, 1),)
 
 NODE_CLASS_MAPPINGS = {
     "LatentCompositeMasked": LatentCompositeMasked,

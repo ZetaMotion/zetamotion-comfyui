@@ -1181,6 +1181,37 @@ class EmptyLatentImage:
         latent = torch.zeros([batch_size, 4, height // 8, width // 8], device=self.device)
         return ({"samples":latent}, )
 
+class EmptySD3LatentImage:
+    """
+    Creates an empty latent tensor for SD3 / Flux models.
+    Shape depends on model (usually 16 channels, 64x smaller spatial dims).
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "width": ("INT", {"default": 512, "min": 64, "max": 4096, "step": 8}),
+                "height": ("INT", {"default": 512, "min": 64, "max": 4096, "step": 8}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 16}),
+            }
+        }
+
+    RETURN_TYPES = ("LATENT",)
+    FUNCTION = "generate"
+    CATEGORY = "latent"
+
+    def generate(self, width, height, batch_size=1):
+        import torch
+
+        # Flux / SD3 uses 16 channels, downscaled by 8 (not 4 like SDXL)
+        latent_w = width // 8
+        latent_h = height // 8
+        samples = torch.zeros(
+            (batch_size, 16, latent_h, latent_w),
+            dtype=torch.float32
+        )
+
+        return ({"samples": samples},)
 
 class LatentFromBatch:
     @classmethod
