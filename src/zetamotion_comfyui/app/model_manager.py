@@ -11,7 +11,7 @@ import zetamotion_comfyui.comfy.utils
 from aiohttp import web
 from PIL import Image
 from io import BytesIO
-from zetamotion_comfyui.folder_paths.import map_legacy, filter_files_extensions, filter_files_content_types
+from zetamotion_comfyui.folder_paths import map_legacy, filter_files_extensions, filter_files_content_types
 
 
 class ModelFileManager:

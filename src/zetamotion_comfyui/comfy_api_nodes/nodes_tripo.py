@@ -1,5 +1,5 @@
 import os
-from zetamotion_comfyui.folder_paths.import get_output_directory
+from zetamotion_comfyui.folder_paths import get_output_directory
 from zetamotion_comfyui.comfy_api_nodes.mapper_utils import model_field_to_node_input
 from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
 from zetamotion_comfyui.comfy_api_nodes.apis import (
