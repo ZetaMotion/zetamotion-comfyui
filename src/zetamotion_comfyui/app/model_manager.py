@@ -5,13 +5,13 @@ import base64
 import json
 import time
 import logging
-import folder_paths
+import zetamotion_comfyui.folder_paths
 import glob
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 from aiohttp import web
 from PIL import Image
 from io import BytesIO
-from folder_paths import map_legacy, filter_files_extensions, filter_files_content_types
+from zetamotion_comfyui.folder_paths.import map_legacy, filter_files_extensions, filter_files_content_types
 
 
 class ModelFileManager:
@@ -31,20 +31,20 @@ class ModelFileManager:
         # NOTE: This is an experiment to replace `/models`
         @routes.get("/experiment/models")
         async def get_model_folders(request):
-            model_types = list(folder_paths.folder_names_and_paths.keys())
+            model_types = list(zetamotion_comfyui.folder_paths.folder_names_and_paths.keys())
             folder_black_list = ["configs", "custom_nodes"]
             output_folders: list[dict] = []
             for folder in model_types:
                 if folder in folder_black_list:
                     continue
-                output_folders.append({"name": folder, "folders": folder_paths.get_folder_paths(folder)})
+                output_folders.append({"name": folder, "folders": zetamotion_comfyui.folder_paths.get_folder_paths(folder)})
             return web.json_response(output_folders)
 
         # NOTE: This is an experiment to replace `/models/{folder}`
         @routes.get("/experiment/models/{folder}")
         async def get_all_models(request):
             folder = request.match_info.get("folder", None)
-            if not folder in folder_paths.folder_names_and_paths:
+            if not folder in zetamotion_comfyui.folder_paths.folder_names_and_paths:
                 return web.Response(status=404)
             files = self.get_model_file_list(folder)
             return web.json_response(files)
@@ -55,10 +55,10 @@ class ModelFileManager:
             path_index = int(request.match_info.get("path_index", None))
             filename = request.match_info.get("filename", None)
 
-            if not folder_name in folder_paths.folder_names_and_paths:
+            if not folder_name in zetamotion_comfyui.folder_paths.folder_names_and_paths:
                 return web.Response(status=404)
 
-            folders = folder_paths.folder_names_and_paths[folder_name]
+            folders = zetamotion_comfyui.folder_paths.folder_names_and_paths[folder_name]
             folder = folders[0][path_index]
             full_filename = os.path.join(folder, filename)
 
@@ -78,7 +78,7 @@ class ModelFileManager:
 
     def get_model_file_list(self, folder_name: str):
         folder_name = map_legacy(folder_name)
-        folders = folder_paths.folder_names_and_paths[folder_name]
+        folders = zetamotion_comfyui.folder_paths.folder_names_and_paths[folder_name]
         output_list: list[dict] = []
 
         for index, folder in enumerate(folders[0]):
@@ -126,7 +126,7 @@ class ModelFileManager:
                 subdirs[:] = [d for d in subdirs if not d.startswith(".")]
                 filenames = [f for f in filenames if not f.startswith(".")]
 
-            filenames = filter_files_extensions(filenames, folder_paths.supported_pt_extensions)
+            filenames = filter_files_extensions(filenames, zetamotion_comfyui.folder_paths.supported_pt_extensions)
 
             for file_name in filenames:
                 try:
@@ -180,7 +180,7 @@ class ModelFileManager:
 
         if safetensors_file:
             safetensors_filepath = os.path.join(dirname, safetensors_file)
-            header = comfy.utils.safetensors_header(safetensors_filepath, max_size=8*1024*1024)
+            header = zetamotion_comfyui.comfy.utils.safetensors_header(safetensors_filepath, max_size=8*1024*1024)
             if header:
                 safetensors_metadata = json.loads(header)
         safetensors_images = safetensors_metadata.get("__metadata__", {}).get("ssmd_cover_images", None)

@@ -1,12 +1,12 @@
-import comfy.sd
-import comfy.model_sampling
-import comfy.latent_formats
-import nodes
+import zetamotion_comfyui.comfy.sd
+import zetamotion_comfyui.comfy.model_sampling
+import zetamotion_comfyui.comfy.latent_formats
+import zetamotion_comfyui.nodes
 import torch
-import node_helpers
+import zetamotion_comfyui.node_helpers
 
 
-class LCM(comfy.model_sampling.EPS):
+class LCM(zetamotion_comfyui.comfy.model_sampling.EPS):
     def calculate_denoised(self, sigma, model_output, model_input):
         timestep = self.timestep(sigma).view(sigma.shape[:1] + (1,) * (model_output.ndim - 1))
         sigma = sigma.view(sigma.shape[:1] + (1,) * (model_output.ndim - 1))
@@ -20,7 +20,7 @@ class LCM(comfy.model_sampling.EPS):
 
         return c_out * x0 + c_skip * model_input
 
-class ModelSamplingDiscreteDistilled(comfy.model_sampling.ModelSamplingDiscrete):
+class ModelSamplingDiscreteDistilled(zetamotion_comfyui.comfy.model_sampling.ModelSamplingDiscrete):
     original_timesteps = 50
 
     def __init__(self, model_config=None, zsnr=None):
@@ -64,18 +64,18 @@ class ModelSamplingDiscrete:
     def patch(self, model, sampling, zsnr):
         m = model.clone()
 
-        sampling_base = comfy.model_sampling.ModelSamplingDiscrete
+        sampling_base = zetamotion_comfyui.comfy.model_sampling.ModelSamplingDiscrete
         if sampling == "eps":
-            sampling_type = comfy.model_sampling.EPS
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.EPS
         elif sampling == "v_prediction":
-            sampling_type = comfy.model_sampling.V_PREDICTION
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.V_PREDICTION
         elif sampling == "lcm":
             sampling_type = LCM
             sampling_base = ModelSamplingDiscreteDistilled
         elif sampling == "x0":
-            sampling_type = comfy.model_sampling.X0
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.X0
         elif sampling == "img_to_img":
-            sampling_type = comfy.model_sampling.IMG_TO_IMG
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.IMG_TO_IMG
 
         class ModelSamplingAdvanced(sampling_base, sampling_type):
             pass
@@ -100,8 +100,8 @@ class ModelSamplingStableCascade:
     def patch(self, model, shift):
         m = model.clone()
 
-        sampling_base = comfy.model_sampling.StableCascadeSampling
-        sampling_type = comfy.model_sampling.EPS
+        sampling_base = zetamotion_comfyui.comfy.model_sampling.StableCascadeSampling
+        sampling_type = zetamotion_comfyui.comfy.model_sampling.EPS
 
         class ModelSamplingAdvanced(sampling_base, sampling_type):
             pass
@@ -126,8 +126,8 @@ class ModelSamplingSD3:
     def patch(self, model, shift, multiplier=1000):
         m = model.clone()
 
-        sampling_base = comfy.model_sampling.ModelSamplingDiscreteFlow
-        sampling_type = comfy.model_sampling.CONST
+        sampling_base = zetamotion_comfyui.comfy.model_sampling.ModelSamplingDiscreteFlow
+        sampling_type = zetamotion_comfyui.comfy.model_sampling.CONST
 
         class ModelSamplingAdvanced(sampling_base, sampling_type):
             pass
@@ -173,8 +173,8 @@ class ModelSamplingFlux:
         b = base_shift - mm * x1
         shift = (width * height / (8 * 8 * 2 * 2)) * mm + b
 
-        sampling_base = comfy.model_sampling.ModelSamplingFlux
-        sampling_type = comfy.model_sampling.CONST
+        sampling_base = zetamotion_comfyui.comfy.model_sampling.ModelSamplingFlux
+        sampling_type = zetamotion_comfyui.comfy.model_sampling.CONST
 
         class ModelSamplingAdvanced(sampling_base, sampling_type):
             pass
@@ -202,23 +202,23 @@ class ModelSamplingContinuousEDM:
     def patch(self, model, sampling, sigma_max, sigma_min):
         m = model.clone()
 
-        sampling_base = comfy.model_sampling.ModelSamplingContinuousEDM
+        sampling_base = zetamotion_comfyui.comfy.model_sampling.ModelSamplingContinuousEDM
         latent_format = None
         sigma_data = 1.0
         if sampling == "eps":
-            sampling_type = comfy.model_sampling.EPS
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.EPS
         elif sampling == "edm":
-            sampling_type = comfy.model_sampling.EDM
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.EDM
             sigma_data = 0.5
         elif sampling == "v_prediction":
-            sampling_type = comfy.model_sampling.V_PREDICTION
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.V_PREDICTION
         elif sampling == "edm_playground_v2.5":
-            sampling_type = comfy.model_sampling.EDM
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.EDM
             sigma_data = 0.5
-            latent_format = comfy.latent_formats.SDXL_Playground_2_5()
+            latent_format = zetamotion_comfyui.comfy.latent_formats.SDXL_Playground_2_5()
         elif sampling == "cosmos_rflow":
-            sampling_type = comfy.model_sampling.COSMOS_RFLOW
-            sampling_base = comfy.model_sampling.ModelSamplingCosmosRFlow
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.COSMOS_RFLOW
+            sampling_base = zetamotion_comfyui.comfy.model_sampling.ModelSamplingCosmosRFlow
 
         class ModelSamplingAdvanced(sampling_base, sampling_type):
             pass
@@ -249,9 +249,9 @@ class ModelSamplingContinuousV:
 
         sigma_data = 1.0
         if sampling == "v_prediction":
-            sampling_type = comfy.model_sampling.V_PREDICTION
+            sampling_type = zetamotion_comfyui.comfy.model_sampling.V_PREDICTION
 
-        class ModelSamplingAdvanced(comfy.model_sampling.ModelSamplingContinuousV, sampling_type):
+        class ModelSamplingAdvanced(zetamotion_comfyui.comfy.model_sampling.ModelSamplingContinuousV, sampling_type):
             pass
 
         model_sampling = ModelSamplingAdvanced(model.model.model_config)

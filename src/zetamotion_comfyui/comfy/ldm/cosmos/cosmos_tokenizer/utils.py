@@ -20,8 +20,8 @@ import torch
 from einops import rearrange
 
 
-import comfy.ops
-ops = comfy.ops.disable_weight_init
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 def time2batch(x: torch.Tensor) -> tuple[torch.Tensor, int]:
     batch_size = x.shape[0]

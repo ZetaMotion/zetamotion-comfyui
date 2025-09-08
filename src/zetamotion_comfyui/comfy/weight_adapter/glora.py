@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from .base import WeightAdapterBase, weight_decompose
 
 
@@ -64,10 +64,10 @@ class GLoRAAdapter(WeightAdapterBase):
                 old_glora = False
                 rank = v[1].shape[0]
 
-        a1 = comfy.model_management.cast_to_device(v[0].flatten(start_dim=1), weight.device, intermediate_dtype)
-        a2 = comfy.model_management.cast_to_device(v[1].flatten(start_dim=1), weight.device, intermediate_dtype)
-        b1 = comfy.model_management.cast_to_device(v[2].flatten(start_dim=1), weight.device, intermediate_dtype)
-        b2 = comfy.model_management.cast_to_device(v[3].flatten(start_dim=1), weight.device, intermediate_dtype)
+        a1 = zetamotion_comfyui.comfy.model_management.cast_to_device(v[0].flatten(start_dim=1), weight.device, intermediate_dtype)
+        a2 = zetamotion_comfyui.comfy.model_management.cast_to_device(v[1].flatten(start_dim=1), weight.device, intermediate_dtype)
+        b1 = zetamotion_comfyui.comfy.model_management.cast_to_device(v[2].flatten(start_dim=1), weight.device, intermediate_dtype)
+        b2 = zetamotion_comfyui.comfy.model_management.cast_to_device(v[3].flatten(start_dim=1), weight.device, intermediate_dtype)
 
         if v[4] is not None:
             alpha = v[4] / rank

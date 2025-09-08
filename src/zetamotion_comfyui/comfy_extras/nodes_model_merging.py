@@ -1,15 +1,15 @@
-import comfy.sd
-import comfy.utils
-import comfy.model_base
-import comfy.model_management
-import comfy.model_sampling
+import zetamotion_comfyui.comfy.sd
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.model_base
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.model_sampling
 
 import torch
-import folder_paths
+import zetamotion_comfyui.folder_paths
 import json
 import os
 
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.cli_args import args
 
 class ModelMergeSimple:
     @classmethod
@@ -166,7 +166,7 @@ class ModelMergeBlocks:
         return (m, )
 
 def save_checkpoint(model, clip=None, vae=None, clip_vision=None, filename_prefix=None, output_dir=None, prompt=None, extra_pnginfo=None):
-    full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, output_dir)
+    full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, output_dir)
     prompt_info = ""
     if prompt is not None:
         prompt_info = json.dumps(prompt)
@@ -174,16 +174,16 @@ def save_checkpoint(model, clip=None, vae=None, clip_vision=None, filename_prefi
     metadata = {}
 
     enable_modelspec = True
-    if isinstance(model.model, comfy.model_base.SDXL):
-        if isinstance(model.model, comfy.model_base.SDXL_instructpix2pix):
+    if isinstance(model.model, zetamotion_comfyui.comfy.model_base.SDXL):
+        if isinstance(model.model, zetamotion_comfyui.comfy.model_base.SDXL_instructpix2pix):
             metadata["modelspec.architecture"] = "stable-diffusion-xl-v1-edit"
         else:
             metadata["modelspec.architecture"] = "stable-diffusion-xl-v1-base"
-    elif isinstance(model.model, comfy.model_base.SDXLRefiner):
+    elif isinstance(model.model, zetamotion_comfyui.comfy.model_base.SDXLRefiner):
         metadata["modelspec.architecture"] = "stable-diffusion-xl-v1-refiner"
-    elif isinstance(model.model, comfy.model_base.SVD_img2vid):
+    elif isinstance(model.model, zetamotion_comfyui.comfy.model_base.SVD_img2vid):
         metadata["modelspec.architecture"] = "stable-video-diffusion-img2vid-v1"
-    elif isinstance(model.model, comfy.model_base.SD3):
+    elif isinstance(model.model, zetamotion_comfyui.comfy.model_base.SD3):
         metadata["modelspec.architecture"] = "stable-diffusion-v3-medium" #TODO: other SD3 variants
     else:
         enable_modelspec = False
@@ -200,14 +200,14 @@ def save_checkpoint(model, clip=None, vae=None, clip_vision=None, filename_prefi
 
     extra_keys = {}
     model_sampling = model.get_model_object("model_sampling")
-    if isinstance(model_sampling, comfy.model_sampling.ModelSamplingContinuousEDM):
-        if isinstance(model_sampling, comfy.model_sampling.V_PREDICTION):
+    if isinstance(model_sampling, zetamotion_comfyui.comfy.model_sampling.ModelSamplingContinuousEDM):
+        if isinstance(model_sampling, zetamotion_comfyui.comfy.model_sampling.V_PREDICTION):
             extra_keys["edm_vpred.sigma_max"] = torch.tensor(model_sampling.sigma_max).float()
             extra_keys["edm_vpred.sigma_min"] = torch.tensor(model_sampling.sigma_min).float()
 
-    if model.model.model_type == comfy.model_base.ModelType.EPS:
+    if model.model.model_type == zetamotion_comfyui.comfy.model_base.ModelType.EPS:
         metadata["modelspec.predict_key"] = "epsilon"
-    elif model.model.model_type == comfy.model_base.ModelType.V_PREDICTION:
+    elif model.model.model_type == zetamotion_comfyui.comfy.model_base.ModelType.V_PREDICTION:
         metadata["modelspec.predict_key"] = "v"
         extra_keys["v_pred"] = torch.tensor([])
         if getattr(model_sampling, "zsnr", False):
@@ -222,11 +222,11 @@ def save_checkpoint(model, clip=None, vae=None, clip_vision=None, filename_prefi
     output_checkpoint = f"{filename}_{counter:05}_.safetensors"
     output_checkpoint = os.path.join(full_output_folder, output_checkpoint)
 
-    comfy.sd.save_checkpoint(output_checkpoint, model, clip, vae, clip_vision, metadata=metadata, extra_keys=extra_keys)
+    zetamotion_comfyui.comfy.sd.save_checkpoint(output_checkpoint, model, clip, vae, clip_vision, metadata=metadata, extra_keys=extra_keys)
 
 class CheckpointSave:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -247,7 +247,7 @@ class CheckpointSave:
 
 class CLIPSave:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -273,7 +273,7 @@ class CLIPSave:
                 for x in extra_pnginfo:
                     metadata[x] = json.dumps(extra_pnginfo[x])
 
-        comfy.model_management.load_models_gpu([clip.load_model()], force_patch_weights=True)
+        zetamotion_comfyui.comfy.model_management.load_models_gpu([clip.load_model()], force_patch_weights=True)
         clip_sd = clip.get_sd()
 
         for prefix in ["clip_l.", "clip_g.", "clip_h.", "t5xxl.", "pile_t5xl.", "mt5xl.", "umt5xxl.", "t5base.", "gemma2_2b.", "llama.", "hydit_clip.", ""]:
@@ -292,19 +292,19 @@ class CLIPSave:
                 replace_prefix[prefix] = ""
             replace_prefix["transformer."] = ""
 
-            full_output_folder, filename, counter, subfolder, filename_prefix_ = folder_paths.get_save_image_path(filename_prefix_, self.output_dir)
+            full_output_folder, filename, counter, subfolder, filename_prefix_ = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix_, self.output_dir)
 
             output_checkpoint = f"{filename}_{counter:05}_.safetensors"
             output_checkpoint = os.path.join(full_output_folder, output_checkpoint)
 
-            current_clip_sd = comfy.utils.state_dict_prefix_replace(current_clip_sd, replace_prefix)
+            current_clip_sd = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(current_clip_sd, replace_prefix)
 
-            comfy.utils.save_torch_file(current_clip_sd, output_checkpoint, metadata=metadata)
+            zetamotion_comfyui.comfy.utils.save_torch_file(current_clip_sd, output_checkpoint, metadata=metadata)
         return {}
 
 class VAESave:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -318,7 +318,7 @@ class VAESave:
     CATEGORY = "advanced/model_merging"
 
     def save(self, vae, filename_prefix, prompt=None, extra_pnginfo=None):
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir)
         prompt_info = ""
         if prompt is not None:
             prompt_info = json.dumps(prompt)
@@ -333,12 +333,12 @@ class VAESave:
         output_checkpoint = f"{filename}_{counter:05}_.safetensors"
         output_checkpoint = os.path.join(full_output_folder, output_checkpoint)
 
-        comfy.utils.save_torch_file(vae.get_sd(), output_checkpoint, metadata=metadata)
+        zetamotion_comfyui.comfy.utils.save_torch_file(vae.get_sd(), output_checkpoint, metadata=metadata)
         return {}
 
 class ModelSave:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):

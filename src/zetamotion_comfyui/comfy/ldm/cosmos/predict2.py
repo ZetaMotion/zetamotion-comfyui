@@ -11,8 +11,8 @@ import math
 from .position_embedding import VideoRopePosition3DEmb, LearnablePosEmbAxis
 from torchvision import transforms
 
-import comfy.patcher_extension
-from comfy.ldm.modules.attention import optimized_attention
+import zetamotion_comfyui.comfy.patcher_extension
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
 
 def apply_rotary_pos_emb(
     t: torch.Tensor,
@@ -814,10 +814,10 @@ class MiniTrainDIT(nn.Module):
         padding_mask: Optional[torch.Tensor] = None,
         **kwargs,
     ):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
         ).execute(x, timesteps, context, fps, padding_mask, **kwargs)
 
     def _forward(

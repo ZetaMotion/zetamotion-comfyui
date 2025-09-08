@@ -7,10 +7,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from comfy.ldm.modules.attention import optimized_attention
-import comfy.ops
-import comfy.patcher_extension
-import comfy.ldm.common_dit
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
+import zetamotion_comfyui.comfy.ops
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.ldm.common_dit
 
 def modulate(x, shift, scale):
     return x * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1)
@@ -407,7 +407,7 @@ class MMDiT(nn.Module):
 
     def patchify(self, x):
         B, C, H, W = x.size()
-        x = comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
+        x = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
         x = x.view(
             B,
             C,
@@ -425,7 +425,7 @@ class MMDiT(nn.Module):
         max_dim = max(h, w)
 
         cur_dim = self.h_max
-        pos_encoding = comfy.ops.cast_to_input(self.positional_encoding.reshape(1, cur_dim, cur_dim, -1), x)
+        pos_encoding = zetamotion_comfyui.comfy.ops.cast_to_input(self.positional_encoding.reshape(1, cur_dim, cur_dim, -1), x)
 
         if max_dim > cur_dim:
             pos_encoding = F.interpolate(pos_encoding.movedim(-1, 1), (max_dim, max_dim), mode="bilinear").movedim(1, -1)
@@ -437,10 +437,10 @@ class MMDiT(nn.Module):
         return x + pos_encoding.reshape(1, -1, self.positional_encoding.shape[-1])
 
     def forward(self, x, timestep, context, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, transformer_options, **kwargs)
 
     def _forward(self, x, timestep, context, transformer_options={}, **kwargs):

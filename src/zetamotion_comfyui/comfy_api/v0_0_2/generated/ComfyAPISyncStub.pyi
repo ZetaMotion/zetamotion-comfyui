@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional, Tuple, Union, Set, Sequence, cast, NamedTuple
-from comfy_api.v0_0_2 import ComfyAPIAdapter_v0_0_2
+from zetamotion_comfyui.comfy_api.v0_0_2 import ComfyAPIAdapter_v0_0_2
 from PIL.Image import Image
 from torch import Tensor
 class ComfyAPISyncStub:
@@ -13,7 +13,7 @@ class ComfyAPISyncStub:
         This function allows custom nodes and API calls to report their progress
         back to the user interface, providing visual feedback during long operations.
 
-        Migration from previous API: comfy.utils.PROGRESS_BAR_HOOK
+        Migration from previous API: zetamotion_comfyui.comfy.utils.PROGRESS_BAR_HOOK
         """
         def set_progress(self, value: float, max_value: float, node_id: Union[str, None] = None, preview_image: Union[Image, Tensor, None] = None, ignore_size_limit: bool = False) -> None: ...
 

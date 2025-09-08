@@ -10,18 +10,18 @@ from .ldm.models.autoencoder import AutoencoderKL, AutoencodingEngine
 from .ldm.cascade.stage_a import StageA
 from .ldm.cascade.stage_c_coder import StageC_coder
 from .ldm.audio.autoencoder import AudioOobleckVAE
-import comfy.ldm.genmo.vae.model
-import comfy.ldm.lightricks.vae.causal_video_autoencoder
-import comfy.ldm.cosmos.vae
-import comfy.ldm.wan.vae
-import comfy.ldm.wan.vae2_2
-import comfy.ldm.hunyuan3d.vae
-import comfy.ldm.ace.vae.music_dcae_pipeline
+import zetamotion_comfyui.comfy.ldm.genmo.vae.model
+import zetamotion_comfyui.comfy.ldm.lightricks.vae.causal_video_autoencoder
+import zetamotion_comfyui.comfy.ldm.cosmos.vae
+import zetamotion_comfyui.comfy.ldm.wan.vae
+import zetamotion_comfyui.comfy.ldm.wan.vae2_2
+import zetamotion_comfyui.comfy.ldm.hunyuan3d.vae
+import zetamotion_comfyui.comfy.ldm.ace.vae.music_dcae_pipeline
 import yaml
 import math
 import os
 
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 
 from . import clip_vision
 from . import gligen
@@ -30,43 +30,43 @@ from . import model_detection
 
 from . import sd1_clip
 from . import sdxl_clip
-import comfy.text_encoders.sd2_clip
-import comfy.text_encoders.sd3_clip
-import comfy.text_encoders.sa_t5
-import comfy.text_encoders.aura_t5
-import comfy.text_encoders.pixart_t5
-import comfy.text_encoders.hydit
-import comfy.text_encoders.flux
-import comfy.text_encoders.long_clipl
-import comfy.text_encoders.genmo
-import comfy.text_encoders.lt
-import comfy.text_encoders.hunyuan_video
-import comfy.text_encoders.cosmos
-import comfy.text_encoders.lumina2
-import comfy.text_encoders.wan
-import comfy.text_encoders.hidream
-import comfy.text_encoders.ace
-import comfy.text_encoders.omnigen2
-import comfy.text_encoders.qwen_image
+import zetamotion_comfyui.comfy.text_encoders.sd2_clip
+import zetamotion_comfyui.comfy.text_encoders.sd3_clip
+import zetamotion_comfyui.comfy.text_encoders.sa_t5
+import zetamotion_comfyui.comfy.text_encoders.aura_t5
+import zetamotion_comfyui.comfy.text_encoders.pixart_t5
+import zetamotion_comfyui.comfy.text_encoders.hydit
+import zetamotion_comfyui.comfy.text_encoders.flux
+import zetamotion_comfyui.comfy.text_encoders.long_clipl
+import zetamotion_comfyui.comfy.text_encoders.genmo
+import zetamotion_comfyui.comfy.text_encoders.lt
+import zetamotion_comfyui.comfy.text_encoders.hunyuan_video
+import zetamotion_comfyui.comfy.text_encoders.cosmos
+import zetamotion_comfyui.comfy.text_encoders.lumina2
+import zetamotion_comfyui.comfy.text_encoders.wan
+import zetamotion_comfyui.comfy.text_encoders.hidream
+import zetamotion_comfyui.comfy.text_encoders.ace
+import zetamotion_comfyui.comfy.text_encoders.omnigen2
+import zetamotion_comfyui.comfy.text_encoders.qwen_image
 
-import comfy.model_patcher
-import comfy.lora
-import comfy.lora_convert
-import comfy.hooks
-import comfy.t2i_adapter.adapter
-import comfy.taesd.taesd
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.lora
+import zetamotion_comfyui.comfy.lora_convert
+import zetamotion_comfyui.comfy.hooks
+import zetamotion_comfyui.comfy.t2i_adapter.adapter
+import zetamotion_comfyui.comfy.taesd.taesd
 
-import comfy.ldm.flux.redux
+import zetamotion_comfyui.comfy.ldm.flux.redux
 
 def load_lora_for_models(model, clip, lora, strength_model, strength_clip):
     key_map = {}
     if model is not None:
-        key_map = comfy.lora.model_lora_keys_unet(model.model, key_map)
+        key_map = zetamotion_comfyui.comfy.lora.model_lora_keys_unet(model.model, key_map)
     if clip is not None:
-        key_map = comfy.lora.model_lora_keys_clip(clip.cond_stage_model, key_map)
+        key_map = zetamotion_comfyui.comfy.lora.model_lora_keys_clip(clip.cond_stage_model, key_map)
 
-    lora = comfy.lora_convert.convert_lora(lora)
-    loaded = comfy.lora.load_lora(lora, key_map)
+    lora = zetamotion_comfyui.comfy.lora_convert.convert_lora(lora)
+    loaded = zetamotion_comfyui.comfy.lora.load_lora(lora, key_map)
     if model is not None:
         new_modelpatcher = model.clone()
         k = new_modelpatcher.add_patches(loaded, strength_model)
@@ -117,8 +117,8 @@ class CLIP:
                     logging.warning("Had to shift TE back.")
 
         self.tokenizer = tokenizer(embedding_directory=embedding_directory, tokenizer_data=tokenizer_data)
-        self.patcher = comfy.model_patcher.ModelPatcher(self.cond_stage_model, load_device=load_device, offload_device=offload_device)
-        self.patcher.hook_mode = comfy.hooks.EnumHookMode.MinVram
+        self.patcher = zetamotion_comfyui.comfy.model_patcher.ModelPatcher(self.cond_stage_model, load_device=load_device, offload_device=offload_device)
+        self.patcher.hook_mode = zetamotion_comfyui.comfy.hooks.EnumHookMode.MinVram
         self.patcher.is_clip = True
         self.apply_hooks_to_conds = None
         if params['device'] == load_device:
@@ -299,7 +299,7 @@ class VAE:
                                                             decoder_config={'target': "comfy.ldm.modules.temporal_ae.VideoDecoder", 'params': decoder_config})
             elif "taesd_decoder.1.weight" in sd:
                 self.latent_channels = sd["taesd_decoder.1.weight"].shape[1]
-                self.first_stage_model = comfy.taesd.taesd.TAESD(latent_channels=self.latent_channels)
+                self.first_stage_model = zetamotion_comfyui.comfy.taesd.taesd.TAESD(latent_channels=self.latent_channels)
             elif "vquantizer.codebook.weight" in sd: #VQGan: stage a of stable cascade
                 self.first_stage_model = StageA()
                 self.downscale_ratio = 4
@@ -359,10 +359,10 @@ class VAE:
                 self.disable_offload = True
             elif "blocks.2.blocks.3.stack.5.weight" in sd or "decoder.blocks.2.blocks.3.stack.5.weight" in sd or "layers.4.layers.1.attn_block.attn.qkv.weight" in sd or "encoder.layers.4.layers.1.attn_block.attn.qkv.weight" in sd: #genmo mochi vae
                 if "blocks.2.blocks.3.stack.5.weight" in sd:
-                    sd = comfy.utils.state_dict_prefix_replace(sd, {"": "decoder."})
+                    sd = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {"": "decoder."})
                 if "layers.4.layers.1.attn_block.attn.qkv.weight" in sd:
-                    sd = comfy.utils.state_dict_prefix_replace(sd, {"": "encoder."})
-                self.first_stage_model = comfy.ldm.genmo.vae.model.VideoVAE()
+                    sd = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {"": "encoder."})
+                self.first_stage_model = zetamotion_comfyui.comfy.ldm.genmo.vae.model.VideoVAE()
                 self.latent_channels = 12
                 self.latent_dim = 3
                 self.memory_used_decode = lambda shape, dtype: (1000 * shape[2] * shape[3] * shape[4] * (6 * 8 * 8)) * model_management.dtype_size(dtype)
@@ -384,7 +384,7 @@ class VAE:
                 vae_config = None
                 if metadata is not None and "config" in metadata:
                     vae_config = json.loads(metadata["config"]).get("vae", None)
-                self.first_stage_model = comfy.ldm.lightricks.vae.causal_video_autoencoder.VideoVAE(version=version, config=vae_config)
+                self.first_stage_model = zetamotion_comfyui.comfy.ldm.lightricks.vae.causal_video_autoencoder.VideoVAE(version=version, config=vae_config)
                 self.latent_channels = 128
                 self.latent_dim = 3
                 self.memory_used_decode = lambda shape, dtype: (900 * shape[2] * shape[3] * shape[4] * (8 * 8 * 8)) * model_management.dtype_size(dtype)
@@ -416,7 +416,7 @@ class VAE:
                 self.latent_dim = 3
                 self.latent_channels = 16
                 ddconfig = {'z_channels': 16, 'latent_channels': self.latent_channels, 'z_factor': 1, 'resolution': 1024, 'in_channels': 3, 'out_channels': 3, 'channels': 128, 'channels_mult': [2, 4, 4], 'num_res_blocks': 2, 'attn_resolutions': [32], 'dropout': 0.0, 'patch_size': 4, 'num_groups': 1, 'temporal_compression': 8, 'spacial_compression': 8}
-                self.first_stage_model = comfy.ldm.cosmos.vae.CausalContinuousVideoTokenizer(**ddconfig)
+                self.first_stage_model = zetamotion_comfyui.comfy.ldm.cosmos.vae.CausalContinuousVideoTokenizer(**ddconfig)
                 #TODO: these values are a bit off because this is not a standard VAE
                 self.memory_used_decode = lambda shape, dtype: (50 * shape[2] * shape[3] * shape[4] * (8 * 8 * 8)) * model_management.dtype_size(dtype)
                 self.memory_used_encode = lambda shape, dtype: (50 * (round((shape[2] + 7) / 8) * 8) * shape[3] * shape[4]) * model_management.dtype_size(dtype)
@@ -430,7 +430,7 @@ class VAE:
                     self.latent_dim = 3
                     self.latent_channels = 48
                     ddconfig = {"dim": 160, "z_dim": self.latent_channels, "dim_mult": [1, 2, 4, 4], "num_res_blocks": 2, "attn_scales": [], "temperal_downsample": [False, True, True], "dropout": 0.0}
-                    self.first_stage_model = comfy.ldm.wan.vae2_2.WanVAE(**ddconfig)
+                    self.first_stage_model = zetamotion_comfyui.comfy.ldm.wan.vae2_2.WanVAE(**ddconfig)
                     self.working_dtypes = [torch.bfloat16, torch.float16, torch.float32]
                     self.memory_used_encode = lambda shape, dtype: 3300 * shape[3] * shape[4] * model_management.dtype_size(dtype)
                     self.memory_used_decode = lambda shape, dtype: 8000 * shape[3] * shape[4] * (16 * 16) * model_management.dtype_size(dtype)
@@ -442,7 +442,7 @@ class VAE:
                     self.latent_dim = 3
                     self.latent_channels = 16
                     ddconfig = {"dim": 96, "z_dim": self.latent_channels, "dim_mult": [1, 2, 4, 4], "num_res_blocks": 2, "attn_scales": [], "temperal_downsample": [False, True, True], "dropout": 0.0}
-                    self.first_stage_model = comfy.ldm.wan.vae.WanVAE(**ddconfig)
+                    self.first_stage_model = zetamotion_comfyui.comfy.ldm.wan.vae.WanVAE(**ddconfig)
                     self.working_dtypes = [torch.bfloat16, torch.float16, torch.float32]
                     self.memory_used_encode = lambda shape, dtype: 6000 * shape[3] * shape[4] * model_management.dtype_size(dtype)
                     self.memory_used_decode = lambda shape, dtype: 7000 * shape[3] * shape[4] * (8 * 8) * model_management.dtype_size(dtype)
@@ -465,12 +465,12 @@ class VAE:
                 self.memory_used_decode = lambda shape, dtype, num_layers = 16, kv_cache_multiplier = 2: \
                     estimate_memory(shape, dtype, num_layers, kv_cache_multiplier)
 
-                self.first_stage_model = comfy.ldm.hunyuan3d.vae.ShapeVAE()
+                self.first_stage_model = zetamotion_comfyui.comfy.ldm.hunyuan3d.vae.ShapeVAE()
                 self.working_dtypes = [torch.float16, torch.bfloat16, torch.float32]
 
 
             elif "vocoder.backbone.channel_layers.0.0.bias" in sd: #Ace Step Audio
-                self.first_stage_model = comfy.ldm.ace.vae.music_dcae_pipeline.MusicDCAE(source_sample_rate=44100)
+                self.first_stage_model = zetamotion_comfyui.comfy.ldm.ace.vae.music_dcae_pipeline.MusicDCAE(source_sample_rate=44100)
                 self.memory_used_encode = lambda shape, dtype: (shape[2] * 330) * model_management.dtype_size(dtype)
                 self.memory_used_decode = lambda shape, dtype: (shape[2] * shape[3] * 87000) * model_management.dtype_size(dtype)
                 self.latent_channels = 8
@@ -508,7 +508,7 @@ class VAE:
         self.first_stage_model.to(self.vae_dtype)
         self.output_device = model_management.intermediate_device()
 
-        self.patcher = comfy.model_patcher.ModelPatcher(self.first_stage_model, load_device=self.device, offload_device=offload_device)
+        self.patcher = zetamotion_comfyui.comfy.model_patcher.ModelPatcher(self.first_stage_model, load_device=self.device, offload_device=offload_device)
         logging.info("VAE load device: {}, offload device: {}, dtype: {}".format(self.device, offload_device, self.vae_dtype))
 
     def throw_exception_if_invalid(self):
@@ -527,16 +527,16 @@ class VAE:
         return pixels
 
     def decode_tiled_(self, samples, tile_x=64, tile_y=64, overlap = 16):
-        steps = samples.shape[0] * comfy.utils.get_tiled_scale_steps(samples.shape[3], samples.shape[2], tile_x, tile_y, overlap)
-        steps += samples.shape[0] * comfy.utils.get_tiled_scale_steps(samples.shape[3], samples.shape[2], tile_x // 2, tile_y * 2, overlap)
-        steps += samples.shape[0] * comfy.utils.get_tiled_scale_steps(samples.shape[3], samples.shape[2], tile_x * 2, tile_y // 2, overlap)
-        pbar = comfy.utils.ProgressBar(steps)
+        steps = samples.shape[0] * zetamotion_comfyui.comfy.utils.get_tiled_scale_steps(samples.shape[3], samples.shape[2], tile_x, tile_y, overlap)
+        steps += samples.shape[0] * zetamotion_comfyui.comfy.utils.get_tiled_scale_steps(samples.shape[3], samples.shape[2], tile_x // 2, tile_y * 2, overlap)
+        steps += samples.shape[0] * zetamotion_comfyui.comfy.utils.get_tiled_scale_steps(samples.shape[3], samples.shape[2], tile_x * 2, tile_y // 2, overlap)
+        pbar = zetamotion_comfyui.comfy.utils.ProgressBar(steps)
 
         decode_fn = lambda a: self.first_stage_model.decode(a.to(self.vae_dtype).to(self.device)).float()
         output = self.process_output(
-            (comfy.utils.tiled_scale(samples, decode_fn, tile_x // 2, tile_y * 2, overlap, upscale_amount = self.upscale_ratio, output_device=self.output_device, pbar = pbar) +
-            comfy.utils.tiled_scale(samples, decode_fn, tile_x * 2, tile_y // 2, overlap, upscale_amount = self.upscale_ratio, output_device=self.output_device, pbar = pbar) +
-             comfy.utils.tiled_scale(samples, decode_fn, tile_x, tile_y, overlap, upscale_amount = self.upscale_ratio, output_device=self.output_device, pbar = pbar))
+            (zetamotion_comfyui.comfy.utils.tiled_scale(samples, decode_fn, tile_x // 2, tile_y * 2, overlap, upscale_amount = self.upscale_ratio, output_device=self.output_device, pbar = pbar) +
+            zetamotion_comfyui.comfy.utils.tiled_scale(samples, decode_fn, tile_x * 2, tile_y // 2, overlap, upscale_amount = self.upscale_ratio, output_device=self.output_device, pbar = pbar) +
+             zetamotion_comfyui.comfy.utils.tiled_scale(samples, decode_fn, tile_x, tile_y, overlap, upscale_amount = self.upscale_ratio, output_device=self.output_device, pbar = pbar))
             / 3.0)
         return output
 
@@ -548,22 +548,22 @@ class VAE:
             samples = samples.reshape((og_shape[0], og_shape[1] * og_shape[2], -1))
             decode_fn = lambda a: self.first_stage_model.decode(a.reshape((-1, og_shape[1], og_shape[2], a.shape[-1])).to(self.vae_dtype).to(self.device)).float()
 
-        return self.process_output(comfy.utils.tiled_scale_multidim(samples, decode_fn, tile=(tile_x,), overlap=overlap, upscale_amount=self.upscale_ratio, out_channels=self.output_channels, output_device=self.output_device))
+        return self.process_output(zetamotion_comfyui.comfy.utils.tiled_scale_multidim(samples, decode_fn, tile=(tile_x,), overlap=overlap, upscale_amount=self.upscale_ratio, out_channels=self.output_channels, output_device=self.output_device))
 
     def decode_tiled_3d(self, samples, tile_t=999, tile_x=32, tile_y=32, overlap=(1, 8, 8)):
         decode_fn = lambda a: self.first_stage_model.decode(a.to(self.vae_dtype).to(self.device)).float()
-        return self.process_output(comfy.utils.tiled_scale_multidim(samples, decode_fn, tile=(tile_t, tile_x, tile_y), overlap=overlap, upscale_amount=self.upscale_ratio, out_channels=self.output_channels, index_formulas=self.upscale_index_formula, output_device=self.output_device))
+        return self.process_output(zetamotion_comfyui.comfy.utils.tiled_scale_multidim(samples, decode_fn, tile=(tile_t, tile_x, tile_y), overlap=overlap, upscale_amount=self.upscale_ratio, out_channels=self.output_channels, index_formulas=self.upscale_index_formula, output_device=self.output_device))
 
     def encode_tiled_(self, pixel_samples, tile_x=512, tile_y=512, overlap = 64):
-        steps = pixel_samples.shape[0] * comfy.utils.get_tiled_scale_steps(pixel_samples.shape[3], pixel_samples.shape[2], tile_x, tile_y, overlap)
-        steps += pixel_samples.shape[0] * comfy.utils.get_tiled_scale_steps(pixel_samples.shape[3], pixel_samples.shape[2], tile_x // 2, tile_y * 2, overlap)
-        steps += pixel_samples.shape[0] * comfy.utils.get_tiled_scale_steps(pixel_samples.shape[3], pixel_samples.shape[2], tile_x * 2, tile_y // 2, overlap)
-        pbar = comfy.utils.ProgressBar(steps)
+        steps = pixel_samples.shape[0] * zetamotion_comfyui.comfy.utils.get_tiled_scale_steps(pixel_samples.shape[3], pixel_samples.shape[2], tile_x, tile_y, overlap)
+        steps += pixel_samples.shape[0] * zetamotion_comfyui.comfy.utils.get_tiled_scale_steps(pixel_samples.shape[3], pixel_samples.shape[2], tile_x // 2, tile_y * 2, overlap)
+        steps += pixel_samples.shape[0] * zetamotion_comfyui.comfy.utils.get_tiled_scale_steps(pixel_samples.shape[3], pixel_samples.shape[2], tile_x * 2, tile_y // 2, overlap)
+        pbar = zetamotion_comfyui.comfy.utils.ProgressBar(steps)
 
         encode_fn = lambda a: self.first_stage_model.encode((self.process_input(a)).to(self.vae_dtype).to(self.device)).float()
-        samples = comfy.utils.tiled_scale(pixel_samples, encode_fn, tile_x, tile_y, overlap, upscale_amount = (1/self.downscale_ratio), out_channels=self.latent_channels, output_device=self.output_device, pbar=pbar)
-        samples += comfy.utils.tiled_scale(pixel_samples, encode_fn, tile_x * 2, tile_y // 2, overlap, upscale_amount = (1/self.downscale_ratio), out_channels=self.latent_channels, output_device=self.output_device, pbar=pbar)
-        samples += comfy.utils.tiled_scale(pixel_samples, encode_fn, tile_x // 2, tile_y * 2, overlap, upscale_amount = (1/self.downscale_ratio), out_channels=self.latent_channels, output_device=self.output_device, pbar=pbar)
+        samples = zetamotion_comfyui.comfy.utils.tiled_scale(pixel_samples, encode_fn, tile_x, tile_y, overlap, upscale_amount = (1/self.downscale_ratio), out_channels=self.latent_channels, output_device=self.output_device, pbar=pbar)
+        samples += zetamotion_comfyui.comfy.utils.tiled_scale(pixel_samples, encode_fn, tile_x * 2, tile_y // 2, overlap, upscale_amount = (1/self.downscale_ratio), out_channels=self.latent_channels, output_device=self.output_device, pbar=pbar)
+        samples += zetamotion_comfyui.comfy.utils.tiled_scale(pixel_samples, encode_fn, tile_x // 2, tile_y * 2, overlap, upscale_amount = (1/self.downscale_ratio), out_channels=self.latent_channels, output_device=self.output_device, pbar=pbar)
         samples /= 3.0
         return samples
 
@@ -580,7 +580,7 @@ class VAE:
             upscale_amount = 1 / self.downscale_ratio
             encode_fn = lambda a: self.first_stage_model.encode((self.process_input(a)).to(self.vae_dtype).to(self.device)).reshape(1, out_channels, -1).float()
 
-        out = comfy.utils.tiled_scale_multidim(samples, encode_fn, tile=(tile_x,), overlap=overlap, upscale_amount=upscale_amount, out_channels=out_channels, output_device=self.output_device)
+        out = zetamotion_comfyui.comfy.utils.tiled_scale_multidim(samples, encode_fn, tile=(tile_x,), overlap=overlap, upscale_amount=upscale_amount, out_channels=out_channels, output_device=self.output_device)
         if self.latent_dim == 1:
             return out
         else:
@@ -588,7 +588,7 @@ class VAE:
 
     def encode_tiled_3d(self, samples, tile_t=9999, tile_x=512, tile_y=512, overlap=(1, 64, 64)):
         encode_fn = lambda a: self.first_stage_model.encode((self.process_input(a)).to(self.vae_dtype).to(self.device)).float()
-        return comfy.utils.tiled_scale_multidim(samples, encode_fn, tile=(tile_t, tile_x, tile_y), overlap=overlap, upscale_amount=self.downscale_ratio, out_channels=self.latent_channels, downscale=True, index_formulas=self.downscale_index_formula, output_device=self.output_device)
+        return zetamotion_comfyui.comfy.utils.tiled_scale_multidim(samples, encode_fn, tile=(tile_t, tile_x, tile_y), overlap=overlap, upscale_amount=self.downscale_ratio, out_channels=self.latent_channels, downscale=True, index_formulas=self.downscale_index_formula, output_device=self.output_device)
 
     def decode(self, samples_in, vae_options={}):
         self.throw_exception_if_invalid()
@@ -755,12 +755,12 @@ class StyleModel:
 
 
 def load_style_model(ckpt_path):
-    model_data = comfy.utils.load_torch_file(ckpt_path, safe_load=True)
+    model_data = zetamotion_comfyui.comfy.utils.load_torch_file(ckpt_path, safe_load=True)
     keys = model_data.keys()
     if "style_embedding" in keys:
-        model = comfy.t2i_adapter.adapter.StyleAdapter(width=1024, context_dim=768, num_head=8, n_layes=3, num_token=8)
+        model = zetamotion_comfyui.comfy.t2i_adapter.adapter.StyleAdapter(width=1024, context_dim=768, num_head=8, n_layes=3, num_token=8)
     elif "redux_down.weight" in keys:
-        model = comfy.ldm.flux.redux.ReduxImageEncoder()
+        model = zetamotion_comfyui.comfy.ldm.flux.redux.ReduxImageEncoder()
     else:
         raise Exception("invalid style model {}".format(ckpt_path))
     model.load_state_dict(model_data)
@@ -790,7 +790,7 @@ class CLIPType(Enum):
 def load_clip(ckpt_paths, embedding_directory=None, clip_type=CLIPType.STABLE_DIFFUSION, model_options={}):
     clip_data = []
     for p in ckpt_paths:
-        clip_data.append(comfy.utils.load_torch_file(p, safe_load=True))
+        clip_data.append(zetamotion_comfyui.comfy.utils.load_torch_file(p, safe_load=True))
     return load_text_encoder_state_dicts(clip_data, embedding_directory=embedding_directory, clip_type=clip_type, model_options=model_options)
 
 
@@ -843,7 +843,7 @@ def t5xxl_detect(clip_data):
 
     for sd in clip_data:
         if weight_name in sd or weight_name_old in sd:
-            return comfy.text_encoders.sd3_clip.t5_xxl_detect(sd)
+            return zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(sd)
 
     return {}
 
@@ -852,7 +852,7 @@ def llama_detect(clip_data):
 
     for sd in clip_data:
         if weight_name in sd:
-            return comfy.text_encoders.hunyuan_video.llama_detect(sd)
+            return zetamotion_comfyui.comfy.text_encoders.hunyuan_video.llama_detect(sd)
 
     return {}
 
@@ -864,7 +864,7 @@ def load_text_encoder_state_dicts(state_dicts=[], embedding_directory=None, clip
 
     for i in range(len(clip_data)):
         if "transformer.resblocks.0.ln_1.weight" in clip_data[i]:
-            clip_data[i] = comfy.utils.clip_text_transformers_convert(clip_data[i], "", "")
+            clip_data[i] = zetamotion_comfyui.comfy.utils.clip_text_transformers_convert(clip_data[i], "", "")
         else:
             if "text_projection" in clip_data[i]:
                 clip_data[i]["text_projection.weight"] = clip_data[i]["text_projection"].transpose(0, 1) #old models saved with the CLIPSave node
@@ -879,91 +879,91 @@ def load_text_encoder_state_dicts(state_dicts=[], embedding_directory=None, clip
                 clip_target.clip = sdxl_clip.StableCascadeClipModel
                 clip_target.tokenizer = sdxl_clip.StableCascadeTokenizer
             elif clip_type == CLIPType.SD3:
-                clip_target.clip = comfy.text_encoders.sd3_clip.sd3_clip(clip_l=False, clip_g=True, t5=False)
-                clip_target.tokenizer = comfy.text_encoders.sd3_clip.SD3Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sd3_clip.sd3_clip(clip_l=False, clip_g=True, t5=False)
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sd3_clip.SD3Tokenizer
             elif clip_type == CLIPType.HIDREAM:
-                clip_target.clip = comfy.text_encoders.hidream.hidream_clip(clip_l=False, clip_g=True, t5=False, llama=False, dtype_t5=None, dtype_llama=None, t5xxl_scaled_fp8=None, llama_scaled_fp8=None)
-                clip_target.tokenizer = comfy.text_encoders.hidream.HiDreamTokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hidream.hidream_clip(clip_l=False, clip_g=True, t5=False, llama=False, dtype_t5=None, dtype_llama=None, t5xxl_scaled_fp8=None, llama_scaled_fp8=None)
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hidream.HiDreamTokenizer
             else:
                 clip_target.clip = sdxl_clip.SDXLRefinerClipModel
                 clip_target.tokenizer = sdxl_clip.SDXLTokenizer
         elif te_model == TEModel.CLIP_H:
-            clip_target.clip = comfy.text_encoders.sd2_clip.SD2ClipModel
-            clip_target.tokenizer = comfy.text_encoders.sd2_clip.SD2Tokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sd2_clip.SD2ClipModel
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sd2_clip.SD2Tokenizer
         elif te_model == TEModel.T5_XXL:
             if clip_type == CLIPType.SD3:
-                clip_target.clip = comfy.text_encoders.sd3_clip.sd3_clip(clip_l=False, clip_g=False, t5=True, **t5xxl_detect(clip_data))
-                clip_target.tokenizer = comfy.text_encoders.sd3_clip.SD3Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sd3_clip.sd3_clip(clip_l=False, clip_g=False, t5=True, **t5xxl_detect(clip_data))
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sd3_clip.SD3Tokenizer
             elif clip_type == CLIPType.LTXV:
-                clip_target.clip = comfy.text_encoders.lt.ltxv_te(**t5xxl_detect(clip_data))
-                clip_target.tokenizer = comfy.text_encoders.lt.LTXVT5Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.lt.ltxv_te(**t5xxl_detect(clip_data))
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.lt.LTXVT5Tokenizer
             elif clip_type == CLIPType.PIXART or clip_type == CLIPType.CHROMA:
-                clip_target.clip = comfy.text_encoders.pixart_t5.pixart_te(**t5xxl_detect(clip_data))
-                clip_target.tokenizer = comfy.text_encoders.pixart_t5.PixArtTokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.pixart_t5.pixart_te(**t5xxl_detect(clip_data))
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.pixart_t5.PixArtTokenizer
             elif clip_type == CLIPType.WAN:
-                clip_target.clip = comfy.text_encoders.wan.te(**t5xxl_detect(clip_data))
-                clip_target.tokenizer = comfy.text_encoders.wan.WanT5Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.wan.te(**t5xxl_detect(clip_data))
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.wan.WanT5Tokenizer
                 tokenizer_data["spiece_model"] = clip_data[0].get("spiece_model", None)
             elif clip_type == CLIPType.HIDREAM:
-                clip_target.clip = comfy.text_encoders.hidream.hidream_clip(**t5xxl_detect(clip_data),
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hidream.hidream_clip(**t5xxl_detect(clip_data),
                                                                         clip_l=False, clip_g=False, t5=True, llama=False, dtype_llama=None, llama_scaled_fp8=None)
-                clip_target.tokenizer = comfy.text_encoders.hidream.HiDreamTokenizer
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hidream.HiDreamTokenizer
             else: #CLIPType.MOCHI
-                clip_target.clip = comfy.text_encoders.genmo.mochi_te(**t5xxl_detect(clip_data))
-                clip_target.tokenizer = comfy.text_encoders.genmo.MochiT5Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.genmo.mochi_te(**t5xxl_detect(clip_data))
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.genmo.MochiT5Tokenizer
         elif te_model == TEModel.T5_XXL_OLD:
-            clip_target.clip = comfy.text_encoders.cosmos.te(**t5xxl_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.cosmos.CosmosT5Tokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.cosmos.te(**t5xxl_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.cosmos.CosmosT5Tokenizer
         elif te_model == TEModel.T5_XL:
-            clip_target.clip = comfy.text_encoders.aura_t5.AuraT5Model
-            clip_target.tokenizer = comfy.text_encoders.aura_t5.AuraT5Tokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.aura_t5.AuraT5Model
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.aura_t5.AuraT5Tokenizer
         elif te_model == TEModel.T5_BASE:
             if clip_type == CLIPType.ACE or "spiece_model" in clip_data[0]:
-                clip_target.clip = comfy.text_encoders.ace.AceT5Model
-                clip_target.tokenizer = comfy.text_encoders.ace.AceT5Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.ace.AceT5Model
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.ace.AceT5Tokenizer
                 tokenizer_data["spiece_model"] = clip_data[0].get("spiece_model", None)
             else:
-                clip_target.clip = comfy.text_encoders.sa_t5.SAT5Model
-                clip_target.tokenizer = comfy.text_encoders.sa_t5.SAT5Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sa_t5.SAT5Model
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sa_t5.SAT5Tokenizer
         elif te_model == TEModel.GEMMA_2_2B:
-            clip_target.clip = comfy.text_encoders.lumina2.te(**llama_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.lumina2.LuminaTokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.lumina2.te(**llama_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.lumina2.LuminaTokenizer
             tokenizer_data["spiece_model"] = clip_data[0].get("spiece_model", None)
         elif te_model == TEModel.LLAMA3_8:
-            clip_target.clip = comfy.text_encoders.hidream.hidream_clip(**llama_detect(clip_data),
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hidream.hidream_clip(**llama_detect(clip_data),
                                                                         clip_l=False, clip_g=False, t5=False, llama=True, dtype_t5=None, t5xxl_scaled_fp8=None)
-            clip_target.tokenizer = comfy.text_encoders.hidream.HiDreamTokenizer
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hidream.HiDreamTokenizer
         elif te_model == TEModel.QWEN25_3B:
-            clip_target.clip = comfy.text_encoders.omnigen2.te(**llama_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.omnigen2.Omnigen2Tokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.omnigen2.te(**llama_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.omnigen2.Omnigen2Tokenizer
         elif te_model == TEModel.QWEN25_7B:
-            clip_target.clip = comfy.text_encoders.qwen_image.te(**llama_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.qwen_image.QwenImageTokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.qwen_image.te(**llama_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.qwen_image.QwenImageTokenizer
         else:
             # clip_l
             if clip_type == CLIPType.SD3:
-                clip_target.clip = comfy.text_encoders.sd3_clip.sd3_clip(clip_l=True, clip_g=False, t5=False)
-                clip_target.tokenizer = comfy.text_encoders.sd3_clip.SD3Tokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sd3_clip.sd3_clip(clip_l=True, clip_g=False, t5=False)
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sd3_clip.SD3Tokenizer
             elif clip_type == CLIPType.HIDREAM:
-                clip_target.clip = comfy.text_encoders.hidream.hidream_clip(clip_l=True, clip_g=False, t5=False, llama=False, dtype_t5=None, dtype_llama=None, t5xxl_scaled_fp8=None, llama_scaled_fp8=None)
-                clip_target.tokenizer = comfy.text_encoders.hidream.HiDreamTokenizer
+                clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hidream.hidream_clip(clip_l=True, clip_g=False, t5=False, llama=False, dtype_t5=None, dtype_llama=None, t5xxl_scaled_fp8=None, llama_scaled_fp8=None)
+                clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hidream.HiDreamTokenizer
             else:
                 clip_target.clip = sd1_clip.SD1ClipModel
                 clip_target.tokenizer = sd1_clip.SD1Tokenizer
     elif len(clip_data) == 2:
         if clip_type == CLIPType.SD3:
             te_models = [detect_te_model(clip_data[0]), detect_te_model(clip_data[1])]
-            clip_target.clip = comfy.text_encoders.sd3_clip.sd3_clip(clip_l=TEModel.CLIP_L in te_models, clip_g=TEModel.CLIP_G in te_models, t5=TEModel.T5_XXL in te_models, **t5xxl_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.sd3_clip.SD3Tokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sd3_clip.sd3_clip(clip_l=TEModel.CLIP_L in te_models, clip_g=TEModel.CLIP_G in te_models, t5=TEModel.T5_XXL in te_models, **t5xxl_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sd3_clip.SD3Tokenizer
         elif clip_type == CLIPType.HUNYUAN_DIT:
-            clip_target.clip = comfy.text_encoders.hydit.HyditModel
-            clip_target.tokenizer = comfy.text_encoders.hydit.HyditTokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hydit.HyditModel
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hydit.HyditTokenizer
         elif clip_type == CLIPType.FLUX:
-            clip_target.clip = comfy.text_encoders.flux.flux_clip(**t5xxl_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.flux.FluxTokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.flux.flux_clip(**t5xxl_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.flux.FluxTokenizer
         elif clip_type == CLIPType.HUNYUAN_VIDEO:
-            clip_target.clip = comfy.text_encoders.hunyuan_video.hunyuan_video_clip(**llama_detect(clip_data))
-            clip_target.tokenizer = comfy.text_encoders.hunyuan_video.HunyuanVideoTokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hunyuan_video.hunyuan_video_clip(**llama_detect(clip_data))
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hunyuan_video.HunyuanVideoTokenizer
         elif clip_type == CLIPType.HIDREAM:
             # Detect
             hidream_dualclip_classes = []
@@ -980,22 +980,22 @@ def load_text_encoder_state_dicts(state_dicts=[], embedding_directory=None, clip
             t5_kwargs = t5xxl_detect(clip_data) if t5 else {}
             llama_kwargs = llama_detect(clip_data) if llama else {}
 
-            clip_target.clip = comfy.text_encoders.hidream.hidream_clip(clip_l=clip_l, clip_g=clip_g, t5=t5, llama=llama, **t5_kwargs, **llama_kwargs)
-            clip_target.tokenizer = comfy.text_encoders.hidream.HiDreamTokenizer
+            clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hidream.hidream_clip(clip_l=clip_l, clip_g=clip_g, t5=t5, llama=llama, **t5_kwargs, **llama_kwargs)
+            clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hidream.HiDreamTokenizer
         else:
             clip_target.clip = sdxl_clip.SDXLClipModel
             clip_target.tokenizer = sdxl_clip.SDXLTokenizer
     elif len(clip_data) == 3:
-        clip_target.clip = comfy.text_encoders.sd3_clip.sd3_clip(**t5xxl_detect(clip_data))
-        clip_target.tokenizer = comfy.text_encoders.sd3_clip.SD3Tokenizer
+        clip_target.clip = zetamotion_comfyui.comfy.text_encoders.sd3_clip.sd3_clip(**t5xxl_detect(clip_data))
+        clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.sd3_clip.SD3Tokenizer
     elif len(clip_data) == 4:
-        clip_target.clip = comfy.text_encoders.hidream.hidream_clip(**t5xxl_detect(clip_data), **llama_detect(clip_data))
-        clip_target.tokenizer = comfy.text_encoders.hidream.HiDreamTokenizer
+        clip_target.clip = zetamotion_comfyui.comfy.text_encoders.hidream.hidream_clip(**t5xxl_detect(clip_data), **llama_detect(clip_data))
+        clip_target.tokenizer = zetamotion_comfyui.comfy.text_encoders.hidream.HiDreamTokenizer
 
     parameters = 0
     for c in clip_data:
-        parameters += comfy.utils.calculate_parameters(c)
-        tokenizer_data, model_options = comfy.text_encoders.long_clipl.model_options_long_clip(c, tokenizer_data, model_options)
+        parameters += zetamotion_comfyui.comfy.utils.calculate_parameters(c)
+        tokenizer_data, model_options = zetamotion_comfyui.comfy.text_encoders.long_clipl.model_options_long_clip(c, tokenizer_data, model_options)
 
     clip = CLIP(clip_target, embedding_directory=embedding_directory, parameters=parameters, tokenizer_data=tokenizer_data, model_options=model_options)
     for c in clip_data:
@@ -1008,11 +1008,11 @@ def load_text_encoder_state_dicts(state_dicts=[], embedding_directory=None, clip
     return clip
 
 def load_gligen(ckpt_path):
-    data = comfy.utils.load_torch_file(ckpt_path, safe_load=True)
+    data = zetamotion_comfyui.comfy.utils.load_torch_file(ckpt_path, safe_load=True)
     model = gligen.load_gligen(data)
     if model_management.should_use_fp16():
         model = model.half()
-    return comfy.model_patcher.ModelPatcher(model, load_device=model_management.get_torch_device(), offload_device=model_management.unet_offload_device())
+    return zetamotion_comfyui.comfy.model_patcher.ModelPatcher(model, load_device=model_management.get_torch_device(), offload_device=model_management.unet_offload_device())
 
 def model_detection_error_hint(path, state_dict):
     filename = os.path.basename(path)
@@ -1033,7 +1033,7 @@ def load_checkpoint(config_path=None, ckpt_path=None, output_vae=True, output_cl
     if "parameterization" in model_config_params:
         if model_config_params["parameterization"] == "v":
             m = model.clone()
-            class ModelSamplingAdvanced(comfy.model_sampling.ModelSamplingDiscrete, comfy.model_sampling.V_PREDICTION):
+            class ModelSamplingAdvanced(zetamotion_comfyui.comfy.model_sampling.ModelSamplingDiscrete, zetamotion_comfyui.comfy.model_sampling.V_PREDICTION):
                 pass
             m.add_object_patch("model_sampling", ModelSamplingAdvanced(model.model.model_config))
             model = m
@@ -1045,7 +1045,7 @@ def load_checkpoint(config_path=None, ckpt_path=None, output_vae=True, output_cl
     return (model, clip, vae)
 
 def load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, output_clipvision=False, embedding_directory=None, output_model=True, model_options={}, te_model_options={}):
-    sd, metadata = comfy.utils.load_torch_file(ckpt_path, return_metadata=True)
+    sd, metadata = zetamotion_comfyui.comfy.utils.load_torch_file(ckpt_path, return_metadata=True)
     out = load_state_dict_guess_config(sd, output_vae, output_clip, output_clipvision, embedding_directory, output_model, model_options, te_model_options=te_model_options, metadata=metadata)
     if out is None:
         raise RuntimeError("ERROR: Could not detect model type of: {}\n{}".format(ckpt_path, model_detection_error_hint(ckpt_path, sd)))
@@ -1059,8 +1059,8 @@ def load_state_dict_guess_config(sd, output_vae=True, output_clip=True, output_c
     model_patcher = None
 
     diffusion_model_prefix = model_detection.unet_prefix_from_state_dict(sd)
-    parameters = comfy.utils.calculate_parameters(sd, diffusion_model_prefix)
-    weight_dtype = comfy.utils.weight_dtype(sd, diffusion_model_prefix)
+    parameters = zetamotion_comfyui.comfy.utils.calculate_parameters(sd, diffusion_model_prefix)
+    weight_dtype = zetamotion_comfyui.comfy.utils.weight_dtype(sd, diffusion_model_prefix)
     load_device = model_management.get_torch_device()
 
     model_config = model_detection.model_config_from_unet(sd, diffusion_model_prefix, metadata=metadata)
@@ -1095,7 +1095,7 @@ def load_state_dict_guess_config(sd, output_vae=True, output_clip=True, output_c
         model.load_model_weights(sd, diffusion_model_prefix)
 
     if output_vae:
-        vae_sd = comfy.utils.state_dict_prefix_replace(sd, {k: "" for k in model_config.vae_key_prefix}, filter_keys=True)
+        vae_sd = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {k: "" for k in model_config.vae_key_prefix}, filter_keys=True)
         vae_sd = model_config.process_vae_state_dict(vae_sd)
         vae = VAE(sd=vae_sd, metadata=metadata)
 
@@ -1104,7 +1104,7 @@ def load_state_dict_guess_config(sd, output_vae=True, output_clip=True, output_c
         if clip_target is not None:
             clip_sd = model_config.process_clip_state_dict(sd)
             if len(clip_sd) > 0:
-                parameters = comfy.utils.calculate_parameters(clip_sd)
+                parameters = zetamotion_comfyui.comfy.utils.calculate_parameters(clip_sd)
                 clip = CLIP(clip_target, embedding_directory=embedding_directory, tokenizer_data=clip_sd, parameters=parameters, model_options=te_model_options)
                 m, u = clip.load_sd(clip_sd, full_model=True)
                 if len(m) > 0:
@@ -1124,7 +1124,7 @@ def load_state_dict_guess_config(sd, output_vae=True, output_clip=True, output_c
         logging.debug("left over keys: {}".format(left_over))
 
     if output_model:
-        model_patcher = comfy.model_patcher.ModelPatcher(model, load_device=load_device, offload_device=model_management.unet_offload_device())
+        model_patcher = zetamotion_comfyui.comfy.model_patcher.ModelPatcher(model, load_device=load_device, offload_device=model_management.unet_offload_device())
         if inital_load_device != torch.device("cpu"):
             logging.info("loaded diffusion model directly to GPU")
             model_management.load_models_gpu([model_patcher], force_full_load=True)
@@ -1158,12 +1158,12 @@ def load_diffusion_model_state_dict(sd, model_options={}):
 
     #Allow loading unets from checkpoint files
     diffusion_model_prefix = model_detection.unet_prefix_from_state_dict(sd)
-    temp_sd = comfy.utils.state_dict_prefix_replace(sd, {diffusion_model_prefix: ""}, filter_keys=True)
+    temp_sd = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {diffusion_model_prefix: ""}, filter_keys=True)
     if len(temp_sd) > 0:
         sd = temp_sd
 
-    parameters = comfy.utils.calculate_parameters(sd)
-    weight_dtype = comfy.utils.weight_dtype(sd)
+    parameters = zetamotion_comfyui.comfy.utils.calculate_parameters(sd)
+    weight_dtype = zetamotion_comfyui.comfy.utils.weight_dtype(sd)
 
     load_device = model_management.get_torch_device()
     model_config = model_detection.model_config_from_unet(sd, "")
@@ -1181,7 +1181,7 @@ def load_diffusion_model_state_dict(sd, model_options={}):
             if model_config is None:
                 return None
 
-            diffusers_keys = comfy.utils.unet_to_diffusers(model_config.unet_config)
+            diffusers_keys = zetamotion_comfyui.comfy.utils.unet_to_diffusers(model_config.unet_config)
 
             new_sd = {}
             for k in diffusers_keys:
@@ -1212,11 +1212,11 @@ def load_diffusion_model_state_dict(sd, model_options={}):
     left_over = sd.keys()
     if len(left_over) > 0:
         logging.info("left over keys in diffusion model: {}".format(left_over))
-    return comfy.model_patcher.ModelPatcher(model, load_device=load_device, offload_device=offload_device)
+    return zetamotion_comfyui.comfy.model_patcher.ModelPatcher(model, load_device=load_device, offload_device=offload_device)
 
 
 def load_diffusion_model(unet_path, model_options={}):
-    sd = comfy.utils.load_torch_file(unet_path)
+    sd = zetamotion_comfyui.comfy.utils.load_torch_file(unet_path)
     model = load_diffusion_model_state_dict(sd, model_options=model_options)
     if model is None:
         logging.error("ERROR UNSUPPORTED DIFFUSION MODEL {}".format(unet_path))
@@ -1252,4 +1252,4 @@ def save_checkpoint(output_path, model, clip=None, vae=None, clip_vision=None, m
         if not t.is_contiguous():
             sd[k] = t.contiguous()
 
-    comfy.utils.save_torch_file(sd, output_path, metadata=metadata)
+    zetamotion_comfyui.comfy.utils.save_torch_file(sd, output_path, metadata=metadata)

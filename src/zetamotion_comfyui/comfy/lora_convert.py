@@ -13,7 +13,7 @@ def convert_lora_bfl_control(sd): #BFL loras for Flux
 
 
 def convert_lora_wan_fun(sd): #Wan Fun loras
-    return comfy.utils.state_dict_prefix_replace(sd, {"lora_unet__": "lora_unet_"})
+    return zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {"lora_unet__": "lora_unet_"})
 
 def convert_uso_lora(sd):
     sd_out = {}

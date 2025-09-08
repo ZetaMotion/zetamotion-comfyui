@@ -11,16 +11,16 @@ from PIL.PngImagePlugin import PngInfo
 import torch.utils.checkpoint
 import tqdm
 
-import comfy.samplers
-import comfy.sd
-import comfy.utils
-import comfy.model_management
-import comfy_extras.nodes_custom_sampler
-import folder_paths
-import node_helpers
-from comfy.cli_args import args
-from comfy.comfy_types.node_typing import IO
-from comfy.weight_adapter import adapters, adapter_maps
+import zetamotion_comfyui.comfy.samplers
+import zetamotion_comfyui.comfy.sd
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy_extras.nodes_custom_sampler
+import zetamotion_comfyui.folder_paths
+import zetamotion_comfyui.node_helpers
+from zetamotion_comfyui.comfy.cli_args import args
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
+from zetamotion_comfyui.comfy.weight_adapter import adapters, adapter_maps
 
 
 def make_batch_extra_option_dict(d, indicies, full_size=None):
@@ -38,7 +38,7 @@ def make_batch_extra_option_dict(d, indicies, full_size=None):
     return new_dict
 
 
-class TrainSampler(comfy.samplers.Sampler):
+class TrainSampler(zetamotion_comfyui.comfy.samplers.Sampler):
     def __init__(self, loss_fn, optimizer, loss_callback=None, batch_size=1, grad_acc=1, total_steps=1, seed=0, training_dtype=torch.bfloat16):
         self.loss_fn = loss_fn
         self.optimizer = optimizer
@@ -53,7 +53,7 @@ class TrainSampler(comfy.samplers.Sampler):
         cond = model_wrap.conds["positive"]
         dataset_size = sigmas.size(0)
         torch.cuda.empty_cache()
-        for i in (pbar:=tqdm.trange(self.total_steps, desc="Training LoRA", smoothing=0.01, disable=not comfy.utils.PROGRESS_BAR_ENABLED)):
+        for i in (pbar:=tqdm.trange(self.total_steps, desc="Training LoRA", smoothing=0.01, disable=not zetamotion_comfyui.comfy.utils.PROGRESS_BAR_ENABLED)):
             noisegen = comfy_extras.nodes_custom_sampler.Noise_RandomNoise(self.seed + i * 1000)
             indicies = torch.randperm(dataset_size)[:self.batch_size].tolist()
 
@@ -171,7 +171,7 @@ class LoadImageSetNode:
                 "images": (
                     [
                         f
-                        for f in os.listdir(folder_paths.get_input_directory())
+                        for f in os.listdir(zetamotion_comfyui.folder_paths.get_input_directory())
                         if f.endswith((".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".jpe", ".apng", ".tif", ".tiff"))
                     ],
                     {"image_upload": True, "allow_batch": True},
@@ -197,12 +197,12 @@ class LoadImageSetNode:
         filenames = images[0] if isinstance(images[0], list) else images
 
         for image in filenames:
-            if not folder_paths.exists_annotated_filepath(image):
+            if not zetamotion_comfyui.folder_paths.exists_annotated_filepath(image):
                 return "Invalid image file: {}".format(image)
         return True
 
     def load_images(self, input_files, resize_method):
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         valid_extensions = [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".jpe", ".apng", ".tif", ".tiff"]
         image_files = [
             f
@@ -218,7 +218,7 @@ class LoadImageSetFromFolderNode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "folder": (folder_paths.get_input_subfolders(), {"tooltip": "The folder to load images from."})
+                "folder": (zetamotion_comfyui.folder_paths.get_input_subfolders(), {"tooltip": "The folder to load images from."})
             },
             "optional": {
                 "resize_method": (
@@ -235,7 +235,7 @@ class LoadImageSetFromFolderNode:
     DESCRIPTION = "Loads a batch of images from a directory for training."
 
     def load_images(self, folder, resize_method):
-        sub_input_dir = os.path.join(folder_paths.get_input_directory(), folder)
+        sub_input_dir = os.path.join(zetamotion_comfyui.folder_paths.get_input_directory(), folder)
         valid_extensions = [".png", ".jpg", ".jpeg", ".webp"]
         image_files = [
             f
@@ -251,7 +251,7 @@ class LoadImageTextSetFromFolderNode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "folder": (folder_paths.get_input_subfolders(), {"tooltip": "The folder to load images from."}),
+                "folder": (zetamotion_comfyui.folder_paths.get_input_subfolders(), {"tooltip": "The folder to load images from."}),
                 "clip": (IO.CLIP, {"tooltip": "The CLIP model used for encoding the text."}),
             },
             "optional": {
@@ -294,7 +294,7 @@ class LoadImageTextSetFromFolderNode:
 
         logging.info(f"Loading images from folder: {folder}")
 
-        sub_input_dir = os.path.join(folder_paths.get_input_directory(), folder)
+        sub_input_dir = os.path.join(zetamotion_comfyui.folder_paths.get_input_directory(), folder)
         valid_extensions = [".png", ".jpg", ".jpeg", ".webp"]
 
         image_files = []
@@ -501,7 +501,7 @@ class TrainLoraNode:
                     }
                 ),
                 "existing_lora": (
-                    folder_paths.get_filename_list("loras") + ["[None]"],
+                    zetamotion_comfyui.folder_paths.get_filename_list("loras") + ["[None]"],
                     {
                         "default": "[None]",
                         "tooltip": "The existing LoRA to append to. Set to None for new LoRA.",
@@ -559,11 +559,11 @@ class TrainLoraNode:
             existing_weights = {}
             existing_steps = 0
             if existing_lora != "[None]":
-                lora_path = folder_paths.get_full_path_or_raise("loras", existing_lora)
+                lora_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("loras", existing_lora)
                 # Extract steps from filename like "trained_lora_10_steps_20250225_203716"
                 existing_steps = int(existing_lora.split("_steps_")[0].split("_")[-1])
                 if lora_path:
-                    existing_weights = comfy.utils.load_torch_file(lora_path)
+                    existing_weights = zetamotion_comfyui.comfy.utils.load_torch_file(lora_path)
 
             all_weight_adapters = []
             for n, m in mp.model.named_modules():
@@ -642,7 +642,7 @@ class TrainLoraNode:
                 for m in find_all_highest_child_module_with_forward(mp.model.diffusion_model):
                     patch(m)
             mp.model.requires_grad_(False)
-            comfy.model_management.load_models_gpu([mp], memory_required=1e20, force_full_load=True)
+            zetamotion_comfyui.comfy.model_management.load_models_gpu([mp], memory_required=1e20, force_full_load=True)
 
             # Setup sampler and guider like in test script
             loss_map = {"loss": []}
@@ -713,13 +713,13 @@ class LoraModelLoader:
         if strength_model == 0:
             return (model, )
 
-        model_lora, _ = comfy.sd.load_lora_for_models(model, None, lora, strength_model, 0)
+        model_lora, _ = zetamotion_comfyui.comfy.sd.load_lora_for_models(model, None, lora, strength_model, 0)
         return (model_lora, )
 
 
 class SaveLoRA:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -757,7 +757,7 @@ class SaveLoRA:
     OUTPUT_NODE = True
 
     def save(self, lora, prefix, steps=None):
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(prefix, self.output_dir)
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(prefix, self.output_dir)
         if steps is None:
             output_checkpoint = f"{filename}_{counter:05}_.safetensors"
         else:
@@ -769,7 +769,7 @@ class SaveLoRA:
 
 class LossGraphNode:
     def __init__(self):
-        self.output_dir = folder_paths.get_temp_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
 
     @classmethod
     def INPUT_TYPES(s):

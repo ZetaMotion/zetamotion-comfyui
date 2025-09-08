@@ -3,16 +3,16 @@ from __future__ import annotations
 import os
 import av
 import torch
-import folder_paths
+import zetamotion_comfyui.folder_paths
 import json
 from typing import Optional
 from typing_extensions import override
 from fractions import Fraction
-from comfy_api.input import AudioInput, ImageInput, VideoInput
-from comfy_api.input_impl import VideoFromComponents, VideoFromFile
-from comfy_api.util import VideoCodec, VideoComponents, VideoContainer
-from comfy_api.latest import ComfyExtension, io, ui
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy_api.input import AudioInput, ImageInput, VideoInput
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromComponents, VideoFromFile
+from zetamotion_comfyui.comfy_api.util import VideoCodec, VideoComponents, VideoContainer
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io, ui
+from zetamotion_comfyui.comfy.cli_args import args
 
 class SaveWEBM(io.ComfyNode):
     @classmethod
@@ -35,8 +35,8 @@ class SaveWEBM(io.ComfyNode):
 
     @classmethod
     def execute(cls, images, codec, fps, filename_prefix, crf) -> io.NodeOutput:
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
-            filename_prefix, folder_paths.get_output_directory(), images[0].shape[1], images[0].shape[0]
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(
+            filename_prefix, zetamotion_comfyui.folder_paths.get_output_directory(), images[0].shape[1], images[0].shape[0]
         )
 
         file = f"{filename}_{counter:05}_.webm"
@@ -90,9 +90,9 @@ class SaveVideo(io.ComfyNode):
     @classmethod
     def execute(cls, video: VideoInput, filename_prefix, format, codec) -> io.NodeOutput:
         width, height = video.get_dimensions()
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(
             filename_prefix,
-            folder_paths.get_output_directory(),
+            zetamotion_comfyui.folder_paths.get_output_directory(),
             width,
             height
         )
@@ -167,9 +167,9 @@ class GetVideoComponents(io.ComfyNode):
 class LoadVideo(io.ComfyNode):
     @classmethod
     def define_schema(cls):
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
-        files = folder_paths.filter_files_content_types(files, ["video"])
+        files = zetamotion_comfyui.folder_paths.filter_files_content_types(files, ["video"])
         return io.Schema(
             node_id="LoadVideo",
             display_name="Load Video",
@@ -184,12 +184,12 @@ class LoadVideo(io.ComfyNode):
 
     @classmethod
     def execute(cls, file) -> io.NodeOutput:
-        video_path = folder_paths.get_annotated_filepath(file)
+        video_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(file)
         return io.NodeOutput(VideoFromFile(video_path))
 
     @classmethod
     def fingerprint_inputs(s, file):
-        video_path = folder_paths.get_annotated_filepath(file)
+        video_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(file)
         mod_time = os.path.getmtime(video_path)
         # Instead of hashing the file, we can just use the modification time to avoid
         # rehashing large files.
@@ -197,7 +197,7 @@ class LoadVideo(io.ComfyNode):
 
     @classmethod
     def validate_inputs(s, file):
-        if not folder_paths.exists_annotated_filepath(file):
+        if not zetamotion_comfyui.folder_paths.exists_annotated_filepath(file):
             return "Invalid video file: {}".format(file)
 
         return True

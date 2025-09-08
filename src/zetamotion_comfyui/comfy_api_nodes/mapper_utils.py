@@ -4,7 +4,7 @@ from pydantic.fields import FieldInfo
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 
-from comfy.comfy_types.node_typing import IO, InputTypeOptions
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, InputTypeOptions
 
 NodeInput = tuple[IO, InputTypeOptions]
 

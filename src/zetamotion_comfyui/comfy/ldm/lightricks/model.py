@@ -1,8 +1,8 @@
 import torch
 from torch import nn
-import comfy.patcher_extension
-import comfy.ldm.modules.attention
-import comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.ldm.modules.attention
+import zetamotion_comfyui.comfy.ldm.common_dit
 from einops import rearrange
 import math
 from typing import Dict, Optional, Tuple
@@ -285,9 +285,9 @@ class CrossAttention(nn.Module):
             k = apply_rotary_emb(k, pe)
 
         if mask is None:
-            out = comfy.ldm.modules.attention.optimized_attention(q, k, v, self.heads, attn_precision=self.attn_precision)
+            out = zetamotion_comfyui.comfy.ldm.modules.attention.optimized_attention(q, k, v, self.heads, attn_precision=self.attn_precision)
         else:
-            out = comfy.ldm.modules.attention.optimized_attention_masked(q, k, v, self.heads, mask, attn_precision=self.attn_precision)
+            out = zetamotion_comfyui.comfy.ldm.modules.attention.optimized_attention_masked(q, k, v, self.heads, mask, attn_precision=self.attn_precision)
         return self.to_out(out)
 
 
@@ -306,11 +306,11 @@ class BasicTransformerBlock(nn.Module):
     def forward(self, x, context=None, attention_mask=None, timestep=None, pe=None):
         shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = (self.scale_shift_table[None, None].to(device=x.device, dtype=x.dtype) + timestep.reshape(x.shape[0], timestep.shape[1], self.scale_shift_table.shape[0], -1)).unbind(dim=2)
 
-        x += self.attn1(comfy.ldm.common_dit.rms_norm(x) * (1 + scale_msa) + shift_msa, pe=pe) * gate_msa
+        x += self.attn1(zetamotion_comfyui.comfy.ldm.common_dit.rms_norm(x) * (1 + scale_msa) + shift_msa, pe=pe) * gate_msa
 
         x += self.attn2(x, context=context, mask=attention_mask)
 
-        y = comfy.ldm.common_dit.rms_norm(x) * (1 + scale_mlp) + shift_mlp
+        y = zetamotion_comfyui.comfy.ldm.common_dit.rms_norm(x) * (1 + scale_mlp) + shift_mlp
         x += self.ff(y) * gate_mlp
 
         return x
@@ -421,10 +421,10 @@ class LTXVModel(torch.nn.Module):
         self.patchifier = SymmetricPatchifier(1)
 
     def forward(self, x, timestep, context, attention_mask, frame_rate=25, transformer_options={}, keyframe_idxs=None, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, attention_mask, frame_rate, transformer_options, keyframe_idxs, **kwargs)
 
     def _forward(self, x, timestep, context, attention_mask, frame_rate=25, transformer_options={}, keyframe_idxs=None, **kwargs):

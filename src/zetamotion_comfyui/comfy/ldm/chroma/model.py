@@ -5,10 +5,10 @@ from dataclasses import dataclass
 import torch
 from torch import Tensor, nn
 from einops import rearrange, repeat
-import comfy.patcher_extension
-import comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.ldm.common_dit
 
-from comfy.ldm.flux.layers import (
+from zetamotion_comfyui.comfy.ldm.flux.layers import (
     EmbedND,
     timestep_embedding,
 )
@@ -254,15 +254,15 @@ class Chroma(nn.Module):
         return img
 
     def forward(self, x, timestep, context, guidance, control=None, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, guidance, control, transformer_options, **kwargs)
 
     def _forward(self, x, timestep, context, guidance, control=None, transformer_options={}, **kwargs):
         bs, c, h, w = x.shape
-        x = comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
+        x = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
 
         img = rearrange(x, "b c (h ph) (w pw) -> b (h w) (c ph pw)", ph=self.patch_size, pw=self.patch_size)
 

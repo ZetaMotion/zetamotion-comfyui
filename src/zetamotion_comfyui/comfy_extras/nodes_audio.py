@@ -3,20 +3,20 @@ from __future__ import annotations
 import av
 import torchaudio
 import torch
-import comfy.model_management
-import folder_paths
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.folder_paths
 import os
 import io
 import json
 import random
 import hashlib
-import node_helpers
-from comfy.cli_args import args
-from comfy.comfy_types import FileLocator
+import zetamotion_comfyui.node_helpers
+from zetamotion_comfyui.comfy.cli_args import args
+from zetamotion_comfyui.comfy.comfy_types import FileLocator
 
 class EmptyLatentAudio:
     def __init__(self):
-        self.device = comfy.model_management.intermediate_device()
+        self.device = zetamotion_comfyui.comfy.model_management.intermediate_device()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -93,7 +93,7 @@ class VAEDecodeAudio:
 def save_audio(self, audio, filename_prefix="ComfyUI", format="flac", prompt=None, extra_pnginfo=None, quality="128k"):
 
     filename_prefix += self.prefix_append
-    full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
+    full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir)
     results: list[FileLocator] = []
 
     # Prepare metadata dictionary
@@ -193,7 +193,7 @@ def save_audio(self, audio, filename_prefix="ComfyUI", format="flac", prompt=Non
 
 class SaveAudio:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
 
@@ -217,7 +217,7 @@ class SaveAudio:
 
 class SaveAudioMP3:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
 
@@ -242,7 +242,7 @@ class SaveAudioMP3:
 
 class SaveAudioOpus:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
 
@@ -267,7 +267,7 @@ class SaveAudioOpus:
 
 class PreviewAudio(SaveAudio):
     def __init__(self):
-        self.output_dir = folder_paths.get_temp_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
         self.type = "temp"
         self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
 
@@ -317,8 +317,8 @@ def load(filepath: str) -> tuple[torch.Tensor, int]:
 class LoadAudio:
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = folder_paths.get_input_directory()
-        files = folder_paths.filter_files_content_types(os.listdir(input_dir), ["audio", "video"])
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
+        files = zetamotion_comfyui.folder_paths.filter_files_content_types(os.listdir(input_dir), ["audio", "video"])
         return {"required": {"audio": (sorted(files), {"audio_upload": True})}}
 
     CATEGORY = "audio"
@@ -327,14 +327,14 @@ class LoadAudio:
     FUNCTION = "load"
 
     def load(self, audio):
-        audio_path = folder_paths.get_annotated_filepath(audio)
+        audio_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(audio)
         waveform, sample_rate = load(audio_path)
         audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
         return (audio, )
 
     @classmethod
     def IS_CHANGED(s, audio):
-        image_path = folder_paths.get_annotated_filepath(audio)
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(audio)
         m = hashlib.sha256()
         with open(image_path, 'rb') as f:
             m.update(f.read())
@@ -342,7 +342,7 @@ class LoadAudio:
 
     @classmethod
     def VALIDATE_INPUTS(s, audio):
-        if not folder_paths.exists_annotated_filepath(audio):
+        if not zetamotion_comfyui.folder_paths.exists_annotated_filepath(audio):
             return "Invalid audio file: {}".format(audio)
         return True
 
@@ -357,7 +357,7 @@ class RecordAudio:
     FUNCTION = "load"
 
     def load(self, audio):
-        audio_path = folder_paths.get_annotated_filepath(audio)
+        audio_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(audio)
 
         waveform, sample_rate = torchaudio.load(audio_path)
         audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}

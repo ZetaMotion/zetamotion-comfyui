@@ -5,9 +5,9 @@ import os
 import av
 import io
 from fractions import Fraction
-from comfy_api.input_impl.video_types import VideoFromFile, VideoFromComponents
-from comfy_api.util.video_types import VideoComponents
-from comfy_api.input.basic_types import AudioInput
+from zetamotion_comfyui.comfy_api.input_impl.video_types import VideoFromFile, VideoFromComponents
+from zetamotion_comfyui.comfy_api.util.video_types import VideoComponents
+from zetamotion_comfyui.comfy_api.input.basic_types import AudioInput
 from av.error import InvalidDataError
 
 EPSILON = 0.0001

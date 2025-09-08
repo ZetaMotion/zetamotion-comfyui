@@ -1,5 +1,5 @@
 import json
-from comfy.comfy_types.node_typing import IO
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
 
 # Preview Any - original implement from
 # https://github.com/rgthree/rgthree-comfy/blob/main/py/display_any.py

@@ -6,12 +6,12 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 
-from comfy.ldm.modules.attention import optimized_attention
-from comfy.ldm.flux.layers import EmbedND
-from comfy.ldm.flux.math import apply_rope
-import comfy.ldm.common_dit
-import comfy.model_management
-import comfy.patcher_extension
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
+from zetamotion_comfyui.comfy.ldm.flux.layers import EmbedND
+from zetamotion_comfyui.comfy.ldm.flux.math import apply_rope
+import zetamotion_comfyui.comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
 
 
 def sinusoidal_embedding_1d(dim, position):
@@ -216,9 +216,9 @@ class WanAttentionBlock(nn.Module):
         # assert e.dtype == torch.float32
 
         if e.ndim < 4:
-            e = (comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device) + e).chunk(6, dim=1)
+            e = (zetamotion_comfyui.comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device) + e).chunk(6, dim=1)
         else:
-            e = (comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device).unsqueeze(0) + e).unbind(2)
+            e = (zetamotion_comfyui.comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device).unsqueeze(0) + e).unbind(2)
         # assert e[0].dtype == torch.float32
 
         # self-attention
@@ -342,9 +342,9 @@ class Head(nn.Module):
         """
         # assert e.dtype == torch.float32
         if e.ndim < 3:
-            e = (comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device) + e.unsqueeze(1)).chunk(2, dim=1)
+            e = (zetamotion_comfyui.comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device) + e.unsqueeze(1)).chunk(2, dim=1)
         else:
-            e = (comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device).unsqueeze(0) + e.unsqueeze(2)).unbind(2)
+            e = (zetamotion_comfyui.comfy.model_management.cast_to(self.modulation, dtype=x.dtype, device=x.device).unsqueeze(0) + e.unsqueeze(2)).unbind(2)
 
         x = (self.head(torch.addcmul(repeat_e(e[0], x), self.norm(x), 1 + repeat_e(e[1], x))))
         return x
@@ -367,7 +367,7 @@ class MLPProj(torch.nn.Module):
 
     def forward(self, image_embeds):
         if self.emb_pos is not None:
-            image_embeds = image_embeds[:, :self.emb_pos.shape[1]] + comfy.model_management.cast_to(self.emb_pos[:, :image_embeds.shape[1]], dtype=image_embeds.dtype, device=image_embeds.device)
+            image_embeds = image_embeds[:, :self.emb_pos.shape[1]] + zetamotion_comfyui.comfy.model_management.cast_to(self.emb_pos[:, :image_embeds.shape[1]], dtype=image_embeds.dtype, device=image_embeds.device)
 
         clip_extra_context_tokens = self.proj(image_embeds)
         return clip_extra_context_tokens
@@ -599,19 +599,19 @@ class WanModel(torch.nn.Module):
         return freqs
 
     def forward(self, x, timestep, context, clip_fea=None, time_dim_concat=None, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, clip_fea, time_dim_concat, transformer_options, **kwargs)
 
     def _forward(self, x, timestep, context, clip_fea=None, time_dim_concat=None, transformer_options={}, **kwargs):
         bs, c, t, h, w = x.shape
-        x = comfy.ldm.common_dit.pad_to_patch_size(x, self.patch_size)
+        x = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, self.patch_size)
 
         t_len = t
         if time_dim_concat is not None:
-            time_dim_concat = comfy.ldm.common_dit.pad_to_patch_size(time_dim_concat, self.patch_size)
+            time_dim_concat = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(time_dim_concat, self.patch_size)
             x = torch.cat([x, time_dim_concat], dim=2)
             t_len = x.shape[2]
 
@@ -953,7 +953,7 @@ class MotionEncoder_tc(nn.Module):
         x = self.norm3(x)
         x = self.act(x)
         x = rearrange(x, '(b n) t c -> b t n c', b=b)
-        padding = comfy.model_management.cast_to(self.padding_tokens, dtype=x.dtype, device=x.device).repeat(b, x.shape[1], 1, 1)
+        padding = zetamotion_comfyui.comfy.model_management.cast_to(self.padding_tokens, dtype=x.dtype, device=x.device).repeat(b, x.shape[1], 1, 1)
         x = torch.cat([x, padding], dim=-2)
         x_local = x.clone()
 
@@ -1005,7 +1005,7 @@ class CausalAudioEncoder(nn.Module):
 
     def forward(self, features):
         # features B * num_layers * dim * video_length
-        weights = self.act(comfy.model_management.cast_to(self.weights, dtype=features.dtype, device=features.device))
+        weights = self.act(zetamotion_comfyui.comfy.model_management.cast_to(self.weights, dtype=features.dtype, device=features.device))
         weights_sum = weights.sum(dim=1, keepdims=True)
         weighted_feat = ((features * weights) / weights_sum).sum(
             dim=1)  # b dim f
@@ -1267,7 +1267,7 @@ class WanModel_S2V(WanModel):
         x = x.flatten(2).transpose(1, 2)
         seq_len = x.size(1)
 
-        cond_mask_weight = comfy.model_management.cast_to(self.trainable_cond_mask.weight, dtype=x.dtype, device=x.device).unsqueeze(1).unsqueeze(1)
+        cond_mask_weight = zetamotion_comfyui.comfy.model_management.cast_to(self.trainable_cond_mask.weight, dtype=x.dtype, device=x.device).unsqueeze(1).unsqueeze(1)
         x = x + cond_mask_weight[0]
 
         if reference_latent is not None:

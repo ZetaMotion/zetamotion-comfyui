@@ -16,7 +16,7 @@ import urllib.request
 import urllib.parse
 
 
-from comfy.samplers import KSampler
+from zetamotion_comfyui.comfy.samplers import KSampler
 
 """
 These tests generate and save images through a range of parameters

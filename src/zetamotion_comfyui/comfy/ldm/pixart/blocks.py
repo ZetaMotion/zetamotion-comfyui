@@ -6,8 +6,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 
-from comfy.ldm.modules.diffusionmodules.mmdit import TimestepEmbedder, Mlp, timestep_embedding
-from comfy.ldm.modules.attention import optimized_attention
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit import TimestepEmbedder, Mlp, timestep_embedding
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
 
 # if model_management.xformers_enabled():
 #     import xformers.ops

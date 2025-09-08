@@ -3,13 +3,13 @@ import torch
 import torch.nn as nn
 
 
-from comfy.ldm.modules.diffusionmodules.mmdit import (
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit import (
     TimestepEmbedder,
     PatchEmbed,
 )
 from .poolers import AttentionPool
 
-import comfy.latent_formats
+import zetamotion_comfyui.comfy.latent_formats
 from .models import HunYuanDiTBlock, calc_rope
 
 
@@ -86,7 +86,7 @@ class HunYuanControlNet(nn.Module):
         self.use_style_cond = use_style_cond
         self.norm = norm
         self.dtype = dtype
-        self.latent_format = comfy.latent_formats.SDXL
+        self.latent_format = zetamotion_comfyui.comfy.latent_formats.SDXL
 
         self.mlp_t5 = nn.Sequential(
             nn.Linear(
@@ -251,7 +251,7 @@ class HunYuanControlNet(nn.Module):
         b_t5, l_t5, c_t5 = text_states_t5.shape
         text_states_t5 = self.mlp_t5(text_states_t5.view(-1, c_t5)).view(b_t5, l_t5, -1)
 
-        padding = comfy.ops.cast_to_input(self.text_embedding_padding, text_states)
+        padding = zetamotion_comfyui.comfy.ops.cast_to_input(self.text_embedding_padding, text_states)
 
         text_states[:, -self.text_len :] = torch.where(
             text_states_mask[:, -self.text_len :].unsqueeze(2),

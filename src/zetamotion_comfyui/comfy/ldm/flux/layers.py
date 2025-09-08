@@ -5,8 +5,8 @@ import torch
 from torch import Tensor, nn
 
 from .math import attention, rope
-import comfy.ops
-import comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.ops
+import zetamotion_comfyui.comfy.ldm.common_dit
 
 
 class EmbedND(nn.Module):
@@ -64,7 +64,7 @@ class RMSNorm(torch.nn.Module):
         self.scale = nn.Parameter(torch.empty((dim), dtype=dtype, device=device))
 
     def forward(self, x: Tensor):
-        return comfy.ldm.common_dit.rms_norm(x, self.scale, 1e-6)
+        return zetamotion_comfyui.comfy.ldm.common_dit.rms_norm(x, self.scale, 1e-6)
 
 
 class QKNorm(torch.nn.Module):

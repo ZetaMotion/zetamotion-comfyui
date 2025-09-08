@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from .base import WeightAdapterBase, WeightAdapterTrainBase, weight_decompose
 
 
@@ -207,19 +207,19 @@ class LoHaAdapter(WeightAdapterBase):
             t1 = v[5]
             t2 = v[6]
             m1 = torch.einsum('i j k l, j r, i p -> p r k l',
-                                comfy.model_management.cast_to_device(t1, weight.device, intermediate_dtype),
-                                comfy.model_management.cast_to_device(w1b, weight.device, intermediate_dtype),
-                                comfy.model_management.cast_to_device(w1a, weight.device, intermediate_dtype))
+                                zetamotion_comfyui.comfy.model_management.cast_to_device(t1, weight.device, intermediate_dtype),
+                                zetamotion_comfyui.comfy.model_management.cast_to_device(w1b, weight.device, intermediate_dtype),
+                                zetamotion_comfyui.comfy.model_management.cast_to_device(w1a, weight.device, intermediate_dtype))
 
             m2 = torch.einsum('i j k l, j r, i p -> p r k l',
-                                comfy.model_management.cast_to_device(t2, weight.device, intermediate_dtype),
-                                comfy.model_management.cast_to_device(w2b, weight.device, intermediate_dtype),
-                                comfy.model_management.cast_to_device(w2a, weight.device, intermediate_dtype))
+                                zetamotion_comfyui.comfy.model_management.cast_to_device(t2, weight.device, intermediate_dtype),
+                                zetamotion_comfyui.comfy.model_management.cast_to_device(w2b, weight.device, intermediate_dtype),
+                                zetamotion_comfyui.comfy.model_management.cast_to_device(w2a, weight.device, intermediate_dtype))
         else:
-            m1 = torch.mm(comfy.model_management.cast_to_device(w1a, weight.device, intermediate_dtype),
-                            comfy.model_management.cast_to_device(w1b, weight.device, intermediate_dtype))
-            m2 = torch.mm(comfy.model_management.cast_to_device(w2a, weight.device, intermediate_dtype),
-                            comfy.model_management.cast_to_device(w2b, weight.device, intermediate_dtype))
+            m1 = torch.mm(zetamotion_comfyui.comfy.model_management.cast_to_device(w1a, weight.device, intermediate_dtype),
+                            zetamotion_comfyui.comfy.model_management.cast_to_device(w1b, weight.device, intermediate_dtype))
+            m2 = torch.mm(zetamotion_comfyui.comfy.model_management.cast_to_device(w2a, weight.device, intermediate_dtype),
+                            zetamotion_comfyui.comfy.model_management.cast_to_device(w2b, weight.device, intermediate_dtype))
 
         try:
             lora_diff = (m1 * m2).reshape(weight.shape)

@@ -1,12 +1,12 @@
 import os
-from folder_paths import get_output_directory
-from comfy_api_nodes.mapper_utils import model_field_to_node_input
-from comfy.comfy_types.node_typing import IO
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.folder_paths.import get_output_directory
+from zetamotion_comfyui.comfy_api_nodes.mapper_utils import model_field_to_node_input
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     TripoOrientation,
     TripoModelVersion,
 )
-from comfy_api_nodes.apis.tripo_api import (
+from zetamotion_comfyui.comfy_api_nodes.apis.tripo_api import (
     TripoTaskType,
     TripoStyle,
     TripoFileReference,
@@ -24,14 +24,14 @@ from comfy_api_nodes.apis.tripo_api import (
     TripoConvertModelRequest,
 )
 
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     upload_images_to_comfyapi,
     download_url_to_bytesio,
 )

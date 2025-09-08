@@ -1,9 +1,9 @@
-import nodes
-import folder_paths
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.folder_paths
 import os
 
-from comfy.comfy_types import IO
-from comfy_api.input_impl import VideoFromFile
+from zetamotion_comfyui.comfy.comfy_types import IO
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromFile
 
 from pathlib import Path
 
@@ -14,12 +14,12 @@ def normalize_path(path):
 class Load3D():
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = os.path.join(folder_paths.get_input_directory(), "3d")
+        input_dir = os.path.join(zetamotion_comfyui.folder_paths.get_input_directory(), "3d")
 
         os.makedirs(input_dir, exist_ok=True)
 
         input_path = Path(input_dir)
-        base_path = Path(folder_paths.get_input_directory())
+        base_path = Path(zetamotion_comfyui.folder_paths.get_input_directory())
 
         files = [
             normalize_path(str(file_path.relative_to(base_path)))
@@ -43,10 +43,10 @@ class Load3D():
     CATEGORY = "3d"
 
     def process(self, model_file, image, **kwargs):
-        image_path = folder_paths.get_annotated_filepath(image['image'])
-        mask_path = folder_paths.get_annotated_filepath(image['mask'])
-        normal_path = folder_paths.get_annotated_filepath(image['normal'])
-        lineart_path = folder_paths.get_annotated_filepath(image['lineart'])
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['image'])
+        mask_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['mask'])
+        normal_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['normal'])
+        lineart_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['lineart'])
 
         load_image_node = nodes.LoadImage()
         output_image, ignore_mask = load_image_node.load_image(image=image_path)
@@ -57,7 +57,7 @@ class Load3D():
         video = None
 
         if image['recording'] != "":
-            recording_video_path = folder_paths.get_annotated_filepath(image['recording'])
+            recording_video_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['recording'])
 
             video = VideoFromFile(recording_video_path)
 
@@ -66,12 +66,12 @@ class Load3D():
 class Load3DAnimation():
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = os.path.join(folder_paths.get_input_directory(), "3d")
+        input_dir = os.path.join(zetamotion_comfyui.folder_paths.get_input_directory(), "3d")
 
         os.makedirs(input_dir, exist_ok=True)
 
         input_path = Path(input_dir)
-        base_path = Path(folder_paths.get_input_directory())
+        base_path = Path(zetamotion_comfyui.folder_paths.get_input_directory())
 
         files = [
             normalize_path(str(file_path.relative_to(base_path)))
@@ -95,9 +95,9 @@ class Load3DAnimation():
     CATEGORY = "3d"
 
     def process(self, model_file, image, **kwargs):
-        image_path = folder_paths.get_annotated_filepath(image['image'])
-        mask_path = folder_paths.get_annotated_filepath(image['mask'])
-        normal_path = folder_paths.get_annotated_filepath(image['normal'])
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['image'])
+        mask_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['mask'])
+        normal_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['normal'])
 
         load_image_node = nodes.LoadImage()
         output_image, ignore_mask = load_image_node.load_image(image=image_path)
@@ -107,7 +107,7 @@ class Load3DAnimation():
         video = None
 
         if image['recording'] != "":
-            recording_video_path = folder_paths.get_annotated_filepath(image['recording'])
+            recording_video_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image['recording'])
 
             video = VideoFromFile(recording_video_path)
 

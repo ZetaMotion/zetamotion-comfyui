@@ -6,21 +6,21 @@ from typing_extensions import override
 import torch
 from pydantic import BaseModel, Field
 
-from comfy_api.latest import ComfyExtension, io as comfy_io
-from comfy_api_nodes.util.validation_utils import (
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io as comfy_io
+from zetamotion_comfyui.comfy_api_nodes.util.validation_utils import (
     validate_aspect_ratio_closeness,
     validate_image_dimensions,
     validate_image_aspect_ratio_range,
     get_number_of_images,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import download_url_to_video_output, upload_images_to_comfyapi
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import download_url_to_video_output, upload_images_to_comfyapi
 
 
 VIDU_TEXT_TO_VIDEO = "/proxy/vidu/text2video"

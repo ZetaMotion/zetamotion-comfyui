@@ -1,7 +1,7 @@
-import nodes
-import node_helpers
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.node_helpers
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 
 
 class CLIPTextEncodeHunyuanDiT:
@@ -36,7 +36,7 @@ class EmptyHunyuanLatentVideo:
     CATEGORY = "latent/video"
 
     def generate(self, width, height, length, batch_size=1):
-        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         return ({"samples":latent}, )
 
 PROMPT_TEMPLATE_ENCODE_VIDEO_I2V = (
@@ -89,11 +89,11 @@ class HunyuanImageToVideo:
     CATEGORY = "conditioning/video_models"
 
     def encode(self, positive, vae, width, height, length, batch_size, guidance_type, start_image=None):
-        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         out_latent = {}
 
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length, :, :, :3].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length, :, :, :3].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
 
             concat_latent_image = vae.encode(start_image)
             mask = torch.ones((1, 1, latent.shape[2], concat_latent_image.shape[-2], concat_latent_image.shape[-1]), device=start_image.device, dtype=start_image.dtype)

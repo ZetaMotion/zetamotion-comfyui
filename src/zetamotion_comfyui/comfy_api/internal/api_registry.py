@@ -1,5 +1,5 @@
 from typing import Type, List, NamedTuple
-from comfy_api.internal.singleton import ProxiedSingleton
+from zetamotion_comfyui.comfy_api.internal.singleton import ProxiedSingleton
 from packaging import version as packaging_version
 
 

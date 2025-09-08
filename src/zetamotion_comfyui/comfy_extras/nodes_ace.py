@@ -1,9 +1,9 @@
 import torch
 from typing_extensions import override
 
-import comfy.model_management
-import node_helpers
-from comfy_api.latest import ComfyExtension, io
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.node_helpers
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
 
 
 class TextEncodeAceStepAudio(io.ComfyNode):
@@ -47,7 +47,7 @@ class EmptyAceStepLatentAudio(io.ComfyNode):
     @classmethod
     def execute(cls, seconds, batch_size) -> io.NodeOutput:
         length = int(seconds * 44100 / 512 / 8)
-        latent = torch.zeros([batch_size, 8, 16, length], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 8, 16, length], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         return io.NodeOutput({"samples": latent, "type": "audio"})
 
 

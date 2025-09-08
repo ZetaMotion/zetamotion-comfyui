@@ -1,15 +1,15 @@
-import folder_paths
-import comfy.sd
-import comfy.model_management
-import nodes
+import zetamotion_comfyui.folder_paths
+import zetamotion_comfyui.comfy.sd
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.nodes
 import torch
-import comfy_extras.nodes_slg
+import zetamotion_comfyui.comfy_extras.nodes_slg
 
 
 class TripleCLIPLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "clip_name1": (folder_paths.get_filename_list("text_encoders"), ), "clip_name2": (folder_paths.get_filename_list("text_encoders"), ), "clip_name3": (folder_paths.get_filename_list("text_encoders"), )
+        return {"required": { "clip_name1": (zetamotion_comfyui.folder_paths.get_filename_list("text_encoders"), ), "clip_name2": (zetamotion_comfyui.folder_paths.get_filename_list("text_encoders"), ), "clip_name3": (zetamotion_comfyui.folder_paths.get_filename_list("text_encoders"), )
                              }}
     RETURN_TYPES = ("CLIP",)
     FUNCTION = "load_clip"
@@ -19,16 +19,16 @@ class TripleCLIPLoader:
     DESCRIPTION = "[Recipes]\n\nsd3: clip-l, clip-g, t5"
 
     def load_clip(self, clip_name1, clip_name2, clip_name3):
-        clip_path1 = folder_paths.get_full_path_or_raise("text_encoders", clip_name1)
-        clip_path2 = folder_paths.get_full_path_or_raise("text_encoders", clip_name2)
-        clip_path3 = folder_paths.get_full_path_or_raise("text_encoders", clip_name3)
-        clip = comfy.sd.load_clip(ckpt_paths=[clip_path1, clip_path2, clip_path3], embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        clip_path1 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name1)
+        clip_path2 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name2)
+        clip_path3 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name3)
+        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path1, clip_path2, clip_path3], embedding_directory=folder_paths.get_folder_paths("embeddings"))
         return (clip,)
 
 
 class EmptySD3LatentImage:
     def __init__(self):
-        self.device = comfy.model_management.intermediate_device()
+        self.device = zetamotion_comfyui.comfy.model_management.intermediate_device()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -85,7 +85,7 @@ class CLIPTextEncodeSD3:
         return (clip.encode_from_tokens_scheduled(tokens), )
 
 
-class ControlNetApplySD3(nodes.ControlNetApplyAdvanced):
+class ControlNetApplySD3(zetamotion_comfyui.nodes.ControlNetApplyAdvanced):
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {"positive": ("CONDITIONING", ),

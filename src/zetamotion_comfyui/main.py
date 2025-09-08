@@ -1,19 +1,19 @@
-import comfy.options
+import zetamotion_comfyui.comfy.options
 comfy.options.enable_args_parsing()
 
 import os
 import importlib.util
-import folder_paths
+import zetamotion_comfyui.folder_paths
 import time
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.cli_args import args
 from app.logger import setup_logger
 import itertools
 import utils.extra_config
 import logging
 import sys
-from comfy_execution.progress import get_progress_state
-from comfy_execution.utils import get_executing_context
-from comfy_api import feature_flags
+from zetamotion_comfyui.comfy_execution.progress import get_progress_state
+from zetamotion_comfyui.comfy_execution.utils import get_executing_context
+from zetamotion_comfyui.comfy_api import feature_flags
 
 if __name__ == "__main__":
     #NOTE: These do not do anything on core ComfyUI, they are for custom nodes.
@@ -36,25 +36,25 @@ def apply_custom_paths():
     if args.output_directory:
         output_dir = os.path.abspath(args.output_directory)
         logging.info(f"Setting output directory to: {output_dir}")
-        folder_paths.set_output_directory(output_dir)
+        zetamotion_comfyui.folder_paths.set_output_directory(output_dir)
 
     # These are the default folders that checkpoints, clip and vae models will be saved to when using CheckpointSave, etc.. nodes
-    folder_paths.add_model_folder_path("checkpoints", os.path.join(folder_paths.get_output_directory(), "checkpoints"))
-    folder_paths.add_model_folder_path("clip", os.path.join(folder_paths.get_output_directory(), "clip"))
-    folder_paths.add_model_folder_path("vae", os.path.join(folder_paths.get_output_directory(), "vae"))
-    folder_paths.add_model_folder_path("diffusion_models",
-                                       os.path.join(folder_paths.get_output_directory(), "diffusion_models"))
-    folder_paths.add_model_folder_path("loras", os.path.join(folder_paths.get_output_directory(), "loras"))
+    zetamotion_comfyui.folder_paths.add_model_folder_path("checkpoints", os.path.join(zetamotion_comfyui.folder_paths.get_output_directory(), "checkpoints"))
+    zetamotion_comfyui.folder_paths.add_model_folder_path("clip", os.path.join(zetamotion_comfyui.folder_paths.get_output_directory(), "clip"))
+    zetamotion_comfyui.folder_paths.add_model_folder_path("vae", os.path.join(zetamotion_comfyui.folder_paths.get_output_directory(), "vae"))
+    zetamotion_comfyui.folder_paths.add_model_folder_path("diffusion_models",
+                                       os.path.join(zetamotion_comfyui.folder_paths.get_output_directory(), "diffusion_models"))
+    zetamotion_comfyui.folder_paths.add_model_folder_path("loras", os.path.join(zetamotion_comfyui.folder_paths.get_output_directory(), "loras"))
 
     if args.input_directory:
         input_dir = os.path.abspath(args.input_directory)
         logging.info(f"Setting input directory to: {input_dir}")
-        folder_paths.set_input_directory(input_dir)
+        zetamotion_comfyui.folder_paths.set_input_directory(input_dir)
 
     if args.user_directory:
         user_dir = os.path.abspath(args.user_directory)
         logging.info(f"Setting user directory to: {user_dir}")
-        folder_paths.set_user_directory(user_dir)
+        zetamotion_comfyui.folder_paths.set_user_directory(user_dir)
 
 
 def execute_prestartup_script():
@@ -72,7 +72,7 @@ def execute_prestartup_script():
             logging.error(f"Failed to execute startup-script: {script_path} / {e}")
         return False
 
-    node_paths = folder_paths.get_folder_paths("custom_nodes")
+    node_paths = zetamotion_comfyui.folder_paths.get_folder_paths("custom_nodes")
     for custom_node_path in node_paths:
         possible_modules = os.listdir(custom_node_path)
         node_prestartup_times = []
@@ -142,20 +142,20 @@ if __name__ == "__main__":
 if 'torch' in sys.modules:
     logging.warning("WARNING: Potential Error in code: Torch already imported, torch should never be imported before this point.")
 
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 
 import execution
 import server
-from protocol import BinaryEventTypes
-import nodes
-import comfy.model_management
+from zetamotion_comfyui.protocol import BinaryEventTypes
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.comfy.model_management
 import comfyui_version
 import app.logger
 import hook_breaker_ac10a0
 
 def cuda_malloc_warning():
-    device = comfy.model_management.get_torch_device()
-    device_name = comfy.model_management.get_torch_device_name(device)
+    device = zetamotion_comfyui.comfy.model_management.get_torch_device()
+    device_name = zetamotion_comfyui.comfy.model_management.get_torch_device_name(device)
     cuda_malloc_warning = False
     if "cudaMallocAsync" in device_name:
         for b in cuda_malloc.blacklist:
@@ -215,7 +215,7 @@ def prompt_worker(q, server_instance):
         free_memory = flags.get("free_memory", False)
 
         if flags.get("unload_models", free_memory):
-            comfy.model_management.unload_all_models()
+            zetamotion_comfyui.comfy.model_management.unload_all_models()
             need_gc = True
             last_gc_collect = 0
 
@@ -228,7 +228,7 @@ def prompt_worker(q, server_instance):
             current_time = time.perf_counter()
             if (current_time - last_gc_collect) > gc_collect_interval:
                 gc.collect()
-                comfy.model_management.soft_empty_cache()
+                zetamotion_comfyui.comfy.model_management.soft_empty_cache()
                 last_gc_collect = current_time
                 need_gc = False
                 hook_breaker_ac10a0.restore_functions()
@@ -249,7 +249,7 @@ def hijack_progress(server_instance):
             prompt_id = executing_context.prompt_id
         if node_id is None and executing_context is not None:
             node_id = executing_context.node_id
-        comfy.model_management.throw_exception_if_processing_interrupted()
+        zetamotion_comfyui.comfy.model_management.throw_exception_if_processing_interrupted()
         if prompt_id is None:
             prompt_id = server_instance.last_prompt_id
         if node_id is None:
@@ -271,11 +271,11 @@ def hijack_progress(server_instance):
                     server_instance.client_id,
                 )
 
-    comfy.utils.set_progress_bar_global_hook(hook)
+    zetamotion_comfyui.comfy.utils.set_progress_bar_global_hook(hook)
 
 
 def cleanup_temp():
-    temp_dir = folder_paths.get_temp_directory()
+    temp_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -297,7 +297,7 @@ def start_comfyui(asyncio_loop=None):
     if args.temp_directory:
         temp_dir = os.path.join(os.path.abspath(args.temp_directory), "temp")
         logging.info(f"Setting temp directory to: {temp_dir}")
-        folder_paths.set_temp_directory(temp_dir)
+        zetamotion_comfyui.folder_paths.set_temp_directory(temp_dir)
     cleanup_temp()
 
     if args.windows_standalone_build:
@@ -313,7 +313,7 @@ def start_comfyui(asyncio_loop=None):
     prompt_server = server.PromptServer(asyncio_loop)
 
     hook_breaker_ac10a0.save_functions()
-    asyncio_loop.run_until_complete(nodes.init_extra_nodes(
+    asyncio_loop.run_until_complete(zetamotion_comfyui.nodes.init_extra_nodes(
         init_custom_nodes=(not args.disable_all_custom_nodes) or len(args.whitelist_custom_nodes) > 0,
         init_api_nodes=not args.disable_api_nodes
     ))
@@ -330,7 +330,7 @@ def start_comfyui(asyncio_loop=None):
     if args.quick_test_for_ci:
         exit(0)
 
-    os.makedirs(folder_paths.get_temp_directory(), exist_ok=True)
+    os.makedirs(zetamotion_comfyui.folder_paths.get_temp_directory(), exist_ok=True)
     call_on_start = None
     if args.auto_launch:
         def startup_server(scheme, address, port):

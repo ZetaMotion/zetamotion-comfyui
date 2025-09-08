@@ -6,22 +6,22 @@ from io import BytesIO
 from typing import Optional
 from typing_extensions import override
 
-from comfy_api.latest import ComfyExtension, io as comfy_io
-from comfy_api.input_impl.video_types import VideoFromFile
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io as comfy_io
+from zetamotion_comfyui.comfy_api.input_impl.video_types import VideoFromFile
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     VeoGenVidRequest,
     VeoGenVidResponse,
     VeoGenVidPollRequest,
     VeoGenVidPollResponse,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
 )
 
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     downscale_image_tensor,
     tensor_to_base64_string,
 )

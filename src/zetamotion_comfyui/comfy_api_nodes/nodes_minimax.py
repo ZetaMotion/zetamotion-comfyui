@@ -3,9 +3,9 @@ from typing import Union
 import logging
 import torch
 
-from comfy.comfy_types.node_typing import IO
-from comfy_api.input_impl.video_types import VideoFromFile
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
+from zetamotion_comfyui.comfy_api.input_impl.video_types import VideoFromFile
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     MinimaxVideoGenerationRequest,
     MinimaxVideoGenerationResponse,
     MinimaxFileRetrieveResponse,
@@ -13,14 +13,14 @@ from comfy_api_nodes.apis import (
     SubjectReferenceItem,
     MiniMaxModel
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     download_url_to_bytesio,
     upload_images_to_comfyapi,
     validate_string,

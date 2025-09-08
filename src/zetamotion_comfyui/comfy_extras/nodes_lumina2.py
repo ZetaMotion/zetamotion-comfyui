@@ -1,4 +1,4 @@
-from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from zetamotion_comfyui.comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 import torch
 
 

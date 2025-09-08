@@ -1,8 +1,8 @@
-from comfy import sd1_clip
+from zetamotion_comfyui.comfy import sd1_clip
 from transformers import BertTokenizer
 from .spiece_tokenizer import SPieceTokenizer
 from .bert import BertModel
-import comfy.text_encoders.t5
+import zetamotion_comfyui.comfy.text_encoders.t5
 import os
 import torch
 
@@ -22,7 +22,7 @@ class MT5XLModel(sd1_clip.SDClipModel):
     def __init__(self, device="cpu", layer="last", layer_idx=None, dtype=None, model_options={}):
         textmodel_json_config = os.path.join(os.path.dirname(os.path.realpath(__file__)), "mt5_config_xl.json")
         model_options = {**model_options, "model_name": "mt5xl"}
-        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config=textmodel_json_config, dtype=dtype, special_tokens={"end": 1, "pad": 0}, model_class=comfy.text_encoders.t5.T5, enable_attention_masks=True, return_attention_masks=True, model_options=model_options)
+        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config=textmodel_json_config, dtype=dtype, special_tokens={"end": 1, "pad": 0}, model_class=zetamotion_comfyui.comfy.text_encoders.t5.T5, enable_attention_masks=True, return_attention_masks=True, model_options=model_options)
 
 class MT5XLTokenizer(sd1_clip.SDTokenizer):
     def __init__(self, embedding_directory=None, tokenizer_data={}):

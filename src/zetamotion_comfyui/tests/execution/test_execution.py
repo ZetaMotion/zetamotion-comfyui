@@ -13,7 +13,7 @@ import uuid
 import urllib.request
 import urllib.parse
 import urllib.error
-from comfy_execution.graph_utils import GraphBuilder, Node
+from zetamotion_comfyui.comfy_execution.graph_utils import GraphBuilder, Node
 
 def run_warmup(client, prefix="warmup"):
     """Run a simple workflow to warm up the server."""

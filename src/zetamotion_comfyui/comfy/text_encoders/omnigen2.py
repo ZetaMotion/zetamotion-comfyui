@@ -1,6 +1,6 @@
 from transformers import Qwen2Tokenizer
-from comfy import sd1_clip
-import comfy.text_encoders.llama
+from zetamotion_comfyui.comfy import sd1_clip
+import zetamotion_comfyui.comfy.text_encoders.llama
 import os
 
 
@@ -24,7 +24,7 @@ class Omnigen2Tokenizer(sd1_clip.SD1Tokenizer):
 
 class Qwen25_3BModel(sd1_clip.SDClipModel):
     def __init__(self, device="cpu", layer="last", layer_idx=None, dtype=None, attention_mask=True, model_options={}):
-        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config={}, dtype=dtype, special_tokens={"pad": 151643}, layer_norm_hidden_state=False, model_class=comfy.text_encoders.llama.Qwen25_3B, enable_attention_masks=attention_mask, return_attention_masks=attention_mask, model_options=model_options)
+        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config={}, dtype=dtype, special_tokens={"pad": 151643}, layer_norm_hidden_state=False, model_class=zetamotion_comfyui.comfy.text_encoders.llama.Qwen25_3B, enable_attention_masks=attention_mask, return_attention_masks=attention_mask, model_options=model_options)
 
 
 class Omnigen2Model(sd1_clip.SD1ClipModel):

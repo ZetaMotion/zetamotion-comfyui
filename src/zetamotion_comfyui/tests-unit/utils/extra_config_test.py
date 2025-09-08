@@ -5,16 +5,16 @@ import sys
 from unittest.mock import Mock, patch, mock_open
 
 from utils.extra_config import load_extra_path_config
-import folder_paths
+import zetamotion_comfyui.folder_paths
 
 
 @pytest.fixture()
 def clear_folder_paths():
     # Clear the global dictionary before each test to ensure isolation
-    original = folder_paths.folder_names_and_paths.copy()
-    folder_paths.folder_names_and_paths.clear()
+    original = zetamotion_comfyui.folder_paths.folder_names_and_paths.copy()
+    zetamotion_comfyui.folder_paths.folder_names_and_paths.clear()
     yield
-    folder_paths.folder_names_and_paths = original
+    zetamotion_comfyui.folder_paths.folder_names_and_paths = original
 
 
 @pytest.fixture
@@ -91,7 +91,7 @@ def test_load_extra_model_paths_expands_userpath(
     mock_expanded_home
 ):
     # Attach mocks used by load_extra_path_config
-    monkeypatch.setattr(folder_paths, 'add_model_folder_path', mock_add_model_folder_path)
+    monkeypatch.setattr(zetamotion_comfyui.folder_paths, 'add_model_folder_path', mock_add_model_folder_path)
     monkeypatch.setattr(os.path, 'expanduser', mock_expanduser)
     monkeypatch.setattr(yaml, 'safe_load', mock_yaml_safe_load)
 
@@ -130,7 +130,7 @@ def test_load_extra_model_paths_expands_appdata(
     mock_file.return_value.read.return_value = yaml_config_with_appdata
 
     # Attach mocks
-    monkeypatch.setattr(folder_paths, 'add_model_folder_path', mock_add_model_folder_path)
+    monkeypatch.setattr(zetamotion_comfyui.folder_paths, 'add_model_folder_path', mock_add_model_folder_path)
     monkeypatch.setattr(os.path, 'expandvars', mock_expandvars_appdata)
     monkeypatch.setattr(yaml, 'safe_load', Mock(return_value=mock_yaml_content_appdata))
 
@@ -200,11 +200,11 @@ def test_load_extra_path_config_relative_base_path(
     expected_checkpoints = os.path.abspath(os.path.join(str(tmp_path), "my_rel_base", "checkpoints"))
     expected_some_value = os.path.abspath(os.path.join(str(tmp_path), "my_rel_base", "some_value"))
 
-    actual_paths = folder_paths.folder_names_and_paths["checkpoints"][0]
+    actual_paths = zetamotion_comfyui.folder_paths.folder_names_and_paths["checkpoints"][0]
     assert len(actual_paths) == 1, "Should have one path added for 'checkpoints'."
     assert actual_paths[0] == expected_checkpoints
 
-    actual_paths = folder_paths.folder_names_and_paths["some_key"][0]
+    actual_paths = zetamotion_comfyui.folder_paths.folder_names_and_paths["some_key"][0]
     assert len(actual_paths) == 1, "Should have one path added for 'some_key'."
     assert actual_paths[0] == expected_some_value
 
@@ -249,11 +249,11 @@ def test_load_extra_path_config_absolute_base_path(
     expected_loras = os.path.join(abs_base, "loras_folder")
     expected_embeddings = os.path.join(abs_base, "embeddings_folder")
 
-    actual_loras = folder_paths.folder_names_and_paths["loras"][0]
+    actual_loras = zetamotion_comfyui.folder_paths.folder_names_and_paths["loras"][0]
     assert len(actual_loras) == 1, "Should have one path for 'loras'."
     assert actual_loras[0] == os.path.abspath(expected_loras)
 
-    actual_embeddings = folder_paths.folder_names_and_paths["embeddings"][0]
+    actual_embeddings = zetamotion_comfyui.folder_paths.folder_names_and_paths["embeddings"][0]
     assert len(actual_embeddings) == 1, "Should have one path for 'embeddings'."
     assert actual_embeddings[0] == os.path.abspath(expected_embeddings)
 
@@ -294,10 +294,10 @@ def test_load_extra_path_config_no_base_path(
     expected_clip = os.path.join(str(tmp_path), "clip")
     expected_unet = os.path.join(str(tmp_path), "unet")
 
-    actual_text_encoders = folder_paths.folder_names_and_paths["text_encoders"][0]
+    actual_text_encoders = zetamotion_comfyui.folder_paths.folder_names_and_paths["text_encoders"][0]
     assert len(actual_text_encoders) == 1, "Should have one path for 'text_encoders'."
     assert actual_text_encoders[0] == os.path.abspath(expected_clip)
 
-    actual_diffusion = folder_paths.folder_names_and_paths["diffusion_models"][0]
+    actual_diffusion = zetamotion_comfyui.folder_paths.folder_names_and_paths["diffusion_models"][0]
     assert len(actual_diffusion) == 1, "Should have one path for 'diffusion_models'."
     assert actual_diffusion[0] == os.path.abspath(expected_unet)

@@ -1,5 +1,5 @@
-import comfy.model_patcher
-import comfy.samplers
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.samplers
 import re
 
 
@@ -55,16 +55,16 @@ class SkipLayerGuidanceDiT:
             model_options = args["model_options"].copy()
 
             for layer in double_layers:
-                model_options = comfy.model_patcher.set_model_options_patch_replace(model_options, skip, "dit", "double_block", layer)
+                model_options = zetamotion_comfyui.comfy.model_patcher.set_model_options_patch_replace(model_options, skip, "dit", "double_block", layer)
 
             for layer in single_layers:
-                model_options = comfy.model_patcher.set_model_options_patch_replace(model_options, skip, "dit", "single_block", layer)
+                model_options = zetamotion_comfyui.comfy.model_patcher.set_model_options_patch_replace(model_options, skip, "dit", "single_block", layer)
 
             model_sampling.percent_to_sigma(start_percent)
 
             sigma_ = sigma[0].item()
             if scale > 0 and sigma_ >= sigma_end and sigma_ <= sigma_start:
-                (slg,) = comfy.samplers.calc_cond_batch(model, [cond], x, sigma, model_options)
+                (slg,) = zetamotion_comfyui.comfy.samplers.calc_cond_batch(model, [cond], x, sigma, model_options)
                 cfg_result = cfg_result + (cond_pred - slg) * scale
                 if rescaling_scale != 0:
                     factor = cond_pred.std() / cfg_result.std()
@@ -125,19 +125,19 @@ class SkipLayerGuidanceDiTSimple:
             slg_model_options = model_options.copy()
 
             for layer in double_layers:
-                slg_model_options = comfy.model_patcher.set_model_options_patch_replace(slg_model_options, skip, "dit", "double_block", layer)
+                slg_model_options = zetamotion_comfyui.comfy.model_patcher.set_model_options_patch_replace(slg_model_options, skip, "dit", "double_block", layer)
 
             for layer in single_layers:
-                slg_model_options = comfy.model_patcher.set_model_options_patch_replace(slg_model_options, skip, "dit", "single_block", layer)
+                slg_model_options = zetamotion_comfyui.comfy.model_patcher.set_model_options_patch_replace(slg_model_options, skip, "dit", "single_block", layer)
 
             cond, uncond = conds
             sigma_ = sigma[0].item()
             if sigma_ >= sigma_end and sigma_ <= sigma_start and uncond is not None:
-                cond_out, _ = comfy.samplers.calc_cond_batch(model, [cond, None], x, sigma, model_options)
-                _, uncond_out = comfy.samplers.calc_cond_batch(model, [None, uncond], x, sigma, slg_model_options)
+                cond_out, _ = zetamotion_comfyui.comfy.samplers.calc_cond_batch(model, [cond, None], x, sigma, model_options)
+                _, uncond_out = zetamotion_comfyui.comfy.samplers.calc_cond_batch(model, [None, uncond], x, sigma, slg_model_options)
                 out = [cond_out, uncond_out]
             else:
-                out = comfy.samplers.calc_cond_batch(model, conds, x, sigma, model_options)
+                out = zetamotion_comfyui.comfy.samplers.calc_cond_batch(model, conds, x, sigma, model_options)
 
             return out
 

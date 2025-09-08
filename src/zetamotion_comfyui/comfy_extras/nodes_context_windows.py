@@ -1,7 +1,7 @@
 from __future__ import annotations
-from comfy_api.latest import ComfyExtension, io
-import comfy.context_windows
-import nodes
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
+import zetamotion_comfyui.comfy.context_windows
+import zetamotion_comfyui.nodes
 
 
 class ContextWindowsManualNode(io.ComfyNode):
@@ -17,14 +17,14 @@ class ContextWindowsManualNode(io.ComfyNode):
                 io.Int.Input("context_length", min=1, default=16, tooltip="The length of the context window."),
                 io.Int.Input("context_overlap", min=0, default=4, tooltip="The overlap of the context window."),
                 io.Combo.Input("context_schedule", options=[
-                    comfy.context_windows.ContextSchedules.STATIC_STANDARD,
-                    comfy.context_windows.ContextSchedules.UNIFORM_STANDARD,
-                    comfy.context_windows.ContextSchedules.UNIFORM_LOOPED,
-                    comfy.context_windows.ContextSchedules.BATCHED,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.STATIC_STANDARD,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.UNIFORM_STANDARD,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.UNIFORM_LOOPED,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.BATCHED,
                     ], tooltip="The stride of the context window."),
                 io.Int.Input("context_stride", min=1, default=1, tooltip="The stride of the context window; only applicable to uniform schedules."),
                 io.Boolean.Input("closed_loop", default=False, tooltip="Whether to close the context window loop; only applicable to looped schedules."),
-                io.Combo.Input("fuse_method", options=comfy.context_windows.ContextFuseMethods.LIST_STATIC, default=comfy.context_windows.ContextFuseMethods.PYRAMID, tooltip="The method to use to fuse the context windows."),
+                io.Combo.Input("fuse_method", options=zetamotion_comfyui.comfy.context_windows.ContextFuseMethods.LIST_STATIC, default=zetamotion_comfyui.comfy.context_windows.ContextFuseMethods.PYRAMID, tooltip="The method to use to fuse the context windows."),
                 io.Int.Input("dim", min=0, max=5, default=0, tooltip="The dimension to apply the context windows to."),
             ],
             outputs=[
@@ -36,16 +36,16 @@ class ContextWindowsManualNode(io.ComfyNode):
     @classmethod
     def execute(cls, model: io.Model.Type, context_length: int, context_overlap: int, context_schedule: str, context_stride: int, closed_loop: bool, fuse_method: str, dim: int) -> io.Model:
         model = model.clone()
-        model.model_options["context_handler"] = comfy.context_windows.IndexListContextHandler(
-            context_schedule=comfy.context_windows.get_matching_context_schedule(context_schedule),
-            fuse_method=comfy.context_windows.get_matching_fuse_method(fuse_method),
+        model.model_options["context_handler"] = zetamotion_comfyui.comfy.context_windows.IndexListContextHandler(
+            context_schedule=zetamotion_comfyui.comfy.context_windows.get_matching_context_schedule(context_schedule),
+            fuse_method=zetamotion_comfyui.comfy.context_windows.get_matching_fuse_method(fuse_method),
             context_length=context_length,
             context_overlap=context_overlap,
             context_stride=context_stride,
             closed_loop=closed_loop,
             dim=dim)
         # make memory usage calculation only take into account the context window latents
-        comfy.context_windows.create_prepare_sampling_wrapper(model)
+        zetamotion_comfyui.comfy.context_windows.create_prepare_sampling_wrapper(model)
         return io.NodeOutput(model)
 
 class WanContextWindowsManualNode(ContextWindowsManualNode):
@@ -57,17 +57,17 @@ class WanContextWindowsManualNode(ContextWindowsManualNode):
         schema.description = "Manually set context windows for WAN-like models (dim=2)."
         schema.inputs = [
             io.Model.Input("model", tooltip="The model to apply context windows to during sampling."),
-                io.Int.Input("context_length", min=1, max=nodes.MAX_RESOLUTION, step=4, default=81, tooltip="The length of the context window."),
+                io.Int.Input("context_length", min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4, default=81, tooltip="The length of the context window."),
                 io.Int.Input("context_overlap", min=0, default=30, tooltip="The overlap of the context window."),
                 io.Combo.Input("context_schedule", options=[
-                    comfy.context_windows.ContextSchedules.STATIC_STANDARD,
-                    comfy.context_windows.ContextSchedules.UNIFORM_STANDARD,
-                    comfy.context_windows.ContextSchedules.UNIFORM_LOOPED,
-                    comfy.context_windows.ContextSchedules.BATCHED,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.STATIC_STANDARD,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.UNIFORM_STANDARD,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.UNIFORM_LOOPED,
+                    zetamotion_comfyui.comfy.context_windows.ContextSchedules.BATCHED,
                     ], tooltip="The stride of the context window."),
                 io.Int.Input("context_stride", min=1, default=1, tooltip="The stride of the context window; only applicable to uniform schedules."),
                 io.Boolean.Input("closed_loop", default=False, tooltip="Whether to close the context window loop; only applicable to looped schedules."),
-                io.Combo.Input("fuse_method", options=comfy.context_windows.ContextFuseMethods.LIST_STATIC, default=comfy.context_windows.ContextFuseMethods.PYRAMID, tooltip="The method to use to fuse the context windows."),
+                io.Combo.Input("fuse_method", options=zetamotion_comfyui.comfy.context_windows.ContextFuseMethods.LIST_STATIC, default=zetamotion_comfyui.comfy.context_windows.ContextFuseMethods.PYRAMID, tooltip="The method to use to fuse the context windows."),
         ]
         return schema
 

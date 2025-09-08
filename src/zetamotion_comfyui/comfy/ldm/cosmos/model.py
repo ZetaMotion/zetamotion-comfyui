@@ -27,7 +27,7 @@ from torchvision import transforms
 from enum import Enum
 import logging
 
-import comfy.patcher_extension
+import zetamotion_comfyui.comfy.patcher_extension
 
 from .blocks import (
     FinalLayer,
@@ -438,10 +438,10 @@ class GeneralDIT(nn.Module):
         condition_video_augment_sigma: Optional[torch.Tensor] = None,
         **kwargs,
     ):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
         ).execute(x,
                 timesteps,
                 context,

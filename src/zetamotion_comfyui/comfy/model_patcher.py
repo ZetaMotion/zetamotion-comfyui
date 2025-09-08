@@ -85,7 +85,7 @@ def set_model_options_pre_cfg_function(model_options, pre_cfg_function, disable_
     return model_options
 
 def create_model_options_clone(orig_model_options: dict):
-    return comfy.patcher_extension.copy_nested_dicts(orig_model_options)
+    return zetamotion_comfyui.comfy.patcher_extension.copy_nested_dicts(orig_model_options)
 
 def create_hook_patches_clone(orig_hook_patches):
     new_hook_patches = {}
@@ -130,18 +130,18 @@ class LowVramPatch:
         intermediate_dtype = weight.dtype
         if intermediate_dtype not in [torch.float32, torch.float16, torch.bfloat16]: #intermediate_dtype has to be one that is supported in math ops
             intermediate_dtype = torch.float32
-            return comfy.float.stochastic_rounding(comfy.lora.calculate_weight(self.patches[self.key], weight.to(intermediate_dtype), self.key, intermediate_dtype=intermediate_dtype), weight.dtype, seed=string_to_seed(self.key))
+            return zetamotion_comfyui.comfy.float.stochastic_rounding(zetamotion_comfyui.comfy.lora.calculate_weight(self.patches[self.key], weight.to(intermediate_dtype), self.key, intermediate_dtype=intermediate_dtype), weight.dtype, seed=string_to_seed(self.key))
 
-        return comfy.lora.calculate_weight(self.patches[self.key], weight, self.key, intermediate_dtype=intermediate_dtype)
+        return zetamotion_comfyui.comfy.lora.calculate_weight(self.patches[self.key], weight, self.key, intermediate_dtype=intermediate_dtype)
 
 def get_key_weight(model, key):
     set_func = None
     convert_func = None
     op_keys = key.rsplit('.', 1)
     if len(op_keys) < 2:
-        weight = comfy.utils.get_attr(model, key)
+        weight = zetamotion_comfyui.comfy.utils.get_attr(model, key)
     else:
-        op = comfy.utils.get_attr(model, op_keys[0])
+        op = zetamotion_comfyui.comfy.utils.get_attr(model, op_keys[0])
         try:
             set_func = getattr(op, "set_{}".format(op_keys[1]))
         except AttributeError:
@@ -154,7 +154,7 @@ def get_key_weight(model, key):
 
         weight = getattr(op, op_keys[1])
         if convert_func is not None:
-            weight = comfy.utils.get_attr(model, key)
+            weight = zetamotion_comfyui.comfy.utils.get_attr(model, key)
 
     return weight, set_func, convert_func
 
@@ -241,7 +241,7 @@ class ModelPatcher:
         self.current_hooks: Optional[comfy.hooks.HookGroup] = None
         self.forced_hooks: Optional[comfy.hooks.HookGroup] = None  # NOTE: only used for CLIP at this time
         self.is_clip = False
-        self.hook_mode = comfy.hooks.EnumHookMode.MaxSpeed
+        self.hook_mode = zetamotion_comfyui.comfy.hooks.EnumHookMode.MaxSpeed
 
         if not hasattr(self.model, 'model_loaded_weight_memory'):
             self.model.model_loaded_weight_memory = 0
@@ -258,7 +258,7 @@ class ModelPatcher:
     def model_size(self):
         if self.size > 0:
             return self.size
-        self.size = comfy.model_management.module_size(self.model)
+        self.size = zetamotion_comfyui.comfy.model_management.module_size(self.model)
         return self.size
 
     def loaded_size(self):
@@ -469,7 +469,7 @@ class ModelPatcher:
             if name in self.object_patches_backup:
                 return self.object_patches_backup[name]
             else:
-                return comfy.utils.get_attr(self.model, name)
+                return zetamotion_comfyui.comfy.utils.get_attr(self.model, name)
 
     def model_patches_to(self, device):
         to = self.model_options["transformer_options"]
@@ -588,19 +588,19 @@ class ModelPatcher:
             self.backup[key] = collections.namedtuple('Dimension', ['weight', 'inplace_update'])(weight.to(device=self.offload_device, copy=inplace_update), inplace_update)
 
         if device_to is not None:
-            temp_weight = comfy.model_management.cast_to_device(weight, device_to, torch.float32, copy=True)
+            temp_weight = zetamotion_comfyui.comfy.model_management.cast_to_device(weight, device_to, torch.float32, copy=True)
         else:
             temp_weight = weight.to(torch.float32, copy=True)
         if convert_func is not None:
             temp_weight = convert_func(temp_weight, inplace=True)
 
-        out_weight = comfy.lora.calculate_weight(self.patches[key], temp_weight, key)
+        out_weight = zetamotion_comfyui.comfy.lora.calculate_weight(self.patches[key], temp_weight, key)
         if set_func is None:
-            out_weight = comfy.float.stochastic_rounding(out_weight, weight.dtype, seed=string_to_seed(key))
+            out_weight = zetamotion_comfyui.comfy.float.stochastic_rounding(out_weight, weight.dtype, seed=string_to_seed(key))
             if inplace_update:
-                comfy.utils.copy_to_param(self.model, key, out_weight)
+                zetamotion_comfyui.comfy.utils.copy_to_param(self.model, key, out_weight)
             else:
-                comfy.utils.set_attr_param(self.model, key, out_weight)
+                zetamotion_comfyui.comfy.utils.set_attr_param(self.model, key, out_weight)
         else:
             set_func(out_weight, inplace_update=inplace_update, seed=string_to_seed(key))
 
@@ -616,7 +616,7 @@ class ModelPatcher:
                     skip = True # skip random weights in non leaf modules
                     break
             if not skip and (hasattr(m, "comfy_cast_weights") or len(params) > 0):
-                loading.append((comfy.model_management.module_size(m), n, m, params))
+                loading.append((zetamotion_comfyui.comfy.model_management.module_size(m), n, m, params))
         return loading
 
     def load(self, device_to=None, lowvram_model_memory=0, force_patch_weights=False, full_load=False):
@@ -728,7 +728,7 @@ class ModelPatcher:
     def patch_model(self, device_to=None, lowvram_model_memory=0, load_weights=True, force_patch_weights=False):
         with self.use_ejected():
             for k in self.object_patches:
-                old = comfy.utils.set_attr(self.model, k, self.object_patches[k])
+                old = zetamotion_comfyui.comfy.utils.set_attr(self.model, k, self.object_patches[k])
                 if k not in self.object_patches_backup:
                     self.object_patches_backup[k] = old
 
@@ -759,9 +759,9 @@ class ModelPatcher:
             for k in keys:
                 bk = self.backup[k]
                 if bk.inplace_update:
-                    comfy.utils.copy_to_param(self.model, k, bk.weight)
+                    zetamotion_comfyui.comfy.utils.copy_to_param(self.model, k, bk.weight)
                 else:
-                    comfy.utils.set_attr_param(self.model, k, bk.weight)
+                    zetamotion_comfyui.comfy.utils.set_attr_param(self.model, k, bk.weight)
 
             self.model.current_weight_patches_uuid = None
             self.backup.clear()
@@ -777,7 +777,7 @@ class ModelPatcher:
 
         keys = list(self.object_patches_backup.keys())
         for k in keys:
-            comfy.utils.set_attr(self.model, k, self.object_patches_backup[k])
+            zetamotion_comfyui.comfy.utils.set_attr(self.model, k, self.object_patches_backup[k])
 
         self.object_patches_backup.clear()
 
@@ -812,9 +812,9 @@ class ModelPatcher:
                                 hooks_unpatched = True
 
                             if bk.inplace_update:
-                                comfy.utils.copy_to_param(self.model, key, bk.weight)
+                                zetamotion_comfyui.comfy.utils.copy_to_param(self.model, key, bk.weight)
                             else:
-                                comfy.utils.set_attr_param(self.model, key, bk.weight)
+                                zetamotion_comfyui.comfy.utils.set_attr_param(self.model, key, bk.weight)
                             self.backup.pop(key)
 
                     weight_key = "{}.weight".format(n)
@@ -882,8 +882,8 @@ class ModelPatcher:
         return self.model.device
 
     def calculate_weight(self, patches, weight, key, intermediate_dtype=torch.float32):
-        logging.warning("The ModelPatcher.calculate_weight function is deprecated, please use: comfy.lora.calculate_weight instead")
-        return comfy.lora.calculate_weight(patches, weight, key, intermediate_dtype=intermediate_dtype)
+        logging.warning("The ModelPatcher.calculate_weight function is deprecated, please use: zetamotion_comfyui.comfy.lora.calculate_weight instead")
+        return zetamotion_comfyui.comfy.lora.calculate_weight(patches, weight, key, intermediate_dtype=intermediate_dtype)
 
     def cleanup(self):
         self.clean_hooks()
@@ -1028,10 +1028,10 @@ class ModelPatcher:
             self.hook_patches = self.hook_patches_backup
             self.hook_patches_backup = None
 
-    def set_hook_mode(self, hook_mode: comfy.hooks.EnumHookMode):
+    def set_hook_mode(self, hook_mode: zetamotion_comfyui.comfy.hooks.EnumHookMode):
         self.hook_mode = hook_mode
 
-    def prepare_hook_patches_current_keyframe(self, t: torch.Tensor, hook_group: comfy.hooks.HookGroup, model_options: dict[str]):
+    def prepare_hook_patches_current_keyframe(self, t: torch.Tensor, hook_group: zetamotion_comfyui.comfy.hooks.HookGroup, model_options: dict[str]):
         curr_t = t[0]
         reset_current_hooks = False
         transformer_options = model_options.get("transformer_options", {})
@@ -1052,14 +1052,14 @@ class ModelPatcher:
         if reset_current_hooks:
             self.patch_hooks(None)
 
-    def register_all_hook_patches(self, hooks: comfy.hooks.HookGroup, target_dict: dict[str], model_options: dict=None,
-                                  registered: comfy.hooks.HookGroup = None):
+    def register_all_hook_patches(self, hooks: zetamotion_comfyui.comfy.hooks.HookGroup, target_dict: dict[str], model_options: dict=None,
+                                  registered: zetamotion_comfyui.comfy.hooks.HookGroup = None):
         self.restore_hook_patches()
         if registered is None:
-            registered = comfy.hooks.HookGroup()
+            registered = zetamotion_comfyui.comfy.hooks.HookGroup()
         # handle WeightHooks
         weight_hooks_to_register: list[comfy.hooks.WeightHook] = []
-        for hook in hooks.get_type(comfy.hooks.EnumHookType.Weight):
+        for hook in hooks.get_type(zetamotion_comfyui.comfy.hooks.EnumHookType.Weight):
             if hook.hook_ref not in self.hook_patches:
                 weight_hooks_to_register.append(hook)
             else:
@@ -1073,7 +1073,7 @@ class ModelPatcher:
             callback(self, hooks, target_dict, model_options, registered)
         return registered
 
-    def add_hook_patches(self, hook: comfy.hooks.WeightHook, patches, strength_patch=1.0, strength_model=1.0):
+    def add_hook_patches(self, hook: zetamotion_comfyui.comfy.hooks.WeightHook, patches, strength_patch=1.0, strength_model=1.0):
         with self.use_ejected():
             # NOTE: this mirrors behavior of add_patches func
             current_hook_patches: dict[str,list] = self.hook_patches.get(hook.hook_ref, {})
@@ -1100,7 +1100,7 @@ class ModelPatcher:
             self.patches_uuid = uuid.uuid4()
             return list(p)
 
-    def get_combined_hook_patches(self, hooks: comfy.hooks.HookGroup):
+    def get_combined_hook_patches(self, hooks: zetamotion_comfyui.comfy.hooks.HookGroup):
         # combined_patches will contain  weights of all relevant hooks, per key
         combined_patches = {}
         if hooks is not None:
@@ -1119,24 +1119,24 @@ class ModelPatcher:
                     combined_patches[key] = current_patches
         return combined_patches
 
-    def apply_hooks(self, hooks: comfy.hooks.HookGroup, transformer_options: dict=None, force_apply=False):
+    def apply_hooks(self, hooks: zetamotion_comfyui.comfy.hooks.HookGroup, transformer_options: dict=None, force_apply=False):
         # TODO: return transformer_options dict with any additions from hooks
         if self.current_hooks == hooks and (not force_apply or (not self.is_clip and hooks is None)):
-            return comfy.hooks.create_transformer_options_from_hooks(self, hooks, transformer_options)
+            return zetamotion_comfyui.comfy.hooks.create_transformer_options_from_hooks(self, hooks, transformer_options)
         self.patch_hooks(hooks=hooks)
         for callback in self.get_all_callbacks(CallbacksMP.ON_APPLY_HOOKS):
             callback(self, hooks)
-        return comfy.hooks.create_transformer_options_from_hooks(self, hooks, transformer_options)
+        return zetamotion_comfyui.comfy.hooks.create_transformer_options_from_hooks(self, hooks, transformer_options)
 
-    def patch_hooks(self, hooks: comfy.hooks.HookGroup):
+    def patch_hooks(self, hooks: zetamotion_comfyui.comfy.hooks.HookGroup):
         with self.use_ejected():
             if hooks is not None:
                 model_sd_keys = list(self.model_state_dict().keys())
                 memory_counter = None
-                if self.hook_mode == comfy.hooks.EnumHookMode.MaxSpeed:
+                if self.hook_mode == zetamotion_comfyui.comfy.hooks.EnumHookMode.MaxSpeed:
                     # TODO: minimum_counter should have a minimum that conforms to loaded model requirements
-                    memory_counter = MemoryCounter(initial=comfy.model_management.get_free_memory(self.load_device),
-                                                minimum=comfy.model_management.minimum_inference_memory()*2)
+                    memory_counter = MemoryCounter(initial=zetamotion_comfyui.comfy.model_management.get_free_memory(self.load_device),
+                                                minimum=zetamotion_comfyui.comfy.model_management.minimum_inference_memory()*2)
                 # if have cached weights for hooks, use it
                 cached_weights = self.cached_hook_patches.get(hooks, None)
                 if cached_weights is not None:
@@ -1166,20 +1166,20 @@ class ModelPatcher:
 
     def patch_cached_hook_weights(self, cached_weights: dict, key: str, memory_counter: MemoryCounter):
         if key not in self.hook_backup:
-            weight: torch.Tensor = comfy.utils.get_attr(self.model, key)
+            weight: torch.Tensor = zetamotion_comfyui.comfy.utils.get_attr(self.model, key)
             target_device = self.offload_device
-            if self.hook_mode == comfy.hooks.EnumHookMode.MaxSpeed:
+            if self.hook_mode == zetamotion_comfyui.comfy.hooks.EnumHookMode.MaxSpeed:
                 used = memory_counter.use(weight)
                 if used:
                     target_device = weight.device
             self.hook_backup[key] = (weight.to(device=target_device, copy=True), weight.device)
-        comfy.utils.copy_to_param(self.model, key, cached_weights[key][0].to(device=cached_weights[key][1]))
+        zetamotion_comfyui.comfy.utils.copy_to_param(self.model, key, cached_weights[key][0].to(device=cached_weights[key][1]))
 
     def clear_cached_hook_weights(self):
         self.cached_hook_patches.clear()
         self.patch_hooks(None)
 
-    def patch_hook_weight_to_device(self, hooks: comfy.hooks.HookGroup, combined_patches: dict, key: str, original_weights: dict, memory_counter: MemoryCounter):
+    def patch_hook_weight_to_device(self, hooks: zetamotion_comfyui.comfy.hooks.HookGroup, combined_patches: dict, key: str, original_weights: dict, memory_counter: MemoryCounter):
         if key not in combined_patches:
             return
 
@@ -1187,26 +1187,26 @@ class ModelPatcher:
         weight: torch.Tensor
         if key not in self.hook_backup:
             target_device = self.offload_device
-            if self.hook_mode == comfy.hooks.EnumHookMode.MaxSpeed:
+            if self.hook_mode == zetamotion_comfyui.comfy.hooks.EnumHookMode.MaxSpeed:
                 used = memory_counter.use(weight)
                 if used:
                     target_device = weight.device
             self.hook_backup[key] = (weight.to(device=target_device, copy=True), weight.device)
         # TODO: properly handle LowVramPatch, if it ends up an issue
-        temp_weight = comfy.model_management.cast_to_device(weight, weight.device, torch.float32, copy=True)
+        temp_weight = zetamotion_comfyui.comfy.model_management.cast_to_device(weight, weight.device, torch.float32, copy=True)
         if convert_func is not None:
             temp_weight = convert_func(temp_weight, inplace=True)
 
-        out_weight = comfy.lora.calculate_weight(combined_patches[key],
+        out_weight = zetamotion_comfyui.comfy.lora.calculate_weight(combined_patches[key],
                                                  temp_weight,
                                                  key, original_weights=original_weights)
         del original_weights[key]
         if set_func is None:
-            out_weight = comfy.float.stochastic_rounding(out_weight, weight.dtype, seed=string_to_seed(key))
-            comfy.utils.copy_to_param(self.model, key, out_weight)
+            out_weight = zetamotion_comfyui.comfy.float.stochastic_rounding(out_weight, weight.dtype, seed=string_to_seed(key))
+            zetamotion_comfyui.comfy.utils.copy_to_param(self.model, key, out_weight)
         else:
             set_func(out_weight, inplace_update=True, seed=string_to_seed(key))
-        if self.hook_mode == comfy.hooks.EnumHookMode.MaxSpeed:
+        if self.hook_mode == zetamotion_comfyui.comfy.hooks.EnumHookMode.MaxSpeed:
             # TODO: disable caching if not enough system RAM to do so
             target_device = self.offload_device
             used = memory_counter.use(weight)
@@ -1227,11 +1227,11 @@ class ModelPatcher:
             if whitelist_keys_set:
                 for k in keys:
                     if k in whitelist_keys_set:
-                        comfy.utils.copy_to_param(self.model, k, self.hook_backup[k][0].to(device=self.hook_backup[k][1]))
+                        zetamotion_comfyui.comfy.utils.copy_to_param(self.model, k, self.hook_backup[k][0].to(device=self.hook_backup[k][1]))
                         self.hook_backup.pop(k)
             else:
                 for k in keys:
-                    comfy.utils.copy_to_param(self.model, k, self.hook_backup[k][0].to(device=self.hook_backup[k][1]))
+                    zetamotion_comfyui.comfy.utils.copy_to_param(self.model, k, self.hook_backup[k][0].to(device=self.hook_backup[k][1]))
 
                 self.hook_backup.clear()
                 self.current_hooks = None

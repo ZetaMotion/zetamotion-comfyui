@@ -12,8 +12,8 @@ import importlib
 # Add ComfyUI to path so we can import modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from comfy_api.internal.async_to_sync import AsyncToSyncConverter
-from comfy_api.version_list import supported_versions
+from zetamotion_comfyui.comfy_api.internal.async_to_sync import AsyncToSyncConverter
+from zetamotion_comfyui.comfy_api.version_list import supported_versions
 
 
 def generate_stubs_for_module(module_name: str) -> None:
@@ -39,7 +39,7 @@ def generate_stubs_for_module(module_name: str) -> None:
 
         elif hasattr(module, "ComfyAPI"):
             # Module only has async API, need to create sync wrapper first
-            from comfy_api.internal.async_to_sync import create_sync_class
+            from zetamotion_comfyui.comfy_api.internal.async_to_sync import create_sync_class
 
             api_class = getattr(module, "ComfyAPI")
             sync_class = create_sync_class(api_class)

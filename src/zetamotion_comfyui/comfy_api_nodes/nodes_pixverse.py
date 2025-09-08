@@ -1,6 +1,6 @@
 from inspect import cleandoc
 from typing import Optional
-from comfy_api_nodes.apis.pixverse_api import (
+from zetamotion_comfyui.comfy_api_nodes.apis.pixverse_api import (
     PixverseTextVideoRequest,
     PixverseImageVideoRequest,
     PixverseTransitionVideoRequest,
@@ -15,19 +15,19 @@ from comfy_api_nodes.apis.pixverse_api import (
     PixverseIO,
     pixverse_templates,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     tensor_to_bytesio,
     validate_string,
 )
-from comfy.comfy_types.node_typing import IO, ComfyNodeABC
-from comfy_api.input_impl import VideoFromFile
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, ComfyNodeABC
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromFile
 
 import torch
 import aiohttp

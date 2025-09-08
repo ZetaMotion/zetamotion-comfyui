@@ -12,14 +12,14 @@ from typing import Optional, TypeVar
 import numpy as np
 import torch
 
-from comfy.comfy_types.node_typing import IO, ComfyNodeABC, InputTypeOptions
-from comfy_api.input_impl import VideoFromFile
-from comfy_api.input_impl.video_types import VideoCodec, VideoContainer, VideoInput
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, ComfyNodeABC, InputTypeOptions
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromFile
+from zetamotion_comfyui.comfy_api.input_impl.video_types import VideoCodec, VideoContainer, VideoInput
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     download_url_to_video_output,
     tensor_to_bytesio,
 )
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     IngredientsMode,
     PikaBodyGenerate22C2vGenerate22PikascenesPost,
     PikaBodyGenerate22I2vGenerate22I2vPost,
@@ -34,14 +34,14 @@ from comfy_api_nodes.apis import (
     PikaResolutionEnum,
     PikaVideoResponse,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     EmptyRequest,
     HttpMethod,
     PollingOperation,
     SynchronousOperation,
 )
-from comfy_api_nodes.mapper_utils import model_field_to_node_input
+from zetamotion_comfyui.comfy_api_nodes.mapper_utils import model_field_to_node_input
 
 R = TypeVar("R")
 

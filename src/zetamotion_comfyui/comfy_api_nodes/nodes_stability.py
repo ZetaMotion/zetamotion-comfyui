@@ -2,8 +2,8 @@ from inspect import cleandoc
 from typing import Optional
 from typing_extensions import override
 
-from comfy_api.latest import ComfyExtension, io as comfy_io
-from comfy_api_nodes.apis.stability_api import (
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io as comfy_io
+from zetamotion_comfyui.comfy_api_nodes.apis.stability_api import (
     StabilityUpscaleConservativeRequest,
     StabilityUpscaleCreativeRequest,
     StabilityAsyncResponse,
@@ -16,14 +16,14 @@ from comfy_api_nodes.apis.stability_api import (
     Stability_SD3_5_GenerationMode,
     get_stability_style_presets,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     bytesio_to_image_tensor,
     tensor_to_bytesio,
     validate_string,

@@ -4,8 +4,8 @@ import torch
 from torch import nn
 from typing import Literal
 import math
-import comfy.ops
-ops = comfy.ops.disable_weight_init
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 def vae_sample(mean, scale):
         stdev = nn.functional.softplus(scale) + 1e-4

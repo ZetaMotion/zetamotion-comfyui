@@ -12,7 +12,7 @@ class CONDRegular:
         return self.__class__(cond)
 
     def process_cond(self, batch_size, **kwargs):
-        return self._copy_with(comfy.utils.repeat_to_batch_size(self.cond, batch_size))
+        return self._copy_with(zetamotion_comfyui.comfy.utils.repeat_to_batch_size(self.cond, batch_size))
 
     def can_concat(self, other):
         if self.cond.shape != other.cond.shape:
@@ -40,7 +40,7 @@ class CONDNoiseShape(CONDRegular):
             for i in range(dims):
                 data = data.narrow(i + 2, area[i + dims], area[i])
 
-        return self._copy_with(comfy.utils.repeat_to_batch_size(data, batch_size))
+        return self._copy_with(zetamotion_comfyui.comfy.utils.repeat_to_batch_size(data, batch_size))
 
 
 class CONDCrossAttn(CONDRegular):
@@ -102,7 +102,7 @@ class CONDList(CONDRegular):
     def process_cond(self, batch_size, **kwargs):
         out = []
         for c in self.cond:
-            out.append(comfy.utils.repeat_to_batch_size(c, batch_size))
+            out.append(zetamotion_comfyui.comfy.utils.repeat_to_batch_size(c, batch_size))
 
         return self._copy_with(out)
 

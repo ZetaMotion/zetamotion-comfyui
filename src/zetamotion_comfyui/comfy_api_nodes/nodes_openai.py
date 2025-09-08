@@ -10,12 +10,12 @@ from inspect import cleandoc
 import numpy as np
 import torch
 from PIL import Image
-from comfy.comfy_types.node_typing import IO, ComfyNodeABC, InputTypeDict
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, ComfyNodeABC, InputTypeDict
 from server import PromptServer
-import folder_paths
+import zetamotion_comfyui.folder_paths
 
 
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     OpenAIImageGenerationRequest,
     OpenAIImageEditRequest,
     OpenAIImageGenerationResponse,
@@ -34,7 +34,7 @@ from comfy_api_nodes.apis import (
     InputFileContent,
 )
 
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
@@ -42,14 +42,14 @@ from comfy_api_nodes.apis.client import (
     EmptyRequest,
 )
 
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     downscale_image_tensor,
     validate_and_cast_response,
     validate_string,
     tensor_to_base64_string,
     text_filepath_to_data_uri,
 )
-from comfy_api_nodes.mapper_utils import model_field_to_node_input
+from zetamotion_comfyui.comfy_api_nodes.mapper_utils import model_field_to_node_input
 
 
 RESPONSES_ENDPOINT = "/proxy/openai/v1/responses"
@@ -866,7 +866,7 @@ class OpenAIInputFiles(ComfyNodeABC):
         For details about the supported file input types, see:
         https://platform.openai.com/docs/guides/pdf-files?api-mode=responses
         """
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         input_files = [
             f
             for f in os.scandir(input_dir)
@@ -916,7 +916,7 @@ class OpenAIInputFiles(ComfyNodeABC):
         """
         Loads and formats input files for OpenAI API.
         """
-        file_path = folder_paths.get_annotated_filepath(file)
+        file_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(file)
         input_file_content = self.create_input_file_content(file_path)
         files = [input_file_content] + OPENAI_INPUT_FILES
         return (files,)

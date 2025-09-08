@@ -1,10 +1,10 @@
-import comfy.utils
-import folder_paths
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.folder_paths
 import torch
 import logging
 
 def load_hypernetwork_patch(path, strength):
-    sd = comfy.utils.load_torch_file(path, safe_load=True)
+    sd = zetamotion_comfyui.comfy.utils.load_torch_file(path, safe_load=True)
     activation_func = sd.get('activation_func', 'linear')
     is_layer_norm = sd.get('is_layer_norm', False)
     use_dropout = sd.get('use_dropout', False)
@@ -98,7 +98,7 @@ class HypernetworkLoader:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "model": ("MODEL",),
-                              "hypernetwork_name": (folder_paths.get_filename_list("hypernetworks"), ),
+                              "hypernetwork_name": (zetamotion_comfyui.folder_paths.get_filename_list("hypernetworks"), ),
                               "strength": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                               }}
     RETURN_TYPES = ("MODEL",)
@@ -107,7 +107,7 @@ class HypernetworkLoader:
     CATEGORY = "loaders"
 
     def load_hypernetwork(self, model, hypernetwork_name, strength):
-        hypernetwork_path = folder_paths.get_full_path_or_raise("hypernetworks", hypernetwork_name)
+        hypernetwork_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("hypernetworks", hypernetwork_name)
         model_hypernetwork = model.clone()
         patch = load_hypernetwork_patch(hypernetwork_path, strength)
         if patch is not None:

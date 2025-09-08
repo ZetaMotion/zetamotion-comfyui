@@ -15,10 +15,10 @@ from typing import Optional, Literal
 
 import torch
 
-import folder_paths
-from comfy.comfy_types.node_typing import IO, ComfyNodeABC, InputTypeDict
+import zetamotion_comfyui.folder_paths
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, ComfyNodeABC, InputTypeDict
 from server import PromptServer
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     GeminiContent,
     GeminiGenerateContentRequest,
     GeminiGenerateContentResponse,
@@ -26,13 +26,13 @@ from comfy_api_nodes.apis import (
     GeminiPart,
     GeminiMimeType,
 )
-from comfy_api_nodes.apis.gemini_api import GeminiImageGenerationConfig, GeminiImageGenerateContentRequest
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.gemini_api import GeminiImageGenerationConfig, GeminiImageGenerateContentRequest
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     validate_string,
     audio_to_base64_string,
     video_to_base64_string,
@@ -310,7 +310,7 @@ class GeminiNode(ComfyNodeABC):
         Returns:
             List of GeminiPart objects containing the encoded video.
         """
-        from comfy_api.util import VideoContainer, VideoCodec
+        from zetamotion_comfyui.comfy_api.util import VideoContainer, VideoCodec
         base_64_string = video_to_base64_string(
             video_input,
             container_format=VideoContainer.MP4,
@@ -444,7 +444,7 @@ class GeminiInputFiles(ComfyNodeABC):
         For details about the supported file input types, see:
         https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference
         """
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         input_files = [
             f
             for f in os.scandir(input_dir)
@@ -506,7 +506,7 @@ class GeminiInputFiles(ComfyNodeABC):
         """
         Loads and formats input files for Gemini API.
         """
-        file_path = folder_paths.get_annotated_filepath(file)
+        file_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(file)
         input_file_content = self.create_file_part(file_path)
         files = [input_file_content] + GEMINI_INPUT_FILES
         return (files,)

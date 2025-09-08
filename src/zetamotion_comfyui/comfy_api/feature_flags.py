@@ -7,7 +7,7 @@ allowing graceful protocol evolution while maintaining backward compatibility.
 
 from typing import Any, Dict
 
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.cli_args import args
 
 # Default server capabilities
 SERVER_FEATURE_FLAGS: Dict[str, Any] = {

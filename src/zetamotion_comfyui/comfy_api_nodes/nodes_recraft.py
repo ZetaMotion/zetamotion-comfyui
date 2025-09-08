@@ -1,10 +1,10 @@
 from __future__ import annotations
 from inspect import cleandoc
 from typing import Optional
-from comfy.utils import ProgressBar
+from zetamotion_comfyui.comfy.utils import ProgressBar
 from comfy_extras.nodes_images import SVG # Added
-from comfy.comfy_types.node_typing import IO
-from comfy_api_nodes.apis.recraft_api import (
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
+from zetamotion_comfyui.comfy_api_nodes.apis.recraft_api import (
     RecraftImageGenerationRequest,
     RecraftImageGenerationResponse,
     RecraftImageSize,
@@ -17,13 +17,13 @@ from comfy_api_nodes.apis.recraft_api import (
     RecraftIO,
     get_v3_substyles,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     bytesio_to_image_tensor,
     download_url_to_bytesio,
     tensor_to_bytesio,

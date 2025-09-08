@@ -1,7 +1,7 @@
 import torch
-import comfy.model_management
-import comfy.utils
-import folder_paths
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.folder_paths
 import os
 import logging
 from enum import Enum
@@ -47,7 +47,7 @@ LORA_TYPES = {"standard": LORAType.STANDARD,
               "full_diff": LORAType.FULL_DIFF}
 
 def calc_lora_model(model_diff, rank, prefix_model, prefix_lora, output_sd, lora_type, bias_diff=False):
-    comfy.model_management.load_models_gpu([model_diff], force_patch_weights=True)
+    zetamotion_comfyui.comfy.model_management.load_models_gpu([model_diff], force_patch_weights=True)
     sd = model_diff.model_state_dict(filter_prefix=prefix_model)
 
     for k in sd:
@@ -73,7 +73,7 @@ def calc_lora_model(model_diff, rank, prefix_model, prefix_lora, output_sd, lora
 
 class LoraSave:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -96,7 +96,7 @@ class LoraSave:
             return {}
 
         lora_type = LORA_TYPES.get(lora_type)
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir)
 
         output_sd = {}
         if model_diff is not None:
@@ -107,7 +107,7 @@ class LoraSave:
         output_checkpoint = f"{filename}_{counter:05}_.safetensors"
         output_checkpoint = os.path.join(full_output_folder, output_checkpoint)
 
-        comfy.utils.save_torch_file(output_sd, output_checkpoint, metadata=None)
+        zetamotion_comfyui.comfy.utils.save_torch_file(output_sd, output_checkpoint, metadata=None)
         return {}
 
 NODE_CLASS_MAPPINGS = {

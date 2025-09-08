@@ -1,13 +1,13 @@
 import os
 
-from comfy import sd1_clip
-import comfy.text_encoders.t5
-import comfy.text_encoders.sd3_clip
-from comfy.sd1_clip import gen_empty_tokens
+from zetamotion_comfyui.comfy import sd1_clip
+import zetamotion_comfyui.comfy.text_encoders.t5
+import zetamotion_comfyui.comfy.text_encoders.sd3_clip
+from zetamotion_comfyui.comfy.sd1_clip import gen_empty_tokens
 
 from transformers import T5TokenizerFast
 
-class T5XXLModel(comfy.text_encoders.sd3_clip.T5XXLModel):
+class T5XXLModel(zetamotion_comfyui.comfy.text_encoders.sd3_clip.T5XXLModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

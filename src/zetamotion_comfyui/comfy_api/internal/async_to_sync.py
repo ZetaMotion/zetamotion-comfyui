@@ -233,7 +233,7 @@ class AsyncToSyncConverter:
                     attr = getattr(self._async_instance, attr_name)
                     # Check if this attribute needs a sync wrapper
                     if hasattr(attr, "__class__"):
-                        from comfy_api.internal.singleton import ProxiedSingleton
+                        from zetamotion_comfyui.comfy_api.internal.singleton import ProxiedSingleton
 
                         if isinstance(attr, ProxiedSingleton):
                             # Create a sync version of this attribute
@@ -256,7 +256,7 @@ class AsyncToSyncConverter:
                         # Check if the type is defined as an inner class
                         if hasattr(async_class, attr_type.__name__):
                             inner_class = getattr(async_class, attr_type.__name__)
-                            from comfy_api.internal.singleton import ProxiedSingleton
+                            from zetamotion_comfyui.comfy_api.internal.singleton import ProxiedSingleton
 
                             # Create an instance of the inner class
                             try:
@@ -288,7 +288,7 @@ class AsyncToSyncConverter:
                 if isinstance(attr, object) and not isinstance(
                     attr, (str, int, float, bool, list, dict, tuple)
                 ):
-                    from comfy_api.internal.singleton import ProxiedSingleton
+                    from zetamotion_comfyui.comfy_api.internal.singleton import ProxiedSingleton
 
                     if isinstance(attr, ProxiedSingleton):
                         # Create a sync version of this nested class

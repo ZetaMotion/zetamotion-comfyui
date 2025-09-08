@@ -1,11 +1,11 @@
 import torch
 from torch import nn
-import folder_paths
-import comfy.utils
-import comfy.ops
-import comfy.model_management
-import comfy.ldm.common_dit
-import comfy.latent_formats
+import zetamotion_comfyui.folder_paths
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.ops
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.latent_formats
 
 
 class BlockWiseControlBlock(torch.nn.Module):
@@ -46,9 +46,9 @@ class QwenImageBlockWiseControlNet(torch.nn.Module):
         )
 
     def process_input_latent_image(self, latent_image):
-        latent_image[:, :16] = comfy.latent_formats.Wan21().process_in(latent_image[:, :16])
+        latent_image[:, :16] = zetamotion_comfyui.comfy.latent_formats.Wan21().process_in(latent_image[:, :16])
         patch_size = 2
-        hidden_states = comfy.ldm.common_dit.pad_to_patch_size(latent_image, (1, patch_size, patch_size))
+        hidden_states = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(latent_image, (1, patch_size, patch_size))
         orig_shape = hidden_states.shape
         hidden_states = hidden_states.view(orig_shape[0], orig_shape[1], orig_shape[-2] // 2, 2, orig_shape[-1] // 2, 2)
         hidden_states = hidden_states.permute(0, 2, 4, 1, 3, 5)
@@ -192,7 +192,7 @@ class SigLIPMultiFeatProjModel(torch.nn.Module):
 class ModelPatchLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "name": (folder_paths.get_filename_list("model_patches"), ),
+        return {"required": { "name": (zetamotion_comfyui.folder_paths.get_filename_list("model_patches"), ),
                               }}
     RETURN_TYPES = ("MODEL_PATCH",)
     FUNCTION = "load_model_patch"
@@ -201,19 +201,19 @@ class ModelPatchLoader:
     CATEGORY = "advanced/loaders"
 
     def load_model_patch(self, name):
-        model_patch_path = folder_paths.get_full_path_or_raise("model_patches", name)
-        sd = comfy.utils.load_torch_file(model_patch_path, safe_load=True)
-        dtype = comfy.utils.weight_dtype(sd)
+        model_patch_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("model_patches", name)
+        sd = zetamotion_comfyui.comfy.utils.load_torch_file(model_patch_path, safe_load=True)
+        dtype = zetamotion_comfyui.comfy.utils.weight_dtype(sd)
 
         if 'controlnet_blocks.0.y_rms.weight' in sd:
             additional_in_dim = sd["img_in.weight"].shape[1] - 64
-            model = QwenImageBlockWiseControlNet(additional_in_dim=additional_in_dim, device=comfy.model_management.unet_offload_device(), dtype=dtype, operations=comfy.ops.manual_cast)
+            model = QwenImageBlockWiseControlNet(additional_in_dim=additional_in_dim, device=zetamotion_comfyui.comfy.model_management.unet_offload_device(), dtype=dtype, operations=zetamotion_comfyui.comfy.ops.manual_cast)
         elif 'feature_embedder.mid_layer_norm.bias' in sd:
-            sd = comfy.utils.state_dict_prefix_replace(sd, {"feature_embedder.": ""}, filter_keys=True)
-            model = SigLIPMultiFeatProjModel(device=comfy.model_management.unet_offload_device(), dtype=dtype, operations=comfy.ops.manual_cast)
+            sd = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {"feature_embedder.": ""}, filter_keys=True)
+            model = SigLIPMultiFeatProjModel(device=zetamotion_comfyui.comfy.model_management.unet_offload_device(), dtype=dtype, operations=zetamotion_comfyui.comfy.ops.manual_cast)
 
         model.load_state_dict(sd)
-        model = comfy.model_patcher.ModelPatcher(model, load_device=comfy.model_management.get_torch_device(), offload_device=comfy.model_management.unet_offload_device())
+        model = zetamotion_comfyui.comfy.model_patcher.ModelPatcher(model, load_device=zetamotion_comfyui.comfy.model_management.get_torch_device(), offload_device=zetamotion_comfyui.comfy.model_management.unet_offload_device())
         return (model,)
 
 
@@ -233,7 +233,7 @@ class DiffSynthCnetPatch:
             if self.mask is None:
                 mask_ = torch.ones_like(latent_image)[:, :self.model_patch.model.additional_in_dim // 4]
             else:
-                mask_ = comfy.utils.common_upscale(self.mask.mean(dim=1, keepdim=True), latent_image.shape[-1], latent_image.shape[-2], "bilinear", "none")
+                mask_ = zetamotion_comfyui.comfy.utils.common_upscale(self.mask.mean(dim=1, keepdim=True), latent_image.shape[-1], latent_image.shape[-2], "bilinear", "none")
 
             return torch.cat([latent_image, mask_], dim=1)
         else:
@@ -245,11 +245,11 @@ class DiffSynthCnetPatch:
         block_index = kwargs.get("block_index")
         spacial_compression = self.vae.spacial_compression_encode()
         if self.encoded_image is None or self.encoded_image_size != (x.shape[-2] * spacial_compression, x.shape[-1] * spacial_compression):
-            image_scaled = comfy.utils.common_upscale(self.image.movedim(-1, 1), x.shape[-1] * spacial_compression, x.shape[-2] * spacial_compression, "area", "center")
-            loaded_models = comfy.model_management.loaded_models(only_currently_used=True)
+            image_scaled = zetamotion_comfyui.comfy.utils.common_upscale(self.image.movedim(-1, 1), x.shape[-1] * spacial_compression, x.shape[-2] * spacial_compression, "area", "center")
+            loaded_models = zetamotion_comfyui.comfy.model_management.loaded_models(only_currently_used=True)
             self.encoded_image = self.model_patch.model.process_input_latent_image(self.encode_latent_cond(image_scaled.movedim(1, -1)))
             self.encoded_image_size = (image_scaled.shape[-2], image_scaled.shape[-1])
-            comfy.model_management.load_models_gpu(loaded_models)
+            zetamotion_comfyui.comfy.model_management.load_models_gpu(loaded_models)
 
         img[:, :self.encoded_image.shape[1]] += (self.model_patch.model.control_block(img[:, :self.encoded_image.shape[1]], self.encoded_image.to(img.dtype), block_index) * self.strength)
         kwargs['img'] = img

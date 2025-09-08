@@ -12,8 +12,8 @@ from typing import Optional
 
 import logging
 
-import comfy.ops
-ops = comfy.ops.disable_weight_init
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 def fps(src: torch.Tensor, batch: torch.Tensor, sampling_ratio: float, start_random: bool = True):
 
@@ -554,7 +554,7 @@ class FourierEmbedder(nn.Module):
 
 class CrossAttentionProcessor:
     def __call__(self, attn, q, k, v):
-        out = comfy.ops.scaled_dot_product_attention(q, k, v)
+        out = zetamotion_comfyui.comfy.ops.scaled_dot_product_attention(q, k, v)
         return out
 
 class DropPath(nn.Module):

@@ -13,7 +13,7 @@ supported_pt_extensions: set[str] = {'.ckpt', '.pt', '.pt2', '.bin', '.pth', '.s
 
 folder_names_and_paths: dict[str, tuple[list[str], set[str]]] = {}
 
-# --base-directory - Resets all default paths configured in folder_paths with a new base path
+# --base-directory - Resets all default paths configured in zetamotion_comfyui.folder_paths.with a new base path
 if args.base_directory:
     base_path = os.path.abspath(args.base_directory)
 else:
@@ -148,7 +148,7 @@ def get_directory_by_type(type_name: str) -> str | None:
 def filter_files_content_types(files: list[str], content_types: List[Literal["image", "video", "audio", "model"]]) -> list[str]:
     """
     Example:
-        files = os.listdir(folder_paths.get_input_directory())
+        files = os.listdir(zetamotion_comfyui.folder_paths.get_input_directory())
         videos = filter_files_content_types(files, ["video"])
 
     Note:

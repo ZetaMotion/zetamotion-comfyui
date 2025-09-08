@@ -3,11 +3,11 @@ import torch
 from tqdm.auto import trange
 from typing_extensions import override
 
-import comfy.model_patcher
-import comfy.samplers
-import comfy.utils
-from comfy.k_diffusion.sampling import to_d
-from comfy_api.latest import ComfyExtension, io
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.samplers
+import zetamotion_comfyui.comfy.utils
+from zetamotion_comfyui.comfy.k_diffusion.sampling import to_d
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
 
 
 @torch.no_grad()
@@ -31,7 +31,7 @@ def sample_lcm_upscale(model, x, sigmas, extra_args=None, callback=None, disable
 
         x = denoised
         if i < len(upscales):
-            x = comfy.utils.common_upscale(x, round(orig_shape[-1] * upscales[i]), round(orig_shape[-2] * upscales[i]), upscale_method, "disabled")
+            x = zetamotion_comfyui.comfy.utils.common_upscale(x, round(orig_shape[-1] * upscales[i]), round(orig_shape[-2] * upscales[i]), upscale_method, "disabled")
 
         if sigmas[i + 1] > 0:
             x += sigmas[i + 1] * torch.randn_like(x)
@@ -58,7 +58,7 @@ class SamplerLCMUpscale(io.ComfyNode):
     def execute(cls, scale_ratio, scale_steps, upscale_method) -> io.NodeOutput:
         if scale_steps < 0:
             scale_steps = None
-        sampler = comfy.samplers.KSAMPLER(sample_lcm_upscale, extra_options={"total_upscale": scale_ratio, "upscale_steps": scale_steps, "upscale_method": upscale_method})
+        sampler = zetamotion_comfyui.comfy.samplers.KSAMPLER(sample_lcm_upscale, extra_options={"total_upscale": scale_ratio, "upscale_steps": scale_steps, "upscale_method": upscale_method})
         return io.NodeOutput(sampler)
 
 
@@ -72,7 +72,7 @@ def sample_euler_pp(model, x, sigmas, extra_args=None, callback=None, disable=No
         return args["denoised"]
 
     model_options = extra_args.get("model_options", {}).copy()
-    extra_args["model_options"] = comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
+    extra_args["model_options"] = zetamotion_comfyui.comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
 
     s_in = x.new_ones([x.shape[0]])
     for i in trange(len(sigmas) - 1, disable=disable):
@@ -103,9 +103,9 @@ class SamplerEulerCFGpp(io.ComfyNode):
     @classmethod
     def execute(cls, version) -> io.NodeOutput:
         if version == "alternative":
-            sampler = comfy.samplers.KSAMPLER(sample_euler_pp)
+            sampler = zetamotion_comfyui.comfy.samplers.KSAMPLER(sample_euler_pp)
         else:
-            sampler = comfy.samplers.ksampler("euler_cfg_pp")
+            sampler = zetamotion_comfyui.comfy.samplers.ksampler("euler_cfg_pp")
         return io.NodeOutput(sampler)
 
 

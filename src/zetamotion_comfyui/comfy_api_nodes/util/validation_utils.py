@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import torch
-from comfy_api.input.video_types import VideoInput
+from zetamotion_comfyui.comfy_api.input.video_types import VideoInput
 
 
 def get_image_dimensions(image: torch.Tensor) -> tuple[int, int]:

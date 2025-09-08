@@ -1,6 +1,6 @@
 from typing_extensions import override
 
-from comfy_api.latest import ComfyExtension, io
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
 
 
 def attention_multiply(attn, model, q, k, v, out):

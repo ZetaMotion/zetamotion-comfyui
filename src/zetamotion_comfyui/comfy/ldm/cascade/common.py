@@ -18,8 +18,8 @@
 
 import torch
 import torch.nn as nn
-from comfy.ldm.modules.attention import optimized_attention
-import comfy.ops
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
+import zetamotion_comfyui.comfy.ops
 
 class OptimizedAttention(nn.Module):
     def __init__(self, c, nhead, dropout=0.0, dtype=None, device=None, operations=None):
@@ -77,7 +77,7 @@ class GlobalResponseNorm(nn.Module):
     def forward(self, x):
         Gx = torch.norm(x, p=2, dim=(1, 2), keepdim=True)
         Nx = Gx / (Gx.mean(dim=-1, keepdim=True) + 1e-6)
-        return comfy.ops.cast_to_input(self.gamma, x) * (x * Nx) + comfy.ops.cast_to_input(self.beta, x) + x
+        return zetamotion_comfyui.comfy.ops.cast_to_input(self.gamma, x) * (x * Nx) + zetamotion_comfyui.comfy.ops.cast_to_input(self.beta, x) + x
 
 
 class ResBlock(nn.Module):

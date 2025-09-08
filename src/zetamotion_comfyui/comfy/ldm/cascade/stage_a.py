@@ -19,9 +19,9 @@
 import torch
 from torch import nn
 from torch.autograd import Function
-import comfy.ops
+import zetamotion_comfyui.comfy.ops
 
-ops = comfy.ops.disable_weight_init
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 
 class vector_quantize(Function):

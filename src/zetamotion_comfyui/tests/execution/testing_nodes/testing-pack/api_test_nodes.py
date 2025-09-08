@@ -1,7 +1,7 @@
 import asyncio
 import time
-from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
-from comfy_api.v0_0_2 import ComfyAPI, ComfyAPISync
+from zetamotion_comfyui.comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from zetamotion_comfyui.comfy_api.v0_0_2 import ComfyAPI, ComfyAPISync
 
 api = ComfyAPI()
 api_sync = ComfyAPISync()

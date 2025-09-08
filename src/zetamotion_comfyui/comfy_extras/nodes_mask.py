@@ -1,22 +1,22 @@
 import numpy as np
 import scipy.ndimage
 import torch
-import comfy.utils
-import node_helpers
-import folder_paths
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.node_helpers
+import zetamotion_comfyui.folder_paths
 import random
 import torch
 import torch.nn.functional as F
 
-import nodes
-from nodes import MAX_RESOLUTION
+import zetamotion_comfyui.nodes
+from zetamotion_comfyui.nodes import MAX_RESOLUTION
 
 def composite(destination, source, x, y, mask = None, multiplier = 8, resize_source = False):
     source = source.to(destination.device)
     if resize_source:
         source = torch.nn.functional.interpolate(source, size=(destination.shape[2], destination.shape[3]), mode="bilinear")
 
-    source = comfy.utils.repeat_to_batch_size(source, destination.shape[0])
+    source = zetamotion_comfyui.comfy.utils.repeat_to_batch_size(source, destination.shape[0])
 
     x = max(-source.shape[3] * multiplier, min(x, destination.shape[3] * multiplier))
     y = max(-source.shape[2] * multiplier, min(y, destination.shape[2] * multiplier))
@@ -29,7 +29,7 @@ def composite(destination, source, x, y, mask = None, multiplier = 8, resize_sou
     else:
         mask = mask.to(destination.device, copy=True)
         mask = torch.nn.functional.interpolate(mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])), size=(source.shape[2], source.shape[3]), mode="bilinear")
-        mask = comfy.utils.repeat_to_batch_size(mask, source.shape[0])
+        mask = zetamotion_comfyui.comfy.utils.repeat_to_batch_size(mask, source.shape[0])
 
     # calculate the bounds of the source that will be overlapping the destination
     # this prevents the source trying to overwrite latent pixels that are out of bounds
@@ -370,9 +370,9 @@ class ThresholdMask:
 # Mask Preview - original implement from
 # https://github.com/cubiq/ComfyUI_essentials/blob/9d9f4bedfc9f0321c19faf71855e228c93bd0dc9/mask.py#L81
 # upstream requested in https://github.com/Kosinkadink/rfcs/blob/main/rfcs/0000-corenodes.md#preview-nodes
-class MaskPreview(nodes.SaveImage):
+class MaskPreview(zetamotion_comfyui.nodes.SaveImage):
     def __init__(self):
-        self.output_dir = folder_paths.get_temp_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
         self.type = "temp"
         self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
         self.compress_level = 4

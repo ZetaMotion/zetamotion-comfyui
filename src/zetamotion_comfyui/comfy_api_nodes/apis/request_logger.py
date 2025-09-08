@@ -4,7 +4,7 @@ import os
 import datetime
 import json
 import logging
-import folder_paths
+import zetamotion_comfyui.folder_paths
 
 # Get the logger instance
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ def get_log_directory():
     Ensures the API log directory exists within ComfyUI's temp directory
     and returns its path.
     """
-    base_temp_dir = folder_paths.get_temp_directory()
+    base_temp_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
     log_dir = os.path.join(base_temp_dir, "api_logs")
     try:
         os.makedirs(log_dir, exist_ok=True)
@@ -92,15 +92,15 @@ def log_request_response(
 if __name__ == '__main__':
     # Example usage (for testing the logger directly)
     logger.setLevel(logging.DEBUG)
-    # Mock folder_paths for direct execution if not running within ComfyUI full context
-    if not hasattr(folder_paths, 'get_temp_directory'):
+    # Mock zetamotion_comfyui.folder_paths.for direct execution if not running within ComfyUI full context
+    if not hasattr(zetamotion_comfyui.folder_paths, 'get_temp_directory'):
         class MockFolderPaths:
             def get_temp_directory(self):
                 # Create a local temp dir for testing if needed
                 p = os.path.join(os.path.dirname(__file__), 'temp_test_logs')
                 os.makedirs(p, exist_ok=True)
                 return p
-        folder_paths = MockFolderPaths()
+        zetamotion_comfyui.folder_paths.= MockFolderPaths()
 
     log_request_response(
         operation_id="test_operation_get",

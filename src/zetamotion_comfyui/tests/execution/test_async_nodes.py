@@ -6,7 +6,7 @@ import numpy as np
 import subprocess
 
 from pytest import fixture
-from comfy_execution.graph_utils import GraphBuilder
+from zetamotion_comfyui.comfy_execution.graph_utils import GraphBuilder
 from tests.execution.test_execution import ComfyClient, run_warmup
 
 

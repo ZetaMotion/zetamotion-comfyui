@@ -639,7 +639,7 @@ def detect_unet_config(state_dict, key_prefix, metadata=None):
     return unet_config
 
 def model_config_from_unet_config(unet_config, state_dict=None):
-    for model_config in comfy.supported_models.models:
+    for model_config in zetamotion_comfyui.comfy.supported_models.models:
         if model_config.matches(unet_config, state_dict):
             return model_config(unet_config)
 
@@ -652,7 +652,7 @@ def model_config_from_unet(state_dict, unet_key_prefix, use_base_if_no_match=Fal
         return None
     model_config = model_config_from_unet_config(unet_config, state_dict)
     if model_config is None and use_base_if_no_match:
-        model_config = comfy.supported_models_base.BASE(unet_config)
+        model_config = zetamotion_comfyui.comfy.supported_models_base.BASE(unet_config)
 
     scaled_fp8_key = "{}scaled_fp8".format(unet_key_prefix)
     if scaled_fp8_key in state_dict:
@@ -889,19 +889,19 @@ def convert_diffusers_mmdit(state_dict, output_prefix=""):
     if 'joint_transformer_blocks.0.attn.add_k_proj.weight' in state_dict: #AuraFlow
         num_joint = count_blocks(state_dict, 'joint_transformer_blocks.{}.')
         num_single = count_blocks(state_dict, 'single_transformer_blocks.{}.')
-        sd_map = comfy.utils.auraflow_to_diffusers({"n_double_layers": num_joint, "n_layers": num_joint + num_single}, output_prefix=output_prefix)
+        sd_map = zetamotion_comfyui.comfy.utils.auraflow_to_diffusers({"n_double_layers": num_joint, "n_layers": num_joint + num_single}, output_prefix=output_prefix)
     elif 'adaln_single.emb.timestep_embedder.linear_1.bias' in state_dict and 'pos_embed.proj.bias' in state_dict: # PixArt
         num_blocks = count_blocks(state_dict, 'transformer_blocks.{}.')
-        sd_map = comfy.utils.pixart_to_diffusers({"depth": num_blocks}, output_prefix=output_prefix)
+        sd_map = zetamotion_comfyui.comfy.utils.pixart_to_diffusers({"depth": num_blocks}, output_prefix=output_prefix)
     elif 'x_embedder.weight' in state_dict: #Flux
         depth = count_blocks(state_dict, 'transformer_blocks.{}.')
         depth_single_blocks = count_blocks(state_dict, 'single_transformer_blocks.{}.')
         hidden_size = state_dict["x_embedder.bias"].shape[0]
-        sd_map = comfy.utils.flux_to_diffusers({"depth": depth, "depth_single_blocks": depth_single_blocks, "hidden_size": hidden_size}, output_prefix=output_prefix)
+        sd_map = zetamotion_comfyui.comfy.utils.flux_to_diffusers({"depth": depth, "depth_single_blocks": depth_single_blocks, "hidden_size": hidden_size}, output_prefix=output_prefix)
     elif 'transformer_blocks.0.attn.add_q_proj.weight' in state_dict and 'pos_embed.proj.weight' in state_dict: #SD3
         num_blocks = count_blocks(state_dict, 'transformer_blocks.{}.')
         depth = state_dict["pos_embed.proj.weight"].shape[0] // 64
-        sd_map = comfy.utils.mmdit_to_diffusers({"depth": depth, "num_blocks": num_blocks}, output_prefix=output_prefix)
+        sd_map = zetamotion_comfyui.comfy.utils.mmdit_to_diffusers({"depth": depth, "num_blocks": num_blocks}, output_prefix=output_prefix)
     else:
         return None
 

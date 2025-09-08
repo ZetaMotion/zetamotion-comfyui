@@ -1,6 +1,6 @@
-import nodes
+import zetamotion_comfyui.nodes
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 
 class EmptyMochiLatentVideo:
     @classmethod
@@ -15,7 +15,7 @@ class EmptyMochiLatentVideo:
     CATEGORY = "latent/video"
 
     def generate(self, width, height, length, batch_size=1):
-        latent = torch.zeros([batch_size, 12, ((length - 1) // 6) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 12, ((length - 1) // 6) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         return ({"samples":latent}, )
 
 NODE_CLASS_MAPPINGS = {

@@ -2,19 +2,19 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Type, TYPE_CHECKING
-from comfy_api.internal import ComfyAPIBase
-from comfy_api.internal.singleton import ProxiedSingleton
-from comfy_api.internal.async_to_sync import create_sync_class
-from comfy_api.latest._input import ImageInput, AudioInput, MaskInput, LatentInput, VideoInput
-from comfy_api.latest._input_impl import VideoFromFile, VideoFromComponents
-from comfy_api.latest._util import VideoCodec, VideoContainer, VideoComponents
-from comfy_api.latest._io import _IO as io  #noqa: F401
-from comfy_api.latest._ui import _UI as ui  #noqa: F401
-# from comfy_api.latest._resources import _RESOURCES as resources  #noqa: F401
-from comfy_execution.utils import get_executing_context
-from comfy_execution.progress import get_progress_state, PreviewImageTuple
+from zetamotion_comfyui.comfy_api.internal import ComfyAPIBase
+from zetamotion_comfyui.comfy_api.internal.singleton import ProxiedSingleton
+from zetamotion_comfyui.comfy_api.internal.async_to_sync import create_sync_class
+from zetamotion_comfyui.comfy_api.latest._input import ImageInput, AudioInput, MaskInput, LatentInput, VideoInput
+from zetamotion_comfyui.comfy_api.latest._input_impl import VideoFromFile, VideoFromComponents
+from zetamotion_comfyui.comfy_api.latest._util import VideoCodec, VideoContainer, VideoComponents
+from zetamotion_comfyui.comfy_api.latest._io import _IO as io  #noqa: F401
+from zetamotion_comfyui.comfy_api.latest._ui import _UI as ui  #noqa: F401
+# from zetamotion_comfyui.comfy_api.latest._resources import _RESOURCES as resources  #noqa: F401
+from zetamotion_comfyui.comfy_execution.utils import get_executing_context
+from zetamotion_comfyui.comfy_execution.progress import get_progress_state, PreviewImageTuple
 from PIL import Image
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.cli_args import args
 import numpy as np
 
 
@@ -37,7 +37,7 @@ class ComfyAPI_latest(ComfyAPIBase):
             This function allows custom nodes and API calls to report their progress
             back to the user interface, providing visual feedback during long operations.
 
-            Migration from previous API: comfy.utils.PROGRESS_BAR_HOOK
+            Migration from previous API: zetamotion_comfyui.comfy.utils.PROGRESS_BAR_HOOK
             """
             executing_context = get_executing_context()
             if node_id is None and executing_context is not None:
@@ -109,7 +109,7 @@ ComfyAPI = ComfyAPI_latest
 
 # Create a synchronous version of the API
 if TYPE_CHECKING:
-    import comfy_api.latest.generated.ComfyAPISyncStub  # type: ignore
+    import zetamotion_comfyui.comfy_api.latest.generated.ComfyAPISyncStub  # type: ignore
 
     ComfyAPISync: Type[comfy_api.latest.generated.ComfyAPISyncStub.ComfyAPISyncStub]
 ComfyAPISync = create_sync_class(ComfyAPI_latest)

@@ -188,7 +188,7 @@ class IndexListContextHandler(ContextHandlerABC):
             counts_final = [torch.zeros(get_shape_for_dim(x_in, self.dim), device=x_in.device) for _ in conds]
         biases_final = [([0.0] * x_in.shape[self.dim]) for _ in conds]
 
-        for callback in comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.EXECUTE_START, self.callbacks):
+        for callback in zetamotion_comfyui.comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.EXECUTE_START, self.callbacks):
             callback(self, model, x_in, conds, timestep, model_options)
 
         for enum_window in enumerated_context_windows:
@@ -209,7 +209,7 @@ class IndexListContextHandler(ContextHandlerABC):
                 del counts_final
                 return conds_final
         finally:
-            for callback in comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.EXECUTE_CLEANUP, self.callbacks):
+            for callback in zetamotion_comfyui.comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.EXECUTE_CLEANUP, self.callbacks):
                 callback(self, model, x_in, conds, timestep, model_options)
 
     def evaluate_context_windows(self, calc_cond_batch: Callable, model: BaseModel, x_in: torch.Tensor, conds, timestep: torch.Tensor, enumerated_context_windows: list[tuple[int, IndexListContextWindow]],
@@ -217,9 +217,9 @@ class IndexListContextHandler(ContextHandlerABC):
         results: list[ContextResults] = []
         for window_idx, window in enumerated_context_windows:
             # allow processing to end between context window executions for faster Cancel
-            comfy.model_management.throw_exception_if_processing_interrupted()
+            zetamotion_comfyui.comfy.model_management.throw_exception_if_processing_interrupted()
 
-            for callback in comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.EVALUATE_CONTEXT_WINDOWS, self.callbacks):
+            for callback in zetamotion_comfyui.comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.EVALUATE_CONTEXT_WINDOWS, self.callbacks):
                 callback(self, model, x_in, conds, timestep, model_options, window_idx, window, model_options, device, first_device)
 
             # update exposed params
@@ -263,7 +263,7 @@ class IndexListContextHandler(ContextHandlerABC):
                 window.add_window(conds_final[i], sub_conds_out[i] * weights_tensor)
                 window.add_window(counts_final[i], weights_tensor)
 
-        for callback in comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.COMBINE_CONTEXT_WINDOW_RESULTS, self.callbacks):
+        for callback in zetamotion_comfyui.comfy.patcher_extension.get_all_callbacks(IndexListCallbacks.COMBINE_CONTEXT_WINDOW_RESULTS, self.callbacks):
             callback(self, x_in, sub_conds_out, sub_conds, window, window_idx, total_windows, timestep, conds_final, counts_final, biases_final)
 
 
@@ -281,7 +281,7 @@ def _prepare_sampling_wrapper(executor, model, noise_shape: torch.Tensor, *args,
 
 def create_prepare_sampling_wrapper(model: ModelPatcher):
     model.add_wrapper_with_key(
-        comfy.patcher_extension.WrappersMP.PREPARE_SAMPLING,
+        zetamotion_comfyui.comfy.patcher_extension.WrappersMP.PREPARE_SAMPLING,
         "ContextWindows_prepare_sampling",
         _prepare_sampling_wrapper
     )

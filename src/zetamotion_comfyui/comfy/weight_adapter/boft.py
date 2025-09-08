@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from .base import WeightAdapterBase, weight_decompose
 
 
@@ -62,9 +62,9 @@ class BOFTAdapter(WeightAdapterBase):
         alpha = v[2]
         dora_scale = v[3]
 
-        blocks = comfy.model_management.cast_to_device(blocks, weight.device, intermediate_dtype)
+        blocks = zetamotion_comfyui.comfy.model_management.cast_to_device(blocks, weight.device, intermediate_dtype)
         if rescale is not None:
-            rescale = comfy.model_management.cast_to_device(rescale, weight.device, intermediate_dtype)
+            rescale = zetamotion_comfyui.comfy.model_management.cast_to_device(rescale, weight.device, intermediate_dtype)
 
         boft_m, block_num, boft_b, *_ = blocks.shape
 
@@ -105,7 +105,7 @@ class BOFTAdapter(WeightAdapterBase):
                 inp = inp * rescale
 
             lora_diff = inp - org
-            lora_diff = comfy.model_management.cast_to_device(lora_diff, weight.device, intermediate_dtype)
+            lora_diff = zetamotion_comfyui.comfy.model_management.cast_to_device(lora_diff, weight.device, intermediate_dtype)
             if dora_scale is not None:
                 weight = weight_decompose(dora_scale, weight, lora_diff, alpha, strength, intermediate_dtype, function)
             else:

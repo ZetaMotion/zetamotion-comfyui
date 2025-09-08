@@ -5,16 +5,16 @@ import torch.nn as nn
 import einops
 from einops import repeat
 
-from comfy.ldm.lightricks.model import TimestepEmbedding, Timesteps
+from zetamotion_comfyui.comfy.ldm.lightricks.model import TimestepEmbedding, Timesteps
 import torch.nn.functional as F
 
-from comfy.ldm.flux.math import apply_rope, rope
-from comfy.ldm.flux.layers import LastLayer
+from zetamotion_comfyui.comfy.ldm.flux.math import apply_rope, rope
+from zetamotion_comfyui.comfy.ldm.flux.layers import LastLayer
 
-from comfy.ldm.modules.attention import optimized_attention
-import comfy.model_management
-import comfy.patcher_extension
-import comfy.ldm.common_dit
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.ldm.common_dit
 
 
 # Copied from https://github.com/black-forest-labs/flux/blob/main/src/flux/modules/layers.py
@@ -262,7 +262,7 @@ class MoEGate(nn.Module):
 
         ### compute gating score
         hidden_states = hidden_states.view(-1, h)
-        logits = F.linear(hidden_states, comfy.model_management.cast_to(self.weight, dtype=hidden_states.dtype, device=hidden_states.device), None)
+        logits = F.linear(hidden_states, zetamotion_comfyui.comfy.model_management.cast_to(self.weight, dtype=hidden_states.dtype, device=hidden_states.device), None)
         if self.scoring_func == 'softmax':
             scores = logits.softmax(dim=-1)
         else:
@@ -703,10 +703,10 @@ class HiDreamImageTransformer2DModel(nn.Module):
         control = None,
         transformer_options = {},
     ):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, t, y, context, encoder_hidden_states_llama3, image_cond, control, transformer_options)
 
     def _forward(
@@ -723,7 +723,7 @@ class HiDreamImageTransformer2DModel(nn.Module):
         bs, c, h, w = x.shape
         if image_cond is not None:
             x = torch.cat([x, image_cond], dim=-1)
-        hidden_states = comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
+        hidden_states = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
         timesteps = t
         pooled_embeds = y
         T5_encoder_hidden_states = context

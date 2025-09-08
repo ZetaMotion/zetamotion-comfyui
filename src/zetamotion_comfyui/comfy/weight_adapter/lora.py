@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from .base import (
     WeightAdapterBase,
     WeightAdapterTrainBase,
@@ -159,10 +159,10 @@ class LoRAAdapter(WeightAdapterBase):
         original_weight=None,
     ):
         v = self.weights
-        mat1 = comfy.model_management.cast_to_device(
+        mat1 = zetamotion_comfyui.comfy.model_management.cast_to_device(
             v[0], weight.device, intermediate_dtype
         )
-        mat2 = comfy.model_management.cast_to_device(
+        mat2 = zetamotion_comfyui.comfy.model_management.cast_to_device(
             v[1], weight.device, intermediate_dtype
         )
         dora_scale = v[4]
@@ -178,7 +178,7 @@ class LoRAAdapter(WeightAdapterBase):
 
         if v[3] is not None:
             # locon mid weights, hopefully the math is fine because I didn't properly test it
-            mat3 = comfy.model_management.cast_to_device(
+            mat3 = zetamotion_comfyui.comfy.model_management.cast_to_device(
                 v[3], weight.device, intermediate_dtype
             )
             final_shape = [mat2.shape[1], mat2.shape[0], mat3.shape[2], mat3.shape[3]]

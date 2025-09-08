@@ -1,14 +1,14 @@
 import io
-import nodes
-import node_helpers
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.node_helpers
 import torch
-import comfy.model_management
-import comfy.model_sampling
-import comfy.utils
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.model_sampling
+import zetamotion_comfyui.comfy.utils
 import math
 import numpy as np
 import av
-from comfy.ldm.lightricks.symmetric_patchifier import SymmetricPatchifier, latent_to_pixel_coords
+from zetamotion_comfyui.comfy.ldm.lightricks.symmetric_patchifier import SymmetricPatchifier, latent_to_pixel_coords
 
 class EmptyLTXVLatentVideo:
     @classmethod
@@ -23,7 +23,7 @@ class EmptyLTXVLatentVideo:
     CATEGORY = "latent/video/ltxv"
 
     def generate(self, width, height, length, batch_size=1):
-        latent = torch.zeros([batch_size, 128, ((length - 1) // 8) + 1, height // 32, width // 32], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 128, ((length - 1) // 8) + 1, height // 32, width // 32], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         return ({"samples": latent}, )
 
 
@@ -48,11 +48,11 @@ class LTXVImgToVideo:
     FUNCTION = "generate"
 
     def generate(self, positive, negative, image, vae, width, height, length, batch_size, strength):
-        pixels = comfy.utils.common_upscale(image.movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+        pixels = zetamotion_comfyui.comfy.utils.common_upscale(image.movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
         encode_pixels = pixels[:, :, :, :3]
         t = vae.encode(encode_pixels)
 
-        latent = torch.zeros([batch_size, 128, ((length - 1) // 8) + 1, height // 32, width // 32], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 128, ((length - 1) // 8) + 1, height // 32, width // 32], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         latent[:, :, :t.shape[2]] = t
 
         conditioning_latent_frames_mask = torch.ones(
@@ -124,7 +124,7 @@ class LTXVAddGuide:
     def encode(self, vae, latent_width, latent_height, images, scale_factors):
         time_scale_factor, width_scale_factor, height_scale_factor = scale_factors
         images = images[:(images.shape[0] - 1) // time_scale_factor * time_scale_factor + 1]
-        pixels = comfy.utils.common_upscale(images.movedim(-1, 1), latent_width * width_scale_factor, latent_height * height_scale_factor, "bilinear", crop="disabled").movedim(1, -1)
+        pixels = zetamotion_comfyui.comfy.utils.common_upscale(images.movedim(-1, 1), latent_width * width_scale_factor, latent_height * height_scale_factor, "bilinear", crop="disabled").movedim(1, -1)
         encode_pixels = pixels[:, :, :, :3]
         t = vae.encode(encode_pixels)
         return encode_pixels, t
@@ -319,8 +319,8 @@ class ModelSamplingLTXV:
         b = base_shift - mm * x1
         shift = (tokens) * mm + b
 
-        sampling_base = comfy.model_sampling.ModelSamplingFlux
-        sampling_type = comfy.model_sampling.CONST
+        sampling_base = zetamotion_comfyui.comfy.model_sampling.ModelSamplingFlux
+        sampling_type = zetamotion_comfyui.comfy.model_sampling.CONST
 
         class ModelSamplingAdvanced(sampling_base, sampling_type):
             pass

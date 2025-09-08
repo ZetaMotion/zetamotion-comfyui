@@ -18,7 +18,7 @@
 
 import torch
 import logging
-import zetamotion_comfyui.zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from zetamotion_comfyui.comfy.cli_args import args, PerformanceFeature
 import zetamotion_comfyui.comfy.float
 import zetamotion_comfyui.comfy.rmsnorm
@@ -50,13 +50,13 @@ try:
 except (ModuleNotFoundError, TypeError):
     logging.warning("Could not set sdpa backend priority.")
 
-cast_to = comfy.model_management.cast_to #TODO: remove once no more references
+cast_to = zetamotion_comfyui.comfy.model_management.cast_to #TODO: remove once no more references
 
 if torch.cuda.is_available() and torch.backends.cudnn.is_available() and PerformanceFeature.AutoTune in args.fast:
     torch.backends.cudnn.benchmark = True
 
 def cast_to_input(weight, input, non_blocking=False, copy=True):
-    return comfy.model_management.cast_to(weight, input.dtype, input.device, non_blocking=non_blocking, copy=copy)
+    return zetamotion_comfyui.comfy.model_management.cast_to(weight, input.dtype, input.device, non_blocking=non_blocking, copy=copy)
 
 def cast_bias_weight(s, input=None, dtype=None, device=None, bias_dtype=None):
     if input is not None:
@@ -67,17 +67,17 @@ def cast_bias_weight(s, input=None, dtype=None, device=None, bias_dtype=None):
         if device is None:
             device = input.device
 
-    offload_stream = comfy.model_management.get_offload_stream(device)
+    offload_stream = zetamotion_comfyui.comfy.model_management.get_offload_stream(device)
     if offload_stream is not None:
         wf_context = offload_stream
     else:
         wf_context = contextlib.nullcontext()
 
     bias = None
-    non_blocking = comfy.model_management.device_supports_non_blocking(device)
+    non_blocking = zetamotion_comfyui.comfy.model_management.device_supports_non_blocking(device)
     if s.bias is not None:
         has_function = len(s.bias_function) > 0
-        bias = comfy.model_management.cast_to(s.bias, bias_dtype, device, non_blocking=non_blocking, copy=has_function, stream=offload_stream)
+        bias = zetamotion_comfyui.comfy.model_management.cast_to(s.bias, bias_dtype, device, non_blocking=non_blocking, copy=has_function, stream=offload_stream)
 
         if has_function:
             with wf_context:
@@ -85,13 +85,13 @@ def cast_bias_weight(s, input=None, dtype=None, device=None, bias_dtype=None):
                     bias = f(bias)
 
     has_function = len(s.weight_function) > 0
-    weight = comfy.model_management.cast_to(s.weight, dtype, device, non_blocking=non_blocking, copy=has_function, stream=offload_stream)
+    weight = zetamotion_comfyui.comfy.model_management.cast_to(s.weight, dtype, device, non_blocking=non_blocking, copy=has_function, stream=offload_stream)
     if has_function:
         with wf_context:
             for f in s.weight_function:
                 weight = f(weight)
 
-    comfy.model_management.sync_stream(device, offload_stream)
+    zetamotion_comfyui.comfy.model_management.sync_stream(device, offload_stream)
     return weight, bias
 
 class CastWeightBiasOp:
@@ -188,7 +188,7 @@ class disable_weight_init:
             else:
                 return super().forward(*args, **kwargs)
 
-    class RMSNorm(comfy.rmsnorm.RMSNorm, CastWeightBiasOp):
+    class RMSNorm(zetamotion_comfyui.comfy.rmsnorm.RMSNorm, CastWeightBiasOp):
         def reset_parameters(self):
             self.bias = None
             return None
@@ -198,7 +198,7 @@ class disable_weight_init:
                 weight, bias = cast_bias_weight(self, input)
             else:
                 weight = None
-            return comfy.rmsnorm.rms_norm(input, weight, self.eps)  # TODO: switch to commented out line when old torch is deprecated
+            return zetamotion_comfyui.comfy.rmsnorm.rms_norm(input, weight, self.eps)  # TODO: switch to commented out line when old torch is deprecated
             # return torch.nn.functional.rms_norm(input, self.normalized_shape, weight, self.eps)
 
         def forward(self, *args, **kwargs):
@@ -416,7 +416,7 @@ def scaled_fp8_ops(fp8_matrix_mult=False, scale_input=False, override_dtype=None
                     return weight * self.scale_weight.to(device=weight.device, dtype=weight.dtype)
 
             def set_weight(self, weight, inplace_update=False, seed=None, **kwargs):
-                weight = comfy.float.stochastic_rounding(weight / self.scale_weight.to(device=weight.device, dtype=weight.dtype), self.weight.dtype, seed=seed)
+                weight = zetamotion_comfyui.comfy.float.stochastic_rounding(weight / self.scale_weight.to(device=weight.device, dtype=weight.dtype), self.weight.dtype, seed=seed)
                 if inplace_update:
                     self.weight.data.copy_(weight)
                 else:
@@ -444,7 +444,7 @@ if CUBLAS_IS_AVAILABLE:
                 return super().forward(*args, **kwargs)
 
 def pick_operations(weight_dtype, compute_dtype, load_device=None, disable_fast_fp8=False, fp8_optimizations=False, scaled_fp8=None):
-    fp8_compute = comfy.model_management.supports_fp8_compute(load_device)
+    fp8_compute = zetamotion_comfyui.comfy.model_management.supports_fp8_compute(load_device)
     if scaled_fp8 is not None:
         return scaled_fp8_ops(fp8_matrix_mult=fp8_compute and fp8_optimizations, scale_input=fp8_optimizations, override_dtype=scaled_fp8)
 

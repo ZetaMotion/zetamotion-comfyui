@@ -7,7 +7,7 @@ import threading
 import uuid
 import websocket
 from typing import List, Dict, Any
-from comfy_execution.graph_utils import GraphBuilder
+from zetamotion_comfyui.comfy_execution.graph_utils import GraphBuilder
 from tests.execution.test_execution import ComfyClient
 
 

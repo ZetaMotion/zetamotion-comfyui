@@ -1,7 +1,7 @@
 import re
 from typing_extensions import override
 
-from comfy_api.latest import ComfyExtension, io
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
 
 
 class StringConcatenate(io.ComfyNode):

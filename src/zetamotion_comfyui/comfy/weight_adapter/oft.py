@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from .base import WeightAdapterBase, WeightAdapterTrainBase, weight_decompose, factorization
 
 
@@ -127,9 +127,9 @@ class OFTAdapter(WeightAdapterBase):
             alpha = 0
         dora_scale = v[3]
 
-        blocks = comfy.model_management.cast_to_device(blocks, weight.device, intermediate_dtype)
+        blocks = zetamotion_comfyui.comfy.model_management.cast_to_device(blocks, weight.device, intermediate_dtype)
         if rescale is not None:
-            rescale = comfy.model_management.cast_to_device(rescale, weight.device, intermediate_dtype)
+            rescale = zetamotion_comfyui.comfy.model_management.cast_to_device(rescale, weight.device, intermediate_dtype)
 
         block_num, block_size, *_ = blocks.shape
 

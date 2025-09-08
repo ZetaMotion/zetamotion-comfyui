@@ -1,4 +1,4 @@
-import node_helpers
+import zetamotion_comfyui.node_helpers
 
 
 class ReferenceLatent:

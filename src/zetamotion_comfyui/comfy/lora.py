@@ -185,7 +185,7 @@ def model_lora_keys_unet(model, key_map={}):
             else:
                 key_map["{}".format(k)] = k #generic lora format for not .weight without any weird key names
 
-    diffusers_keys = comfy.utils.unet_to_diffusers(model.model_config.unet_config)
+    diffusers_keys = zetamotion_comfyui.comfy.utils.unet_to_diffusers(model.model_config.unet_config)
     for k in diffusers_keys:
         if k.endswith(".weight"):
             unet_key = "diffusion_model.{}".format(diffusers_keys[k])
@@ -200,15 +200,15 @@ def model_lora_keys_unet(model, key_map={}):
                     diffusers_lora_key = diffusers_lora_key[:-2]
                 key_map[diffusers_lora_key] = unet_key
 
-    if isinstance(model, comfy.model_base.StableCascade_C):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.StableCascade_C):
         for k in sdk:
             if k.startswith("diffusion_model."):
                 if k.endswith(".weight"):
                     key_lora = k[len("diffusion_model."):-len(".weight")].replace(".", "_")
                     key_map["lora_prior_unet_{}".format(key_lora)] = k
 
-    if isinstance(model, comfy.model_base.SD3): #Diffusers lora SD3
-        diffusers_keys = comfy.utils.mmdit_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.SD3): #Diffusers lora SD3
+        diffusers_keys = zetamotion_comfyui.comfy.utils.mmdit_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
         for k in diffusers_keys:
             if k.endswith(".weight"):
                 to = diffusers_keys[k]
@@ -224,16 +224,16 @@ def model_lora_keys_unet(model, key_map={}):
                 key_lora = "lycoris_{}".format(k[:-len(".weight")].replace(".", "_")) #simpletuner lycoris format
                 key_map[key_lora] = to
 
-    if isinstance(model, comfy.model_base.AuraFlow): #Diffusers lora AuraFlow
-        diffusers_keys = comfy.utils.auraflow_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.AuraFlow): #Diffusers lora AuraFlow
+        diffusers_keys = zetamotion_comfyui.comfy.utils.auraflow_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
         for k in diffusers_keys:
             if k.endswith(".weight"):
                 to = diffusers_keys[k]
                 key_lora = "transformer.{}".format(k[:-len(".weight")]) #simpletrainer and probably regular diffusers lora format
                 key_map[key_lora] = to
 
-    if isinstance(model, comfy.model_base.PixArt):
-        diffusers_keys = comfy.utils.pixart_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.PixArt):
+        diffusers_keys = zetamotion_comfyui.comfy.utils.pixart_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
         for k in diffusers_keys:
             if k.endswith(".weight"):
                 to = diffusers_keys[k]
@@ -246,14 +246,14 @@ def model_lora_keys_unet(model, key_map={}):
                 key_lora = "unet.base_model.model.{}".format(k[:-len(".weight")]) #old reference peft script
                 key_map[key_lora] = to
 
-    if isinstance(model, comfy.model_base.HunyuanDiT):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.HunyuanDiT):
         for k in sdk:
             if k.startswith("diffusion_model.") and k.endswith(".weight"):
                 key_lora = k[len("diffusion_model."):-len(".weight")]
                 key_map["base_model.model.{}".format(key_lora)] = k #official hunyuan lora format
 
-    if isinstance(model, comfy.model_base.Flux): #Diffusers lora Flux
-        diffusers_keys = comfy.utils.flux_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.Flux): #Diffusers lora Flux
+        diffusers_keys = zetamotion_comfyui.comfy.utils.flux_to_diffusers(model.model_config.unet_config, output_prefix="diffusion_model.")
         for k in diffusers_keys:
             if k.endswith(".weight"):
                 to = diffusers_keys[k]
@@ -265,13 +265,13 @@ def model_lora_keys_unet(model, key_map={}):
             if k.endswith(".weight") and ".linear1." in k:
                 key_map["{}".format(k.replace(".linear1.weight", ".linear1_qkv"))] = (k, (0, 0, hidden_size * 3))
 
-    if isinstance(model, comfy.model_base.GenmoMochi):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.GenmoMochi):
         for k in sdk:
             if k.startswith("diffusion_model.") and k.endswith(".weight"): #Official Mochi lora format
                 key_lora = k[len("diffusion_model."):-len(".weight")]
                 key_map["{}".format(key_lora)] = k
 
-    if isinstance(model, comfy.model_base.HunyuanVideo):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.HunyuanVideo):
         for k in sdk:
             if k.startswith("diffusion_model.") and k.endswith(".weight"):
                 # diffusion-pipe lora format
@@ -283,7 +283,7 @@ def model_lora_keys_unet(model, key_map={}):
                 key_map["transformer.{}".format(key_lora)] = k
                 key_map["diffusion_model.{}".format(key_lora)] = k  # Old loras
 
-    if isinstance(model, comfy.model_base.HiDream):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.HiDream):
         for k in sdk:
             if k.startswith("diffusion_model."):
                 if k.endswith(".weight"):
@@ -291,13 +291,13 @@ def model_lora_keys_unet(model, key_map={}):
                     key_map["lycoris_{}".format(key_lora.replace(".", "_"))] = k #SimpleTuner lycoris format
                     key_map["transformer.{}".format(key_lora)] = k #SimpleTuner regular format
 
-    if isinstance(model, comfy.model_base.ACEStep):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.ACEStep):
         for k in sdk:
             if k.startswith("diffusion_model.") and k.endswith(".weight"): #Official ACE step lora format
                 key_lora = k[len("diffusion_model."):-len(".weight")]
                 key_map["{}".format(key_lora)] = k
 
-    if isinstance(model, comfy.model_base.QwenImage):
+    if isinstance(model, zetamotion_comfyui.comfy.model_base.QwenImage):
         for k in sdk:
             if k.startswith("diffusion_model.") and k.endswith(".weight"): #QwenImage lora format
                 key_lora = k[len("diffusion_model."):-len(".weight")]
@@ -362,7 +362,7 @@ def calculate_weight(patches, weight, key, intermediate_dtype=torch.float32, ori
             weight *= strength_model
 
         if isinstance(v, list):
-            v = (calculate_weight(v[1:], v[0][1](comfy.model_management.cast_to_device(v[0][0], weight.device, intermediate_dtype, copy=True), inplace=True), key, intermediate_dtype=intermediate_dtype), )
+            v = (calculate_weight(v[1:], v[0][1](zetamotion_comfyui.comfy.model_management.cast_to_device(v[0][0], weight.device, intermediate_dtype, copy=True), inplace=True), key, intermediate_dtype=intermediate_dtype), )
 
         if isinstance(v, weight_adapter.WeightAdapterBase):
             output = v.calculate_weight(weight, key, strength, strength_model, offset, function, intermediate_dtype, original_weights)
@@ -392,14 +392,14 @@ def calculate_weight(patches, weight, key, intermediate_dtype=torch.float32, ori
                 if diff.shape != weight.shape:
                     logging.warning("WARNING SHAPE MISMATCH {} WEIGHT NOT MERGED {} != {}".format(key, diff.shape, weight.shape))
                 else:
-                    weight += function(strength * comfy.model_management.cast_to_device(diff, weight.device, weight.dtype))
+                    weight += function(strength * zetamotion_comfyui.comfy.model_management.cast_to_device(diff, weight.device, weight.dtype))
         elif patch_type == "set":
             weight.copy_(v[0])
         elif patch_type == "model_as_lora":
             target_weight: torch.Tensor = v[0]
-            diff_weight = comfy.model_management.cast_to_device(target_weight, weight.device, intermediate_dtype) - \
-                          comfy.model_management.cast_to_device(original_weights[key][0][0], weight.device, intermediate_dtype)
-            weight += function(strength * comfy.model_management.cast_to_device(diff_weight, weight.device, weight.dtype))
+            diff_weight = zetamotion_comfyui.comfy.model_management.cast_to_device(target_weight, weight.device, intermediate_dtype) - \
+                          zetamotion_comfyui.comfy.model_management.cast_to_device(original_weights[key][0][0], weight.device, intermediate_dtype)
+            weight += function(strength * zetamotion_comfyui.comfy.model_management.cast_to_device(diff_weight, weight.device, weight.dtype))
         else:
             logging.warning("patch type not recognized {} {}".format(patch_type, key))
 

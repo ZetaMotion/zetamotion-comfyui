@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-import folder_paths
+import zetamotion_comfyui.folder_paths
 import glob
 from aiohttp import web
 import json
@@ -59,7 +59,7 @@ class CustomNodeManager:
 
         translations = {}
 
-        for folder in folder_paths.get_folder_paths("custom_nodes"):
+        for folder in zetamotion_comfyui.folder_paths.get_folder_paths("custom_nodes"):
             # Sort glob results for deterministic ordering
             for custom_node_dir in sorted(glob.glob(os.path.join(folder, "*/"))):
                 locales_dir = os.path.join(custom_node_dir, "locales")
@@ -101,7 +101,7 @@ class CustomNodeManager:
 
             files = []
 
-            for folder in folder_paths.get_folder_paths("custom_nodes"):
+            for folder in zetamotion_comfyui.folder_paths.get_folder_paths("custom_nodes"):
                 for folder_name in example_workflow_folder_names:
                     pattern = os.path.join(folder, f"*/{folder_name}/*.json")
                     matched_files = glob.glob(pattern)

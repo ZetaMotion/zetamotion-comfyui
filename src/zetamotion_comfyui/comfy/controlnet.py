@@ -203,7 +203,7 @@ class ControlNet(ControlBase):
         self.control_model = control_model
         self.load_device = load_device
         if control_model is not None:
-            self.control_model_wrapped = comfy.model_patcher.ModelPatcher(self.control_model, load_device=load_device, offload_device=comfy.model_management.unet_offload_device())
+            self.control_model_wrapped = zetamotion_comfyui.comfy.model_patcher.ModelPatcher(self.control_model, load_device=load_device, offload_device=zetamotion_comfyui.comfy.model_management.unet_offload_device())
 
         self.compression_ratio = compression_ratio
         self.global_average_pooling = global_average_pooling
@@ -241,20 +241,20 @@ class ControlNet(ControlBase):
             else:
                 if self.latent_format is not None:
                     raise ValueError("This Controlnet needs a VAE but none was provided, please use a ControlNetApply node with a VAE input and connect it.")
-            self.cond_hint = comfy.utils.common_upscale(self.cond_hint_original, x_noisy.shape[-1] * compression_ratio, x_noisy.shape[-2] * compression_ratio, self.upscale_algorithm, "center")
+            self.cond_hint = zetamotion_comfyui.comfy.utils.common_upscale(self.cond_hint_original, x_noisy.shape[-1] * compression_ratio, x_noisy.shape[-2] * compression_ratio, self.upscale_algorithm, "center")
             self.cond_hint = self.preprocess_image(self.cond_hint)
             if self.vae is not None:
-                loaded_models = comfy.model_management.loaded_models(only_currently_used=True)
+                loaded_models = zetamotion_comfyui.comfy.model_management.loaded_models(only_currently_used=True)
                 self.cond_hint = self.vae.encode(self.cond_hint.movedim(1, -1))
-                comfy.model_management.load_models_gpu(loaded_models)
+                zetamotion_comfyui.comfy.model_management.load_models_gpu(loaded_models)
             if self.latent_format is not None:
                 self.cond_hint = self.latent_format.process_in(self.cond_hint)
             if len(self.extra_concat_orig) > 0:
                 to_concat = []
                 for c in self.extra_concat_orig:
                     c = c.to(self.cond_hint.device)
-                    c = comfy.utils.common_upscale(c, self.cond_hint.shape[3], self.cond_hint.shape[2], self.upscale_algorithm, "center")
-                    to_concat.append(comfy.utils.repeat_to_batch_size(c, self.cond_hint.shape[0]))
+                    c = zetamotion_comfyui.comfy.utils.common_upscale(c, self.cond_hint.shape[3], self.cond_hint.shape[2], self.upscale_algorithm, "center")
+                    to_concat.append(zetamotion_comfyui.comfy.utils.repeat_to_batch_size(c, self.cond_hint.shape[0]))
                 self.cond_hint = torch.cat([self.cond_hint] + to_concat, dim=1)
 
             self.cond_hint = self.cond_hint.to(device=x_noisy.device, dtype=dtype)
@@ -266,12 +266,12 @@ class ControlNet(ControlBase):
         for c in self.extra_conds:
             temp = cond.get(c, None)
             if temp is not None:
-                extra[c] = comfy.model_base.convert_tensor(temp, dtype, x_noisy.device)
+                extra[c] = zetamotion_comfyui.comfy.model_base.convert_tensor(temp, dtype, x_noisy.device)
 
         timestep = self.model_sampling_current.timestep(t)
         x_noisy = self.model_sampling_current.calculate_input(t, x_noisy)
 
-        control = self.control_model(x=x_noisy.to(dtype), hint=self.cond_hint, timesteps=timestep.to(dtype), context=comfy.model_management.cast_to_device(context, x_noisy.device, dtype), **extra)
+        control = self.control_model(x=x_noisy.to(dtype), hint=self.cond_hint, timesteps=timestep.to(dtype), context=zetamotion_comfyui.comfy.model_management.cast_to_device(context, x_noisy.device, dtype), **extra)
         return self.control_merge(control, control_prev, output_dtype=None)
 
     def copy(self):
@@ -295,7 +295,7 @@ class ControlNet(ControlBase):
         super().cleanup()
 
 class ControlLoraOps:
-    class Linear(torch.nn.Module, comfy.ops.CastWeightBiasOp):
+    class Linear(torch.nn.Module, zetamotion_comfyui.comfy.ops.CastWeightBiasOp):
         def __init__(self, in_features: int, out_features: int, bias: bool = True,
                     device=None, dtype=None) -> None:
             super().__init__()
@@ -307,13 +307,13 @@ class ControlLoraOps:
             self.bias = None
 
         def forward(self, input):
-            weight, bias = comfy.ops.cast_bias_weight(self, input)
+            weight, bias = zetamotion_comfyui.comfy.ops.cast_bias_weight(self, input)
             if self.up is not None:
                 return torch.nn.functional.linear(input, weight + (torch.mm(self.up.flatten(start_dim=1), self.down.flatten(start_dim=1))).reshape(self.weight.shape).type(input.dtype), bias)
             else:
                 return torch.nn.functional.linear(input, weight, bias)
 
-    class Conv2d(torch.nn.Module, comfy.ops.CastWeightBiasOp):
+    class Conv2d(torch.nn.Module, zetamotion_comfyui.comfy.ops.CastWeightBiasOp):
         def __init__(
             self,
             in_channels,
@@ -347,7 +347,7 @@ class ControlLoraOps:
 
 
         def forward(self, input):
-            weight, bias = comfy.ops.cast_bias_weight(self, input)
+            weight, bias = zetamotion_comfyui.comfy.ops.cast_bias_weight(self, input)
             if self.up is not None:
                 return torch.nn.functional.conv2d(input, weight + (torch.mm(self.up.flatten(start_dim=1), self.down.flatten(start_dim=1))).reshape(self.weight.shape).type(input.dtype), bias, self.stride, self.padding, self.dilation, self.groups)
             else:
@@ -369,31 +369,31 @@ class ControlLora(ControlNet):
         self.manual_cast_dtype = model.manual_cast_dtype
         dtype = model.get_dtype()
         if self.manual_cast_dtype is None:
-            class control_lora_ops(ControlLoraOps, comfy.ops.disable_weight_init):
+            class control_lora_ops(ControlLoraOps, zetamotion_comfyui.comfy.ops.disable_weight_init):
                 pass
         else:
-            class control_lora_ops(ControlLoraOps, comfy.ops.manual_cast):
+            class control_lora_ops(ControlLoraOps, zetamotion_comfyui.comfy.ops.manual_cast):
                 pass
             dtype = self.manual_cast_dtype
 
         controlnet_config["operations"] = control_lora_ops
         controlnet_config["dtype"] = dtype
-        self.control_model = comfy.cldm.cldm.ControlNet(**controlnet_config)
-        self.control_model.to(comfy.model_management.get_torch_device())
+        self.control_model = zetamotion_comfyui.comfy.cldm.cldm.ControlNet(**controlnet_config)
+        self.control_model.to(zetamotion_comfyui.comfy.model_management.get_torch_device())
         diffusion_model = model.diffusion_model
         sd = diffusion_model.state_dict()
 
         for k in sd:
             weight = sd[k]
             try:
-                comfy.utils.set_attr_param(self.control_model, k, weight)
+                zetamotion_comfyui.comfy.utils.set_attr_param(self.control_model, k, weight)
             except:
                 pass
 
         for k in self.control_weights:
             if (k not in {"lora_controlnet"}):
                 if (k.endswith(".up") or k.endswith(".down") or k.endswith(".weight") or k.endswith(".bias")) and ("__" not in k):
-                    comfy.utils.set_attr_param(self.control_model, k, self.control_weights[k].to(dtype).to(comfy.model_management.get_torch_device()))
+                    zetamotion_comfyui.comfy.utils.set_attr_param(self.control_model, k, self.control_weights[k].to(dtype).to(zetamotion_comfyui.comfy.model_management.get_torch_device()))
 
     def copy(self):
         c = ControlLora(self.control_weights, global_average_pooling=self.global_average_pooling)
@@ -410,26 +410,26 @@ class ControlLora(ControlNet):
         return out
 
     def inference_memory_requirements(self, dtype):
-        return comfy.utils.calculate_parameters(self.control_weights) * comfy.model_management.dtype_size(dtype) + ControlBase.inference_memory_requirements(self, dtype)
+        return zetamotion_comfyui.comfy.utils.calculate_parameters(self.control_weights) * zetamotion_comfyui.comfy.model_management.dtype_size(dtype) + ControlBase.inference_memory_requirements(self, dtype)
 
 def controlnet_config(sd, model_options={}):
-    model_config = comfy.model_detection.model_config_from_unet(sd, "", True)
+    model_config = zetamotion_comfyui.comfy.model_detection.model_config_from_unet(sd, "", True)
 
     unet_dtype = model_options.get("dtype", None)
     if unet_dtype is None:
-        weight_dtype = comfy.utils.weight_dtype(sd)
+        weight_dtype = zetamotion_comfyui.comfy.utils.weight_dtype(sd)
 
         supported_inference_dtypes = list(model_config.supported_inference_dtypes)
-        unet_dtype = comfy.model_management.unet_dtype(model_params=-1, supported_dtypes=supported_inference_dtypes, weight_dtype=weight_dtype)
+        unet_dtype = zetamotion_comfyui.comfy.model_management.unet_dtype(model_params=-1, supported_dtypes=supported_inference_dtypes, weight_dtype=weight_dtype)
 
-    load_device = comfy.model_management.get_torch_device()
-    manual_cast_dtype = comfy.model_management.unet_manual_cast(unet_dtype, load_device)
+    load_device = zetamotion_comfyui.comfy.model_management.get_torch_device()
+    manual_cast_dtype = zetamotion_comfyui.comfy.model_management.unet_manual_cast(unet_dtype, load_device)
 
     operations = model_options.get("custom_operations", None)
     if operations is None:
-        operations = comfy.ops.pick_operations(unet_dtype, manual_cast_dtype, disable_fast_fp8=True)
+        operations = zetamotion_comfyui.comfy.ops.pick_operations(unet_dtype, manual_cast_dtype, disable_fast_fp8=True)
 
-    offload_device = comfy.model_management.unet_offload_device()
+    offload_device = zetamotion_comfyui.comfy.model_management.unet_offload_device()
     return model_config, operations, load_device, unet_dtype, manual_cast_dtype, offload_device
 
 def controlnet_load_state_dict(control_model, sd):
@@ -444,9 +444,9 @@ def controlnet_load_state_dict(control_model, sd):
 
 
 def load_controlnet_mmdit(sd, model_options={}):
-    new_sd = comfy.model_detection.convert_diffusers_mmdit(sd, "")
+    new_sd = zetamotion_comfyui.comfy.model_detection.convert_diffusers_mmdit(sd, "")
     model_config, operations, load_device, unet_dtype, manual_cast_dtype, offload_device = controlnet_config(new_sd, model_options=model_options)
-    num_blocks = comfy.model_detection.count_blocks(new_sd, 'joint_blocks.{}.')
+    num_blocks = zetamotion_comfyui.comfy.model_detection.count_blocks(new_sd, 'joint_blocks.{}.')
     for k in sd:
         new_sd[k] = sd[k]
 
@@ -455,10 +455,10 @@ def load_controlnet_mmdit(sd, model_options={}):
     if control_latent_channels == 17: #inpaint controlnet
         concat_mask = True
 
-    control_model = comfy.cldm.mmdit.ControlNet(num_blocks=num_blocks, control_latent_channels=control_latent_channels, operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
+    control_model = zetamotion_comfyui.comfy.cldm.mmdit.ControlNet(num_blocks=num_blocks, control_latent_channels=control_latent_channels, operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
     control_model = controlnet_load_state_dict(control_model, new_sd)
 
-    latent_format = comfy.latent_formats.SD3()
+    latent_format = zetamotion_comfyui.comfy.latent_formats.SD3()
     latent_format.shift_factor = 0 #SD3 controlnet weirdness
     control = ControlNet(control_model, compression_ratio=1, latent_format=latent_format, concat_mask=concat_mask, load_device=load_device, manual_cast_dtype=manual_cast_dtype)
     return control
@@ -489,7 +489,7 @@ def load_controlnet_sd35(sd, model_options={}):
     depth_cnet = control_type == 2
 
     new_sd = {}
-    for k in comfy.utils.MMDIT_MAP_BASIC:
+    for k in zetamotion_comfyui.comfy.utils.MMDIT_MAP_BASIC:
         if k[1] in sd:
             new_sd[k[0]] = sd.pop(k[1])
     for k in sd:
@@ -501,19 +501,19 @@ def load_controlnet_sd35(sd, model_options={}):
     hidden_size = 64 * depth
     num_heads = depth
     head_dim = hidden_size // num_heads
-    num_blocks = comfy.model_detection.count_blocks(new_sd, 'transformer_blocks.{}.')
+    num_blocks = zetamotion_comfyui.comfy.model_detection.count_blocks(new_sd, 'transformer_blocks.{}.')
 
-    load_device = comfy.model_management.get_torch_device()
-    offload_device = comfy.model_management.unet_offload_device()
-    unet_dtype = comfy.model_management.unet_dtype(model_params=-1)
+    load_device = zetamotion_comfyui.comfy.model_management.get_torch_device()
+    offload_device = zetamotion_comfyui.comfy.model_management.unet_offload_device()
+    unet_dtype = zetamotion_comfyui.comfy.model_management.unet_dtype(model_params=-1)
 
-    manual_cast_dtype = comfy.model_management.unet_manual_cast(unet_dtype, load_device)
+    manual_cast_dtype = zetamotion_comfyui.comfy.model_management.unet_manual_cast(unet_dtype, load_device)
 
     operations = model_options.get("custom_operations", None)
     if operations is None:
-        operations = comfy.ops.pick_operations(unet_dtype, manual_cast_dtype, disable_fast_fp8=True)
+        operations = zetamotion_comfyui.comfy.ops.pick_operations(unet_dtype, manual_cast_dtype, disable_fast_fp8=True)
 
-    control_model = comfy.cldm.dit_embedder.ControlNetEmbedder(img_size=None,
+    control_model = zetamotion_comfyui.comfy.cldm.dit_embedder.ControlNetEmbedder(img_size=None,
                                                                patch_size=2,
                                                                in_chans=16,
                                                                num_layers=num_blocks,
@@ -528,7 +528,7 @@ def load_controlnet_sd35(sd, model_options={}):
 
     control_model = controlnet_load_state_dict(control_model, sd)
 
-    latent_format = comfy.latent_formats.SD3()
+    latent_format = zetamotion_comfyui.comfy.latent_formats.SD3()
     preprocess_image = lambda a: a
     if canny_cnet:
         preprocess_image = lambda a: (a * 255 * 0.5 + 0.5)
@@ -543,24 +543,24 @@ def load_controlnet_sd35(sd, model_options={}):
 def load_controlnet_hunyuandit(controlnet_data, model_options={}):
     model_config, operations, load_device, unet_dtype, manual_cast_dtype, offload_device = controlnet_config(controlnet_data, model_options=model_options)
 
-    control_model = comfy.ldm.hydit.controlnet.HunYuanControlNet(operations=operations, device=offload_device, dtype=unet_dtype)
+    control_model = zetamotion_comfyui.comfy.ldm.hydit.controlnet.HunYuanControlNet(operations=operations, device=offload_device, dtype=unet_dtype)
     control_model = controlnet_load_state_dict(control_model, controlnet_data)
 
-    latent_format = comfy.latent_formats.SDXL()
+    latent_format = zetamotion_comfyui.comfy.latent_formats.SDXL()
     extra_conds = ['text_embedding_mask', 'encoder_hidden_states_t5', 'text_embedding_mask_t5', 'image_meta_size', 'style', 'cos_cis_img', 'sin_cis_img']
     control = ControlNet(control_model, compression_ratio=1, latent_format=latent_format, load_device=load_device, manual_cast_dtype=manual_cast_dtype, extra_conds=extra_conds, strength_type=StrengthType.CONSTANT)
     return control
 
 def load_controlnet_flux_xlabs_mistoline(sd, mistoline=False, model_options={}):
     model_config, operations, load_device, unet_dtype, manual_cast_dtype, offload_device = controlnet_config(sd, model_options=model_options)
-    control_model = comfy.ldm.flux.controlnet.ControlNetFlux(mistoline=mistoline, operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
+    control_model = zetamotion_comfyui.comfy.ldm.flux.controlnet.ControlNetFlux(mistoline=mistoline, operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
     control_model = controlnet_load_state_dict(control_model, sd)
     extra_conds = ['y', 'guidance']
     control = ControlNet(control_model, load_device=load_device, manual_cast_dtype=manual_cast_dtype, extra_conds=extra_conds)
     return control
 
 def load_controlnet_flux_instantx(sd, model_options={}):
-    new_sd = comfy.model_detection.convert_diffusers_mmdit(sd, "")
+    new_sd = zetamotion_comfyui.comfy.model_detection.convert_diffusers_mmdit(sd, "")
     model_config, operations, load_device, unet_dtype, manual_cast_dtype, offload_device = controlnet_config(new_sd, model_options=model_options)
     for k in sd:
         new_sd[k] = sd[k]
@@ -575,25 +575,25 @@ def load_controlnet_flux_instantx(sd, model_options={}):
     if control_latent_channels == 17:
         concat_mask = True
 
-    control_model = comfy.ldm.flux.controlnet.ControlNetFlux(latent_input=True, num_union_modes=num_union_modes, control_latent_channels=control_latent_channels, operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
+    control_model = zetamotion_comfyui.comfy.ldm.flux.controlnet.ControlNetFlux(latent_input=True, num_union_modes=num_union_modes, control_latent_channels=control_latent_channels, operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
     control_model = controlnet_load_state_dict(control_model, new_sd)
 
-    latent_format = comfy.latent_formats.Flux()
+    latent_format = zetamotion_comfyui.comfy.latent_formats.Flux()
     extra_conds = ['y', 'guidance']
     control = ControlNet(control_model, compression_ratio=1, latent_format=latent_format, concat_mask=concat_mask, load_device=load_device, manual_cast_dtype=manual_cast_dtype, extra_conds=extra_conds)
     return control
 
 def load_controlnet_qwen_instantx(sd, model_options={}):
     model_config, operations, load_device, unet_dtype, manual_cast_dtype, offload_device = controlnet_config(sd, model_options=model_options)
-    control_model = comfy.ldm.qwen_image.controlnet.QwenImageControlNetModel(operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
+    control_model = zetamotion_comfyui.comfy.ldm.qwen_image.controlnet.QwenImageControlNetModel(operations=operations, device=offload_device, dtype=unet_dtype, **model_config.unet_config)
     control_model = controlnet_load_state_dict(control_model, sd)
-    latent_format = comfy.latent_formats.Wan21()
+    latent_format = zetamotion_comfyui.comfy.latent_formats.Wan21()
     extra_conds = []
     control = ControlNet(control_model, compression_ratio=1, latent_format=latent_format, load_device=load_device, manual_cast_dtype=manual_cast_dtype, extra_conds=extra_conds)
     return control
 
 def convert_mistoline(sd):
-    return comfy.utils.state_dict_prefix_replace(sd, {"single_controlnet_blocks.": "controlnet_single_blocks."})
+    return zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(sd, {"single_controlnet_blocks.": "controlnet_single_blocks."})
 
 
 def load_controlnet_state_dict(state_dict, model=None, model_options={}):
@@ -608,8 +608,8 @@ def load_controlnet_state_dict(state_dict, model=None, model_options={}):
     supported_inference_dtypes = None
 
     if "controlnet_cond_embedding.conv_in.weight" in controlnet_data: #diffusers format
-        controlnet_config = comfy.model_detection.unet_config_from_diffusers_unet(controlnet_data)
-        diffusers_keys = comfy.utils.unet_to_diffusers(controlnet_config)
+        controlnet_config = zetamotion_comfyui.comfy.model_detection.unet_config_from_diffusers_unet(controlnet_data)
+        diffusers_keys = zetamotion_comfyui.comfy.utils.unet_to_diffusers(controlnet_config)
         diffusers_keys["controlnet_mid_block.weight"] = "middle_block_out.0.weight"
         diffusers_keys["controlnet_mid_block.bias"] = "middle_block_out.0.bias"
 
@@ -689,37 +689,37 @@ def load_controlnet_state_dict(state_dict, model=None, model_options={}):
         return net
 
     if controlnet_config is None:
-        model_config = comfy.model_detection.model_config_from_unet(controlnet_data, prefix, True)
+        model_config = zetamotion_comfyui.comfy.model_detection.model_config_from_unet(controlnet_data, prefix, True)
         supported_inference_dtypes = list(model_config.supported_inference_dtypes)
         controlnet_config = model_config.unet_config
 
     unet_dtype = model_options.get("dtype", None)
     if unet_dtype is None:
-        weight_dtype = comfy.utils.weight_dtype(controlnet_data)
+        weight_dtype = zetamotion_comfyui.comfy.utils.weight_dtype(controlnet_data)
 
         if supported_inference_dtypes is None:
             supported_inference_dtypes = [comfy.model_management.unet_dtype()]
 
-        unet_dtype = comfy.model_management.unet_dtype(model_params=-1, supported_dtypes=supported_inference_dtypes, weight_dtype=weight_dtype)
+        unet_dtype = zetamotion_comfyui.comfy.model_management.unet_dtype(model_params=-1, supported_dtypes=supported_inference_dtypes, weight_dtype=weight_dtype)
 
-    load_device = comfy.model_management.get_torch_device()
+    load_device = zetamotion_comfyui.comfy.model_management.get_torch_device()
 
-    manual_cast_dtype = comfy.model_management.unet_manual_cast(unet_dtype, load_device)
+    manual_cast_dtype = zetamotion_comfyui.comfy.model_management.unet_manual_cast(unet_dtype, load_device)
     operations = model_options.get("custom_operations", None)
     if operations is None:
-        operations = comfy.ops.pick_operations(unet_dtype, manual_cast_dtype)
+        operations = zetamotion_comfyui.comfy.ops.pick_operations(unet_dtype, manual_cast_dtype)
 
     controlnet_config["operations"] = operations
     controlnet_config["dtype"] = unet_dtype
-    controlnet_config["device"] = comfy.model_management.unet_offload_device()
+    controlnet_config["device"] = zetamotion_comfyui.comfy.model_management.unet_offload_device()
     controlnet_config.pop("out_channels")
     controlnet_config["hint_channels"] = controlnet_data["{}input_hint_block.0.weight".format(prefix)].shape[1]
-    control_model = comfy.cldm.cldm.ControlNet(**controlnet_config)
+    control_model = zetamotion_comfyui.comfy.cldm.cldm.ControlNet(**controlnet_config)
 
     if pth:
         if 'difference' in controlnet_data:
             if model is not None:
-                comfy.model_management.load_models_gpu([model])
+                zetamotion_comfyui.comfy.model_management.load_models_gpu([model])
                 model_sd = model.model_state_dict()
                 for x in controlnet_data:
                     c_m = "control_model."
@@ -756,7 +756,7 @@ def load_controlnet(ckpt_path, model=None, model_options={}):
         if filename.endswith("_shuffle") or filename.endswith("_shuffle_fp16"): #TODO: smarter way of enabling global_average_pooling
             model_options["global_average_pooling"] = True
 
-    cnet = load_controlnet_state_dict(comfy.utils.load_torch_file(ckpt_path, safe_load=True), model=model, model_options=model_options)
+    cnet = load_controlnet_state_dict(zetamotion_comfyui.comfy.utils.load_torch_file(ckpt_path, safe_load=True), model=model, model_options=model_options)
     if cnet is None:
         logging.error("error checkpoint does not contain controlnet or t2i adapter data {}".format(ckpt_path))
     return cnet
@@ -770,7 +770,7 @@ class T2IAdapter(ControlBase):
         self.compression_ratio = compression_ratio
         self.upscale_algorithm = upscale_algorithm
         if device is None:
-            device = comfy.model_management.get_torch_device()
+            device = zetamotion_comfyui.comfy.model_management.get_torch_device()
         self.device = device
 
     def scale_image_to(self, width, height):
@@ -797,7 +797,7 @@ class T2IAdapter(ControlBase):
             self.control_input = None
             self.cond_hint = None
             width, height = self.scale_image_to(x_noisy.shape[3] * self.compression_ratio, x_noisy.shape[2] * self.compression_ratio)
-            self.cond_hint = comfy.utils.common_upscale(self.cond_hint_original, width, height, self.upscale_algorithm, "center").float().to(self.device)
+            self.cond_hint = zetamotion_comfyui.comfy.utils.common_upscale(self.cond_hint_original, width, height, self.upscale_algorithm, "center").float().to(self.device)
             if self.channels_in == 1 and self.cond_hint.shape[1] > 1:
                 self.cond_hint = torch.mean(self.cond_hint, 1, keepdim=True)
         if x_noisy.shape[0] != self.cond_hint.shape[0]:
@@ -832,12 +832,12 @@ def load_t2i_adapter(t2i_data, model_options={}): #TODO: model_options
                 prefix_replace["adapter.body.{}.resnets.{}.".format(i, j)] = "body.{}.".format(i * 2 + j)
             prefix_replace["adapter.body.{}.".format(i, )] = "body.{}.".format(i * 2)
         prefix_replace["adapter."] = ""
-        t2i_data = comfy.utils.state_dict_prefix_replace(t2i_data, prefix_replace)
+        t2i_data = zetamotion_comfyui.comfy.utils.state_dict_prefix_replace(t2i_data, prefix_replace)
     keys = t2i_data.keys()
 
     if "body.0.in_conv.weight" in keys:
         cin = t2i_data['body.0.in_conv.weight'].shape[1]
-        model_ad = comfy.t2i_adapter.adapter.Adapter_light(cin=cin, channels=[320, 640, 1280, 1280], nums_rb=4)
+        model_ad = zetamotion_comfyui.comfy.t2i_adapter.adapter.Adapter_light(cin=cin, channels=[320, 640, 1280, 1280], nums_rb=4)
     elif 'conv_in.weight' in keys:
         cin = t2i_data['conv_in.weight'].shape[1]
         channel = t2i_data['conv_in.weight'].shape[0]
@@ -849,13 +849,13 @@ def load_t2i_adapter(t2i_data, model_options={}): #TODO: model_options
         xl = False
         if cin == 256 or cin == 768:
             xl = True
-        model_ad = comfy.t2i_adapter.adapter.Adapter(cin=cin, channels=[channel, channel*2, channel*4, channel*4][:4], nums_rb=2, ksize=ksize, sk=True, use_conv=use_conv, xl=xl)
+        model_ad = zetamotion_comfyui.comfy.t2i_adapter.adapter.Adapter(cin=cin, channels=[channel, channel*2, channel*4, channel*4][:4], nums_rb=2, ksize=ksize, sk=True, use_conv=use_conv, xl=xl)
     elif "backbone.0.0.weight" in keys:
-        model_ad = comfy.ldm.cascade.controlnet.ControlNet(c_in=t2i_data['backbone.0.0.weight'].shape[1], proj_blocks=[0, 4, 8, 12, 51, 55, 59, 63])
+        model_ad = zetamotion_comfyui.comfy.ldm.cascade.controlnet.ControlNet(c_in=t2i_data['backbone.0.0.weight'].shape[1], proj_blocks=[0, 4, 8, 12, 51, 55, 59, 63])
         compression_ratio = 32
         upscale_algorithm = 'bilinear'
     elif "backbone.10.blocks.0.weight" in keys:
-        model_ad = comfy.ldm.cascade.controlnet.ControlNet(c_in=t2i_data['backbone.0.weight'].shape[1], bottleneck_mode="large", proj_blocks=[0, 4, 8, 12, 51, 55, 59, 63])
+        model_ad = zetamotion_comfyui.comfy.ldm.cascade.controlnet.ControlNet(c_in=t2i_data['backbone.0.weight'].shape[1], bottleneck_mode="large", proj_blocks=[0, 4, 8, 12, 51, 55, 59, 63])
         compression_ratio = 1
         upscale_algorithm = 'nearest-exact'
     else:

@@ -7,8 +7,8 @@ Rodin API docs: https://developer.hyper3d.ai/
 
 from __future__ import annotations
 from inspect import cleandoc
-from comfy.comfy_types.node_typing import IO
-import folder_paths as comfy_paths
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
+import zetamotion_comfyui.folder_paths as comfy_paths
 import aiohttp
 import os
 import datetime
@@ -17,7 +17,7 @@ import io
 import logging
 import math
 from PIL import Image
-from comfy_api_nodes.apis.rodin_api import (
+from zetamotion_comfyui.comfy_api_nodes.apis.rodin_api import (
     Rodin3DGenerateRequest,
     Rodin3DGenerateResponse,
     Rodin3DCheckStatusRequest,
@@ -26,7 +26,7 @@ from comfy_api_nodes.apis.rodin_api import (
     Rodin3DDownloadResponse,
     JobStatus,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,

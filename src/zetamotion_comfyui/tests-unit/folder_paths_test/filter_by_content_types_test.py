@@ -1,7 +1,7 @@
 import pytest
 import os
 import tempfile
-from folder_paths import filter_files_content_types, extension_mimetypes_cache
+from zetamotion_comfyui.folder_paths.import filter_files_content_types, extension_mimetypes_cache
 from unittest.mock import patch
 
 

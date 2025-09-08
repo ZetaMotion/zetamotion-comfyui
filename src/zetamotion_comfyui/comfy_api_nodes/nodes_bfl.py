@@ -2,8 +2,8 @@ import asyncio
 import io
 from inspect import cleandoc
 from typing import Union, Optional
-from comfy.comfy_types.node_typing import IO, ComfyNodeABC
-from comfy_api_nodes.apis.bfl_api import (
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, ComfyNodeABC
+from zetamotion_comfyui.comfy_api_nodes.apis.bfl_api import (
     BFLStatus,
     BFLFluxExpandImageRequest,
     BFLFluxFillImageRequest,
@@ -14,12 +14,12 @@ from comfy_api_nodes.apis.bfl_api import (
     BFLFluxProUltraGenerateRequest,
     BFLFluxProGenerateResponse,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     downscale_image_tensor,
     validate_aspect_ratio,
     process_image_response,

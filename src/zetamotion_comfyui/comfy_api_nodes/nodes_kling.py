@@ -12,7 +12,7 @@ import logging
 
 import torch
 
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     KlingTaskStatus,
     KlingCameraControl,
     KlingCameraConfig,
@@ -50,31 +50,31 @@ from comfy_api_nodes.apis import (
     KlingCharacterEffectModelName,
     KlingSingleImageEffectModelName,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     tensor_to_base64_string,
     download_url_to_video_output,
     upload_video_to_comfyapi,
     upload_audio_to_comfyapi,
     download_url_to_image_tensor,
 )
-from comfy_api_nodes.mapper_utils import model_field_to_node_input
-from comfy_api_nodes.util.validation_utils import (
+from zetamotion_comfyui.comfy_api_nodes.mapper_utils import model_field_to_node_input
+from zetamotion_comfyui.comfy_api_nodes.util.validation_utils import (
     validate_image_dimensions,
     validate_image_aspect_ratio,
     validate_video_dimensions,
     validate_video_duration,
 )
-from comfy_api.input.basic_types import AudioInput
-from comfy_api.input.video_types import VideoInput
-from comfy_api.input_impl import VideoFromFile
-from comfy.comfy_types.node_typing import IO, InputTypeOptions, ComfyNodeABC
+from zetamotion_comfyui.comfy_api.input.basic_types import AudioInput
+from zetamotion_comfyui.comfy_api.input.video_types import VideoInput
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromFile
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, InputTypeOptions, ComfyNodeABC
 
 KLING_API_VERSION = "v1"
 PATH_TEXT_TO_VIDEO = f"/proxy/kling/{KLING_API_VERSION}/videos/text2video"

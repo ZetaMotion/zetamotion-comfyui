@@ -3,7 +3,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 
 
 class WeightAdapterBase:
@@ -60,7 +60,7 @@ class WeightAdapterTrainBase(nn.Module):
 
 
 def weight_decompose(dora_scale, weight, lora_diff, alpha, strength, intermediate_dtype, function):
-    dora_scale = comfy.model_management.cast_to_device(dora_scale, weight.device, intermediate_dtype)
+    dora_scale = zetamotion_comfyui.comfy.model_management.cast_to_device(dora_scale, weight.device, intermediate_dtype)
     lora_diff *= alpha
     weight_calc = weight + function(lora_diff).type(weight.dtype)
 

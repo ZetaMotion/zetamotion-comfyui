@@ -8,8 +8,8 @@ import shutil
 import logging
 from aiohttp import web
 from urllib import parse
-from comfy.cli_args import args
-import folder_paths
+from zetamotion_comfyui.comfy.cli_args import args
+import zetamotion_comfyui.folder_paths
 from .app_settings import AppSettings
 from typing import TypedDict
 
@@ -34,7 +34,7 @@ def get_file_info(path: str, relative_to: str) -> FileInfo:
 
 class UserManager():
     def __init__(self):
-        user_directory = folder_paths.get_user_directory()
+        user_directory = zetamotion_comfyui.folder_paths.get_user_directory()
 
         self.settings = AppSettings(self)
         if not os.path.exists(user_directory):
@@ -53,7 +53,7 @@ class UserManager():
             self.users = {"default": "default"}
 
     def get_users_file(self):
-        return os.path.join(folder_paths.get_user_directory(), "users.json")
+        return os.path.join(zetamotion_comfyui.folder_paths.get_user_directory(), "users.json")
 
     def get_request_user_id(self, request):
         user = "default"
@@ -66,7 +66,7 @@ class UserManager():
         return user
 
     def get_request_user_filepath(self, request, file, type="userdata", create_dir=True):
-        user_directory = folder_paths.get_user_directory()
+        user_directory = zetamotion_comfyui.folder_paths.get_user_directory()
 
         if type == "userdata":
             root_dir = user_directory

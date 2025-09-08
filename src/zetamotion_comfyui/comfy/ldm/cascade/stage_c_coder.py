@@ -19,9 +19,9 @@ import torch
 import torchvision
 from torch import nn
 
-import comfy.ops
+import zetamotion_comfyui.comfy.ops
 
-ops = comfy.ops.disable_weight_init
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 # EfficientNet
 class EfficientNetEncoder(nn.Module):

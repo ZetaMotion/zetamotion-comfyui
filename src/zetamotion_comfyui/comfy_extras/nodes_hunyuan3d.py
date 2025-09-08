@@ -3,10 +3,10 @@ import os
 import json
 import struct
 import numpy as np
-from comfy.ldm.modules.diffusionmodules.mmdit import get_1d_sincos_pos_embed_from_grid_torch
-import folder_paths
-import comfy.model_management
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit import get_1d_sincos_pos_embed_from_grid_torch
+import zetamotion_comfyui.folder_paths
+import zetamotion_comfyui.comfy.model_management
+from zetamotion_comfyui.comfy.cli_args import args
 
 class EmptyLatentHunyuan3Dv2:
     @classmethod
@@ -24,7 +24,7 @@ class EmptyLatentHunyuan3Dv2:
     CATEGORY = "latent/3d"
 
     def generate(self, resolution, batch_size):
-        latent = torch.zeros([batch_size, 64, resolution], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 64, resolution], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         return ({"samples": latent, "type": "hunyuan3dv2"}, )
 
 class Hunyuan3Dv2Conditioning:
@@ -253,7 +253,7 @@ def voxel_to_mesh_surfnet(voxels, threshold=0.5, device=None):
     ], device=device)
 
     cell_vertices = {}
-    progress = comfy.utils.ProgressBar(100)
+    progress = zetamotion_comfyui.comfy.utils.ProgressBar(100)
 
     for edge_idx, (e1, e2) in enumerate(edges):
         progress.update(1)
@@ -596,7 +596,7 @@ class SaveGLB:
     CATEGORY = "3d"
 
     def save(self, mesh, filename_prefix, prompt=None, extra_pnginfo=None):
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, folder_paths.get_output_directory())
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, zetamotion_comfyui.folder_paths.get_output_directory())
         results = []
 
         metadata = {}

@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from typing import Optional, Any
 import math
 
-from comfy.ldm.modules.attention import optimized_attention_for_device
-import comfy.model_management
-import comfy.ldm.common_dit
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention_for_device
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.ldm.common_dit
 
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 from . import qwen_vl
 
 @dataclass
@@ -95,7 +95,7 @@ class RMSNorm(nn.Module):
         if self.add:
             w = w + 1.0
 
-        return comfy.ldm.common_dit.rms_norm(x, w, self.eps)
+        return zetamotion_comfyui.comfy.ldm.common_dit.rms_norm(x, w, self.eps)
 
 
 

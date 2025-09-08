@@ -1,8 +1,8 @@
-import nodes
+import zetamotion_comfyui.nodes
 import torch
 import numpy as np
 from einops import rearrange
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 
 
 
@@ -196,7 +196,7 @@ class WanCameraEmbedding:
         cam_params = np.array([[float(x) for x in pose] for pose in trajs])
         cam_params = np.concatenate([np.zeros_like(cam_params[:, :1]), cam_params], 1)
         control_camera_video = process_pose_params(cam_params, width=width, height=height)
-        control_camera_video = control_camera_video.permute([3, 0, 1, 2]).unsqueeze(0).to(device=comfy.model_management.intermediate_device())
+        control_camera_video = control_camera_video.permute([3, 0, 1, 2]).unsqueeze(0).to(device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         control_camera_video = torch.concat(
             [

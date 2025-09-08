@@ -8,7 +8,7 @@ from app.frontend_management import (
     FrontEndProvider,
     Release,
 )
-from comfy.cli_args import DEFAULT_VERSION_STRING
+from zetamotion_comfyui.comfy.cli_args import DEFAULT_VERSION_STRING
 
 
 @pytest.fixture

@@ -1,5 +1,5 @@
-from comfy import sd1_clip
-import comfy.text_encoders.t5
+from zetamotion_comfyui.comfy import sd1_clip
+import zetamotion_comfyui.comfy.text_encoders.t5
 import os
 from transformers import T5TokenizerFast
 
@@ -12,7 +12,7 @@ class T5XXLModel(sd1_clip.SDClipModel):
             model_options = model_options.copy()
             model_options["scaled_fp8"] = t5xxl_scaled_fp8
 
-        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config=textmodel_json_config, dtype=dtype, special_tokens={"end": 1, "pad": 0}, model_class=comfy.text_encoders.t5.T5, enable_attention_masks=attention_mask, return_attention_masks=attention_mask, zero_out_masked=attention_mask, model_options=model_options)
+        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config=textmodel_json_config, dtype=dtype, special_tokens={"end": 1, "pad": 0}, model_class=zetamotion_comfyui.comfy.text_encoders.t5.T5, enable_attention_masks=attention_mask, return_attention_masks=attention_mask, zero_out_masked=attention_mask, model_options=model_options)
 
 class CosmosT5XXL(sd1_clip.SD1ClipModel):
     def __init__(self, device="cpu", dtype=None, model_options={}):

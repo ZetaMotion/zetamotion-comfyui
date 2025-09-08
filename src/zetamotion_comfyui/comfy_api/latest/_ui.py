@@ -17,11 +17,11 @@ except:
 from PIL import Image as PILImage
 from PIL.PngImagePlugin import PngInfo
 
-import folder_paths
+import zetamotion_comfyui.folder_paths
 
 # used for image preview
-from comfy.cli_args import args
-from comfy_api.latest._io import ComfyNode, FolderType, Image, _UIOutput
+from zetamotion_comfyui.comfy.cli_args import args
+from zetamotion_comfyui.comfy_api.latest._io import ComfyNode, FolderType, Image, _UIOutput
 
 
 class SavedResult(dict):
@@ -67,10 +67,10 @@ class SavedAudios(_UIOutput):
 
 def _get_directory_by_folder_type(folder_type: FolderType) -> str:
     if folder_type == FolderType.input:
-        return folder_paths.get_input_directory()
+        return zetamotion_comfyui.folder_paths.get_input_directory()
     if folder_type == FolderType.output:
-        return folder_paths.get_output_directory()
-    return folder_paths.get_temp_directory()
+        return zetamotion_comfyui.folder_paths.get_output_directory()
+    return zetamotion_comfyui.folder_paths.get_temp_directory()
 
 
 class ImageSaveHelper:
@@ -139,7 +139,7 @@ class ImageSaveHelper:
         images, filename_prefix: str, folder_type: FolderType, cls: Type[ComfyNode] | None, compress_level = 4,
     ) -> list[SavedResult]:
         """Saves a batch of images as individual PNG files."""
-        full_output_folder, filename, counter, subfolder, _ = folder_paths.get_save_image_path(
+        full_output_folder, filename, counter, subfolder, _ = zetamotion_comfyui.folder_paths.get_save_image_path(
             filename_prefix, _get_directory_by_folder_type(folder_type), images[0].shape[1], images[0].shape[0]
         )
         results = []
@@ -171,7 +171,7 @@ class ImageSaveHelper:
         images, filename_prefix: str, folder_type: FolderType, cls: Type[ComfyNode] | None, fps: float, compress_level: int
     ) -> SavedResult:
         """Saves a batch of images as a single animated PNG."""
-        full_output_folder, filename, counter, subfolder, _ = folder_paths.get_save_image_path(
+        full_output_folder, filename, counter, subfolder, _ = zetamotion_comfyui.folder_paths.get_save_image_path(
             filename_prefix, _get_directory_by_folder_type(folder_type), images[0].shape[1], images[0].shape[0]
         )
         pil_images = [ImageSaveHelper._convert_tensor_to_pil(img) for img in images]
@@ -215,7 +215,7 @@ class ImageSaveHelper:
         method: int,
     ) -> SavedResult:
         """Saves a batch of images as a single animated WebP."""
-        full_output_folder, filename, counter, subfolder, _ = folder_paths.get_save_image_path(
+        full_output_folder, filename, counter, subfolder, _ = zetamotion_comfyui.folder_paths.get_save_image_path(
             filename_prefix, _get_directory_by_folder_type(folder_type), images[0].shape[1], images[0].shape[0]
         )
         pil_images = [ImageSaveHelper._convert_tensor_to_pil(img) for img in images]
@@ -270,7 +270,7 @@ class AudioSaveHelper:
         format: str = "flac",
         quality: str = "128k",
     ) -> list[SavedResult]:
-        full_output_folder, filename, counter, subfolder, _ = folder_paths.get_save_image_path(
+        full_output_folder, filename, counter, subfolder, _ = zetamotion_comfyui.folder_paths.get_save_image_path(
             filename_prefix, _get_directory_by_folder_type(folder_type)
         )
 

@@ -12,9 +12,9 @@ import asyncio
 
 import torch
 
-import comfy.model_management
-import nodes
-from comfy_execution.caching import (
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.nodes
+from zetamotion_comfyui.comfy_execution.caching import (
     BasicCache,
     CacheKeySetID,
     CacheKeySetInputSignature,
@@ -22,18 +22,18 @@ from comfy_execution.caching import (
     HierarchicalCache,
     LRUCache,
 )
-from comfy_execution.graph import (
+from zetamotion_comfyui.comfy_execution.graph import (
     DynamicPrompt,
     ExecutionBlocker,
     ExecutionList,
     get_input_info,
 )
-from comfy_execution.graph_utils import GraphBuilder, is_link
-from comfy_execution.validation import validate_node_input
-from comfy_execution.progress import get_progress_state, reset_progress_state, add_progress_handler, WebUIProgressHandler
-from comfy_execution.utils import CurrentNodeContext
-from comfy_api.internal import _ComfyNodeInternal, _NodeOutputInternal, first_real_override, is_class, make_locked_method_func
-from comfy_api.latest import io
+from zetamotion_comfyui.comfy_execution.graph_utils import GraphBuilder, is_link
+from zetamotion_comfyui.comfy_execution.validation import validate_node_input
+from zetamotion_comfyui.comfy_execution.progress import get_progress_state, reset_progress_state, add_progress_handler, WebUIProgressHandler
+from zetamotion_comfyui.comfy_execution.utils import CurrentNodeContext
+from zetamotion_comfyui.comfy_api.internal import _ComfyNodeInternal, _NodeOutputInternal, first_real_override, is_class, make_locked_method_func
+from zetamotion_comfyui.comfy_api.latest import io
 
 
 class ExecutionResult(Enum):
@@ -57,7 +57,7 @@ class IsChangedCache:
 
         node = self.dynprompt.get_node(node_id)
         class_type = node["class_type"]
-        class_def = nodes.NODE_CLASS_MAPPINGS[class_type]
+        class_def = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
         has_is_changed = False
         is_changed_name = None
         if issubclass(class_def, _ComfyNodeInternal) and first_real_override(class_def, "fingerprint_inputs") is not None:
@@ -399,7 +399,7 @@ async def execute(server, dynprompt, caches, current_item, extra_data, executed,
     parent_node_id = dynprompt.get_parent_node_id(unique_id)
     inputs = dynprompt.get_node(unique_id)['inputs']
     class_type = dynprompt.get_node(unique_id)['class_type']
-    class_def = nodes.NODE_CLASS_MAPPINGS[class_type]
+    class_def = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
     if caches.outputs.get(unique_id) is not None:
         if server.client_id is not None:
             cached_output = caches.ui.get(unique_id) or {}
@@ -535,7 +535,7 @@ async def execute(server, dynprompt, caches, current_item, extra_data, executed,
                         dynprompt.add_ephemeral_node(node_id, node_info, unique_id, display_id)
                         # Figure out if the newly created node is an output node
                         class_type = node_info["class_type"]
-                        class_def = nodes.NODE_CLASS_MAPPINGS[class_type]
+                        class_def = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
                         if hasattr(class_def, 'OUTPUT_NODE') and class_def.OUTPUT_NODE == True:
                             new_output_ids.append(node_id)
                     for i in range(len(node_outputs)):
@@ -554,7 +554,7 @@ async def execute(server, dynprompt, caches, current_item, extra_data, executed,
             pending_subgraph_results[unique_id] = cached_outputs
             return (ExecutionResult.PENDING, None, None)
         caches.outputs.set(unique_id, output_data)
-    except comfy.model_management.InterruptProcessingException as iex:
+    except zetamotion_comfyui.comfy.model_management.InterruptProcessingException as iex:
         logging.info("Processing interrupted")
 
         # skip formatting inputs/outputs
@@ -576,10 +576,10 @@ async def execute(server, dynprompt, caches, current_item, extra_data, executed,
         logging.error(traceback.format_exc())
         tips = ""
 
-        if isinstance(ex, comfy.model_management.OOM_EXCEPTION):
+        if isinstance(ex, zetamotion_comfyui.comfy.model_management.OOM_EXCEPTION):
             tips = "This error means you ran out of memory on your GPU.\n\nTIPS: If the workflow worked before you might have accidentally set the batch_size to a large number."
             logging.error("Got an OOM, unloading all loaded models.")
-            comfy.model_management.unload_all_models()
+            zetamotion_comfyui.comfy.model_management.unload_all_models()
 
         error_details = {
             "node_id": real_node_id,
@@ -623,7 +623,7 @@ class PromptExecutor:
 
         # First, send back the status to the frontend depending
         # on the exception type
-        if isinstance(ex, comfy.model_management.InterruptProcessingException):
+        if isinstance(ex, zetamotion_comfyui.comfy.model_management.InterruptProcessingException):
             mes = {
                 "prompt_id": prompt_id,
                 "node_id": node_id,
@@ -673,7 +673,7 @@ class PromptExecutor:
                 if self.caches.outputs.get(node_id) is not None:
                     cached_nodes.append(node_id)
 
-            comfy.model_management.cleanup_models_gc()
+            zetamotion_comfyui.comfy.model_management.cleanup_models_gc()
             self.add_message("execution_cached",
                           { "nodes": cached_nodes, "prompt_id": prompt_id},
                           broadcast=False)
@@ -718,8 +718,8 @@ class PromptExecutor:
                 "meta": meta_outputs,
             }
             self.server.last_node_id = None
-            if comfy.model_management.DISABLE_SMART_MEMORY:
-                comfy.model_management.unload_all_models()
+            if zetamotion_comfyui.comfy.model_management.DISABLE_SMART_MEMORY:
+                zetamotion_comfyui.comfy.model_management.unload_all_models()
 
 
 async def validate_inputs(prompt_id, prompt, item, validated):
@@ -729,7 +729,7 @@ async def validate_inputs(prompt_id, prompt, item, validated):
 
     inputs = prompt[unique_id]['inputs']
     class_type = prompt[unique_id]['class_type']
-    obj_class = nodes.NODE_CLASS_MAPPINGS[class_type]
+    obj_class = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
 
     class_inputs = obj_class.INPUT_TYPES()
     valid_inputs = set(class_inputs.get('required',{})).union(set(class_inputs.get('optional',{})))
@@ -786,7 +786,7 @@ async def validate_inputs(prompt_id, prompt, item, validated):
 
             o_id = val[0]
             o_class_type = prompt[o_id]['class_type']
-            r = nodes.NODE_CLASS_MAPPINGS[o_class_type].RETURN_TYPES
+            r = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[o_class_type].RETURN_TYPES
             received_type = r[val[1]]
             received_types[x] = received_type
             if 'input_types' not in validate_function_inputs and not validate_node_input(received_type, input_type):
@@ -976,7 +976,7 @@ async def validate_prompt(prompt_id, prompt, partial_execution_list: Union[list[
             return (False, error, [], {})
 
         class_type = prompt[x]['class_type']
-        class_ = nodes.NODE_CLASS_MAPPINGS.get(class_type, None)
+        class_ = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS.get(class_type, None)
         if class_ is None:
             error = {
                 "type": "invalid_prompt",

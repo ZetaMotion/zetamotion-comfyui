@@ -1,6 +1,6 @@
-from comfy.cldm.control_types import UNION_CONTROLNET_TYPES
-import nodes
-import comfy.utils
+from zetamotion_comfyui.comfy.cldm.control_types import UNION_CONTROLNET_TYPES
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.comfy.utils
 
 class SetUnionControlNetType:
     @classmethod
@@ -24,7 +24,7 @@ class SetUnionControlNetType:
 
         return (control_net,)
 
-class ControlNetInpaintingAliMamaApply(nodes.ControlNetApplyAdvanced):
+class ControlNetInpaintingAliMamaApply(zetamotion_comfyui.nodes.ControlNetApplyAdvanced):
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {"positive": ("CONDITIONING", ),
@@ -46,7 +46,7 @@ class ControlNetInpaintingAliMamaApply(nodes.ControlNetApplyAdvanced):
         extra_concat = []
         if control_net.concat_mask:
             mask = 1.0 - mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1]))
-            mask_apply = comfy.utils.common_upscale(mask, image.shape[2], image.shape[1], "bilinear", "center").round()
+            mask_apply = zetamotion_comfyui.comfy.utils.common_upscale(mask, image.shape[2], image.shape[1], "bilinear", "center").round()
             image = image * mask_apply.movedim(1, -1).repeat(1, 1, 1, image.shape[3])
             extra_concat = [mask]
 

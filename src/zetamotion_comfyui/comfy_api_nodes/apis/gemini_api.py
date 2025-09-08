@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from comfy_api_nodes.apis import GeminiGenerationConfig, GeminiContent, GeminiSafetySetting, GeminiSystemInstructionContent, GeminiTool, GeminiVideoMetadata
+from zetamotion_comfyui.comfy_api_nodes.apis import GeminiGenerationConfig, GeminiContent, GeminiSafetySetting, GeminiSystemInstructionContent, GeminiTool, GeminiVideoMetadata
 from pydantic import BaseModel
 
 

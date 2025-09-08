@@ -10,8 +10,8 @@ from tqdm.auto import trange, tqdm
 from . import utils
 from . import deis
 from . import sa_solver
-import comfy.model_patcher
-import comfy.model_sampling
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.model_sampling
 
 def append_zero(x):
     return torch.cat([x, x.new_zeros([1])])
@@ -146,7 +146,7 @@ class BrownianTreeNoiseSampler:
 
 def sigma_to_half_log_snr(sigma, model_sampling):
     """Convert sigma to half-logSNR log(alpha_t / sigma_t)."""
-    if isinstance(model_sampling, comfy.model_sampling.CONST):
+    if isinstance(model_sampling, zetamotion_comfyui.comfy.model_sampling.CONST):
         # log((1 - t) / t) = log((1 - sigma) / sigma)
         return sigma.logit().neg()
     return sigma.log().neg()
@@ -154,7 +154,7 @@ def sigma_to_half_log_snr(sigma, model_sampling):
 
 def half_log_snr_to_sigma(half_log_snr, model_sampling):
     """Convert half-logSNR log(alpha_t / sigma_t) to sigma."""
-    if isinstance(model_sampling, comfy.model_sampling.CONST):
+    if isinstance(model_sampling, zetamotion_comfyui.comfy.model_sampling.CONST):
         # 1 / (1 + exp(half_log_snr))
         return half_log_snr.neg().sigmoid()
     return half_log_snr.neg().exp()
@@ -164,7 +164,7 @@ def offset_first_sigma_for_snr(sigmas, model_sampling, percent_offset=1e-4):
     """Adjust the first sigma to avoid invalid logSNR."""
     if len(sigmas) <= 1:
         return sigmas
-    if isinstance(model_sampling, comfy.model_sampling.CONST):
+    if isinstance(model_sampling, zetamotion_comfyui.comfy.model_sampling.CONST):
         if sigmas[0] >= 1:
             sigmas = sigmas.clone()
             sigmas[0] = model_sampling.percent_to_sigma(percent_offset)
@@ -209,7 +209,7 @@ def sample_euler(model, x, sigmas, extra_args=None, callback=None, disable=None,
 
 @torch.no_grad()
 def sample_euler_ancestral(model, x, sigmas, extra_args=None, callback=None, disable=None, eta=1., s_noise=1., noise_sampler=None):
-    if isinstance(model.inner_model.inner_model.model_sampling, comfy.model_sampling.CONST):
+    if isinstance(model.inner_model.inner_model.model_sampling, zetamotion_comfyui.comfy.model_sampling.CONST):
         return sample_euler_ancestral_RF(model, x, sigmas, extra_args, callback, disable, eta, s_noise, noise_sampler)
     """Ancestral sampling with Euler method steps."""
     extra_args = {} if extra_args is None else extra_args
@@ -332,7 +332,7 @@ def sample_dpm_2(model, x, sigmas, extra_args=None, callback=None, disable=None,
 
 @torch.no_grad()
 def sample_dpm_2_ancestral(model, x, sigmas, extra_args=None, callback=None, disable=None, eta=1., s_noise=1., noise_sampler=None):
-    if isinstance(model.inner_model.inner_model.model_sampling, comfy.model_sampling.CONST):
+    if isinstance(model.inner_model.inner_model.model_sampling, zetamotion_comfyui.comfy.model_sampling.CONST):
         return sample_dpm_2_ancestral_RF(model, x, sigmas, extra_args, callback, disable, eta, s_noise, noise_sampler)
 
     """Ancestral sampling with DPM-Solver second-order steps."""
@@ -639,7 +639,7 @@ def sample_dpm_adaptive(model, x, sigma_min, sigma_max, extra_args=None, callbac
 
 @torch.no_grad()
 def sample_dpmpp_2s_ancestral(model, x, sigmas, extra_args=None, callback=None, disable=None, eta=1., s_noise=1., noise_sampler=None):
-    if isinstance(model.inner_model.inner_model.model_sampling, comfy.model_sampling.CONST):
+    if isinstance(model.inner_model.inner_model.model_sampling, zetamotion_comfyui.comfy.model_sampling.CONST):
         return sample_dpmpp_2s_ancestral_RF(model, x, sigmas, extra_args, callback, disable, eta, s_noise, noise_sampler)
 
     """Ancestral sampling with DPM-Solver++(2S) second-order steps."""
@@ -1253,7 +1253,7 @@ def sample_euler_ancestral_cfg_pp(model, x, sigmas, extra_args=None, callback=No
         return args["denoised"]
 
     model_options = extra_args.get("model_options", {}).copy()
-    extra_args["model_options"] = comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
+    extra_args["model_options"] = zetamotion_comfyui.comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
 
     s_in = x.new_ones([x.shape[0]])
     for i in trange(len(sigmas) - 1, disable=disable):
@@ -1298,7 +1298,7 @@ def sample_dpmpp_2s_ancestral_cfg_pp(model, x, sigmas, extra_args=None, callback
         return args["denoised"]
 
     model_options = extra_args.get("model_options", {}).copy()
-    extra_args["model_options"] = comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
+    extra_args["model_options"] = zetamotion_comfyui.comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
 
     s_in = x.new_ones([x.shape[0]])
     sigma_fn = lambda t: t.neg().exp()
@@ -1343,7 +1343,7 @@ def sample_dpmpp_2m_cfg_pp(model, x, sigmas, extra_args=None, callback=None, dis
         return args["denoised"]
 
     model_options = extra_args.get("model_options", {}).copy()
-    extra_args["model_options"] = comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
+    extra_args["model_options"] = zetamotion_comfyui.comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
 
     for i in trange(len(sigmas) - 1, disable=disable):
         denoised = model(x, sigmas[i] * s_in, **extra_args)
@@ -1382,7 +1382,7 @@ def res_multistep(model, x, sigmas, extra_args=None, callback=None, disable=None
 
     if cfg_pp:
         model_options = extra_args.get("model_options", {}).copy()
-        extra_args["model_options"] = comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
+        extra_args["model_options"] = zetamotion_comfyui.comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
 
     for i in trange(len(sigmas) - 1, disable=disable):
         denoised = model(x, sigmas[i] * s_in, **extra_args)
@@ -1457,7 +1457,7 @@ def sample_gradient_estimation(model, x, sigmas, extra_args=None, callback=None,
 
     if cfg_pp:
         model_options = extra_args.get("model_options", {}).copy()
-        extra_args["model_options"] = comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
+        extra_args["model_options"] = zetamotion_comfyui.comfy.model_patcher.set_model_options_post_cfg_function(model_options, post_cfg_function, disable_cfg1_optimization=True)
 
     for i in trange(len(sigmas) - 1, disable=disable):
         denoised = model(x, sigmas[i] * s_in, **extra_args)

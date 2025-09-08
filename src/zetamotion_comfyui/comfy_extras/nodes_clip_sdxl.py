@@ -1,4 +1,4 @@
-from nodes import MAX_RESOLUTION
+from zetamotion_comfyui.nodes import MAX_RESOLUTION
 
 class CLIPTextEncodeSDXLRefiner:
     @classmethod

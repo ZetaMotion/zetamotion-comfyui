@@ -1,11 +1,11 @@
-from comfy_api.v0_0_2 import (
+from zetamotion_comfyui.comfy_api.v0_0_2 import (
     ComfyAPIAdapter_v0_0_2,
     Input as Input_v0_0_2,
     InputImpl as InputImpl_v0_0_2,
     Types as Types_v0_0_2,
 )
 from typing import Type, TYPE_CHECKING
-from comfy_api.internal.async_to_sync import create_sync_class
+from zetamotion_comfyui.comfy_api.internal.async_to_sync import create_sync_class
 
 
 # This version only exists to serve as a template for future version adapters.
@@ -27,7 +27,7 @@ ComfyAPI = ComfyAPIAdapter_v0_0_1
 
 # Create a synchronous version of the API
 if TYPE_CHECKING:
-    from comfy_api.v0_0_1.generated.ComfyAPISyncStub import ComfyAPISyncStub  # type: ignore
+    from zetamotion_comfyui.comfy_api.v0_0_1.generated.ComfyAPISyncStub import ComfyAPISyncStub  # type: ignore
 
     ComfyAPISync: Type[ComfyAPISyncStub]
 

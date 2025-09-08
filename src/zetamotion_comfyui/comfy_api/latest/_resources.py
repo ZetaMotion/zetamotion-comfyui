@@ -1,6 +1,6 @@
 from __future__ import annotations
-import comfy.utils
-import folder_paths
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.folder_paths
 import logging
 from abc import ABC, abstractmethod
 from typing import Any
@@ -51,11 +51,11 @@ class ResourcesLocal(Resources):
         to_return = None
         if isinstance(key, TorchDictFolderFilename):
             if default is ...:
-                to_return = comfy.utils.load_torch_file(folder_paths.get_full_path_or_raise(key.folder_name, key.file_name), safe_load=True)
+                to_return = zetamotion_comfyui.comfy.utils.load_torch_file(zetamotion_comfyui.folder_paths.get_full_path_or_raise(key.folder_name, key.file_name), safe_load=True)
             else:
-                full_path = folder_paths.get_full_path(key.folder_name, key.file_name)
+                full_path = zetamotion_comfyui.folder_paths.get_full_path(key.folder_name, key.file_name)
                 if full_path is not None:
-                    to_return = comfy.utils.load_torch_file(full_path, safe_load=True)
+                    to_return = zetamotion_comfyui.comfy.utils.load_torch_file(full_path, safe_load=True)
 
         if to_return is not None:
             self.local_resources[key] = to_return

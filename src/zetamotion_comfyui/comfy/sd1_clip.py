@@ -1,7 +1,7 @@
 import os
 
 from transformers import CLIPTokenizer
-import comfy.ops
+import zetamotion_comfyui.comfy.ops
 import torch
 import traceback
 import zipfile
@@ -86,7 +86,7 @@ class SDClipModel(torch.nn.Module, ClipTokenWeightEncoder):
         "all"
     ]
     def __init__(self, device="cpu", max_length=77,
-                 freeze=True, layer="last", layer_idx=None, textmodel_json_config=None, dtype=None, model_class=comfy.clip_model.CLIPTextModel,
+                 freeze=True, layer="last", layer_idx=None, textmodel_json_config=None, dtype=None, model_class=zetamotion_comfyui.comfy.clip_model.CLIPTextModel,
                  special_tokens={"start": 49406, "end": 49407, "pad": 49407}, layer_norm_hidden_state=True, enable_attention_masks=False, zero_out_masked=False,
                  return_projected_pooled=True, return_attention_masks=False, model_options={}):  # clip-vit-base-patch32
         super().__init__()
@@ -113,9 +113,9 @@ class SDClipModel(torch.nn.Module, ClipTokenWeightEncoder):
         if operations is None:
             scaled_fp8 = model_options.get("scaled_fp8", None)
             if scaled_fp8 is not None:
-                operations = comfy.ops.scaled_fp8_ops(fp8_matrix_mult=False, override_dtype=scaled_fp8)
+                operations = zetamotion_comfyui.comfy.ops.scaled_fp8_ops(fp8_matrix_mult=False, override_dtype=scaled_fp8)
             else:
-                operations = comfy.ops.manual_cast
+                operations = zetamotion_comfyui.comfy.ops.manual_cast
 
         self.operations = operations
         self.transformer = model_class(config, dtype, device, self.operations)

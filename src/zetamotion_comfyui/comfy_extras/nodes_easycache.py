@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Union
-from comfy_api.latest import io, ComfyExtension
-import comfy.patcher_extension
+from zetamotion_comfyui.comfy_api.latest import io, ComfyExtension
+import zetamotion_comfyui.comfy.patcher_extension
 import logging
 import torch
-import comfy.model_patcher
+import zetamotion_comfyui.comfy.model_patcher
 if TYPE_CHECKING:
     from uuid import UUID
 
@@ -148,7 +148,7 @@ def easycache_sample_wrapper(executor, *args, **kwargs):
     try:
         guider = executor.class_obj
         orig_model_options = guider.model_options
-        guider.model_options = comfy.model_patcher.create_model_options_clone(orig_model_options)
+        guider.model_options = zetamotion_comfyui.comfy.model_patcher.create_model_options_clone(orig_model_options)
         # clone and prepare timesteps
         guider.model_options["transformer_options"]["easycache"] = guider.model_options["transformer_options"]["easycache"].clone().prepare_timesteps(guider.model_patcher.model.model_sampling)
         easycache: Union[EasyCacheHolder, LazyCacheHolder] = guider.model_options['transformer_options']['easycache']
@@ -345,9 +345,9 @@ class EasyCacheNode(io.ComfyNode):
     def execute(cls, model: io.Model.Type, reuse_threshold: float, start_percent: float, end_percent: float, verbose: bool) -> io.NodeOutput:
         model = model.clone()
         model.model_options["transformer_options"]["easycache"] = EasyCacheHolder(reuse_threshold, start_percent, end_percent, subsample_factor=8, offload_cache_diff=False, verbose=verbose)
-        model.add_wrapper_with_key(comfy.patcher_extension.WrappersMP.OUTER_SAMPLE, "easycache", easycache_sample_wrapper)
-        model.add_wrapper_with_key(comfy.patcher_extension.WrappersMP.CALC_COND_BATCH, "easycache", easycache_calc_cond_batch_wrapper)
-        model.add_wrapper_with_key(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, "easycache", easycache_forward_wrapper)
+        model.add_wrapper_with_key(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.OUTER_SAMPLE, "easycache", easycache_sample_wrapper)
+        model.add_wrapper_with_key(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.CALC_COND_BATCH, "easycache", easycache_calc_cond_batch_wrapper)
+        model.add_wrapper_with_key(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, "easycache", easycache_forward_wrapper)
         return io.NodeOutput(model)
 
 
@@ -477,8 +477,8 @@ class LazyCacheNode(io.ComfyNode):
     def execute(cls, model: io.Model.Type, reuse_threshold: float, start_percent: float, end_percent: float, verbose: bool) -> io.NodeOutput:
         model = model.clone()
         model.model_options["transformer_options"]["easycache"] = LazyCacheHolder(reuse_threshold, start_percent, end_percent, subsample_factor=8, offload_cache_diff=False, verbose=verbose)
-        model.add_wrapper_with_key(comfy.patcher_extension.WrappersMP.OUTER_SAMPLE, "lazycache", easycache_sample_wrapper)
-        model.add_wrapper_with_key(comfy.patcher_extension.WrappersMP.PREDICT_NOISE, "lazycache", lazycache_predict_noise_wrapper)
+        model.add_wrapper_with_key(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.OUTER_SAMPLE, "lazycache", easycache_sample_wrapper)
+        model.add_wrapper_with_key(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.PREDICT_NOISE, "lazycache", lazycache_predict_noise_wrapper)
         return io.NodeOutput(model)
 
 

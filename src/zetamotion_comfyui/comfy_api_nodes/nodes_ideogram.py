@@ -1,10 +1,10 @@
 from io import BytesIO
 from typing_extensions import override
-from comfy_api.latest import ComfyExtension, io as comfy_io
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io as comfy_io
 from PIL import Image
 import numpy as np
 import torch
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     IdeogramGenerateRequest,
     IdeogramGenerateResponse,
     ImageRequest,
@@ -12,13 +12,13 @@ from comfy_api_nodes.apis import (
     IdeogramV3EditRequest,
 )
 
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
 )
 
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     download_url_to_bytesio,
     bytesio_to_image_tensor,
     resize_mask_to_image,

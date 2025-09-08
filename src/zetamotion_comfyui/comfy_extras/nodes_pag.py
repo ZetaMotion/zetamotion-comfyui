@@ -3,8 +3,8 @@
 
 #My modified one here is more basic but has less chances of breaking with ComfyUI updates.
 
-import comfy.model_patcher
-import comfy.samplers
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.samplers
 
 class PerturbedAttentionGuidance:
     @classmethod
@@ -42,8 +42,8 @@ class PerturbedAttentionGuidance:
                 return cfg_result
 
             # Replace Self-attention with PAG
-            model_options = comfy.model_patcher.set_model_options_patch_replace(model_options, perturbed_attention, "attn1", unet_block, unet_block_id)
-            (pag,) = comfy.samplers.calc_cond_batch(model, [cond], x, sigma, model_options)
+            model_options = zetamotion_comfyui.comfy.model_patcher.set_model_options_patch_replace(model_options, perturbed_attention, "attn1", unet_block, unet_block_id)
+            (pag,) = zetamotion_comfyui.comfy.samplers.calc_cond_batch(model, [cond], x, sigma, model_options)
 
             return cfg_result + (cond_pred - pag) * scale
 

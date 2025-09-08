@@ -1,5 +1,5 @@
 from __future__ import annotations
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     TripoModelVersion,
     TripoTextureQuality,
 )

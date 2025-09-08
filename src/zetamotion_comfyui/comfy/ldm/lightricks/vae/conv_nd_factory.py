@@ -3,8 +3,8 @@ from typing import Tuple, Union
 
 from .dual_conv3d import DualConv3d
 from .causal_conv3d import CausalConv3d
-import comfy.ops
-ops = comfy.ops.disable_weight_init
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 def make_conv_nd(
     dims: Union[int, Tuple[int, int]],

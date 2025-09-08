@@ -18,7 +18,7 @@ from typing_extensions import NotRequired
 
 from utils.install_util import get_missing_requirements_message, requirements_path
 
-from comfy.cli_args import DEFAULT_VERSION_STRING
+from zetamotion_comfyui.comfy.cli_args import DEFAULT_VERSION_STRING
 import app.logger
 
 

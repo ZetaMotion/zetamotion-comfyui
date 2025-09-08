@@ -1,6 +1,6 @@
-from comfy import sd1_clip
-import comfy.model_management
-import comfy.text_encoders.llama
+from zetamotion_comfyui.comfy import sd1_clip
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.text_encoders.llama
 from transformers import LlamaTokenizerFast
 import torch
 import os
@@ -38,7 +38,7 @@ class LLAMAModel(sd1_clip.SDClipModel):
             textmodel_json_config["vocab_size"] = vocab_size
 
         model_options = {**model_options, "model_name": "llama"}
-        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config=textmodel_json_config, dtype=dtype, special_tokens=special_tokens, layer_norm_hidden_state=False, model_class=comfy.text_encoders.llama.Llama2, enable_attention_masks=attention_mask, return_attention_masks=attention_mask, model_options=model_options)
+        super().__init__(device=device, layer=layer, layer_idx=layer_idx, textmodel_json_config=textmodel_json_config, dtype=dtype, special_tokens=special_tokens, layer_norm_hidden_state=False, model_class=zetamotion_comfyui.comfy.text_encoders.llama.Llama2, enable_attention_masks=attention_mask, return_attention_masks=attention_mask, model_options=model_options)
 
 
 class HunyuanVideoTokenizer:
@@ -76,7 +76,7 @@ class HunyuanVideoTokenizer:
 class HunyuanVideoClipModel(torch.nn.Module):
     def __init__(self, dtype_llama=None, device="cpu", dtype=None, model_options={}):
         super().__init__()
-        dtype_llama = comfy.model_management.pick_weight_dtype(dtype_llama, dtype, device)
+        dtype_llama = zetamotion_comfyui.comfy.model_management.pick_weight_dtype(dtype_llama, dtype, device)
         self.clip_l = sd1_clip.SDClipModel(device=device, dtype=dtype, return_projected_pooled=False, model_options=model_options)
         self.llama = LLAMAModel(device=device, dtype=dtype_llama, model_options=model_options)
         self.dtypes = set([dtype, dtype_llama])

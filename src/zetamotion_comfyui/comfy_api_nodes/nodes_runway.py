@@ -17,7 +17,7 @@ from enum import Enum
 
 import torch
 
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     RunwayImageToVideoRequest,
     RunwayImageToVideoResponse,
     RunwayTaskStatusResponse as TaskStatusResponse,
@@ -33,23 +33,23 @@ from comfy_api_nodes.apis import (
     ReferenceImage,
     RunwayTextToImageAspectRatioEnum,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     upload_images_to_comfyapi,
     download_url_to_video_output,
     image_tensor_pair_to_batch,
     validate_string,
     download_url_to_image_tensor,
 )
-from comfy_api.input_impl import VideoFromFile
-from comfy_api.latest import ComfyExtension, io as comfy_io
-from comfy_api_nodes.util.validation_utils import validate_image_dimensions, validate_image_aspect_ratio
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromFile
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io as comfy_io
+from zetamotion_comfyui.comfy_api_nodes.util.validation_utils import validate_image_dimensions, validate_image_aspect_ratio
 
 PATH_IMAGE_TO_VIDEO = "/proxy/runway/image_to_video"
 PATH_TEXT_TO_IMAGE = "/proxy/runway/text_to_image"

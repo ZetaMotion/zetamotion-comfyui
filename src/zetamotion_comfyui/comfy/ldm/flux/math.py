@@ -2,8 +2,8 @@ import torch
 from einops import rearrange
 from torch import Tensor
 
-from comfy.ldm.modules.attention import optimized_attention
-import comfy.model_management
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
+import zetamotion_comfyui.comfy.model_management
 
 
 def attention(q: Tensor, k: Tensor, v: Tensor, pe: Tensor, mask=None) -> Tensor:
@@ -23,7 +23,7 @@ def attention(q: Tensor, k: Tensor, v: Tensor, pe: Tensor, mask=None) -> Tensor:
 
 def rope(pos: Tensor, dim: int, theta: int) -> Tensor:
     assert dim % 2 == 0
-    if comfy.model_management.is_device_mps(pos.device) or comfy.model_management.is_intel_xpu() or comfy.model_management.is_directml_enabled():
+    if zetamotion_comfyui.comfy.model_management.is_device_mps(pos.device) or zetamotion_comfyui.comfy.model_management.is_intel_xpu() or zetamotion_comfyui.comfy.model_management.is_directml_enabled():
         device = torch.device("cpu")
     else:
         device = pos.device

@@ -1,6 +1,6 @@
 import torch
-import nodes
-import comfy.utils
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.comfy.utils
 
 def camera_embeddings(elevation, azimuth):
     elevation = torch.as_tensor([elevation])
@@ -42,7 +42,7 @@ class StableZero123_Conditioning:
     def encode(self, clip_vision, init_image, vae, width, height, batch_size, elevation, azimuth):
         output = clip_vision.encode_image(init_image)
         pooled = output.image_embeds.unsqueeze(0)
-        pixels = comfy.utils.common_upscale(init_image.movedim(-1,1), width, height, "bilinear", "center").movedim(1,-1)
+        pixels = zetamotion_comfyui.comfy.utils.common_upscale(init_image.movedim(-1,1), width, height, "bilinear", "center").movedim(1,-1)
         encode_pixels = pixels[:,:,:,:3]
         t = vae.encode(encode_pixels)
         cam_embeds = camera_embeddings(elevation, azimuth)
@@ -77,7 +77,7 @@ class StableZero123_Conditioning_Batched:
     def encode(self, clip_vision, init_image, vae, width, height, batch_size, elevation, azimuth, elevation_batch_increment, azimuth_batch_increment):
         output = clip_vision.encode_image(init_image)
         pooled = output.image_embeds.unsqueeze(0)
-        pixels = comfy.utils.common_upscale(init_image.movedim(-1,1), width, height, "bilinear", "center").movedim(1,-1)
+        pixels = zetamotion_comfyui.comfy.utils.common_upscale(init_image.movedim(-1,1), width, height, "bilinear", "center").movedim(1,-1)
         encode_pixels = pixels[:,:,:,:3]
         t = vae.encode(encode_pixels)
 
@@ -116,7 +116,7 @@ class SV3D_Conditioning:
     def encode(self, clip_vision, init_image, vae, width, height, video_frames, elevation):
         output = clip_vision.encode_image(init_image)
         pooled = output.image_embeds.unsqueeze(0)
-        pixels = comfy.utils.common_upscale(init_image.movedim(-1,1), width, height, "bilinear", "center").movedim(1,-1)
+        pixels = zetamotion_comfyui.comfy.utils.common_upscale(init_image.movedim(-1,1), width, height, "bilinear", "center").movedim(1,-1)
         encode_pixels = pixels[:,:,:,:3]
         t = vae.encode(encode_pixels)
 

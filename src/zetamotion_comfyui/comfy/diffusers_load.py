@@ -22,15 +22,15 @@ def load_diffusers(model_path, output_vae=True, output_clip=True, embedding_dire
     if text_encoder2_path is not None:
         text_encoder_paths.append(text_encoder2_path)
 
-    unet = comfy.sd.load_diffusion_model(unet_path)
+    unet = zetamotion_comfyui.comfy.sd.load_diffusion_model(unet_path)
 
     clip = None
     if output_clip:
-        clip = comfy.sd.load_clip(text_encoder_paths, embedding_directory=embedding_directory)
+        clip = zetamotion_comfyui.comfy.sd.load_clip(text_encoder_paths, embedding_directory=embedding_directory)
 
     vae = None
     if output_vae:
-        sd = comfy.utils.load_torch_file(vae_path)
-        vae = comfy.sd.VAE(sd=sd)
+        sd = zetamotion_comfyui.comfy.utils.load_torch_file(vae_path)
+        vae = zetamotion_comfyui.comfy.sd.VAE(sd=sd)
 
     return (unet, clip, vae)

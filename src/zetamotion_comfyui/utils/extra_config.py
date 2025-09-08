@@ -1,6 +1,6 @@
 import os
 import yaml
-import folder_paths
+import zetamotion_comfyui.folder_paths
 import logging
 
 def load_extra_path_config(yaml_path):
@@ -31,4 +31,4 @@ def load_extra_path_config(yaml_path):
                     full_path = os.path.abspath(os.path.join(yaml_dir, y))
                 normalized_path = os.path.normpath(full_path)
                 logging.info("Adding extra search path {} {}".format(x, normalized_path))
-                folder_paths.add_model_folder_path(x, normalized_path, is_default)
+                zetamotion_comfyui.folder_paths.add_model_folder_path(x, normalized_path, is_default)

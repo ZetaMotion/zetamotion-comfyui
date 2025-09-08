@@ -1,36 +1,36 @@
 import logging
 from typing import Any, Callable, Optional, TypeVar
 import torch
-from comfy_api_nodes.util.validation_utils import (
+from zetamotion_comfyui.comfy_api_nodes.util.validation_utils import (
     get_image_dimensions,
     validate_image_dimensions,
 )
 
 
-from comfy_api_nodes.apis import (
+from zetamotion_comfyui.comfy_api_nodes.apis import (
     MoonvalleyTextToVideoRequest,
     MoonvalleyTextToVideoInferenceParams,
     MoonvalleyVideoToVideoInferenceParams,
     MoonvalleyVideoToVideoRequest,
     MoonvalleyPromptResponse,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     download_url_to_video_output,
     upload_images_to_comfyapi,
     upload_video_to_comfyapi,
 )
-from comfy_api_nodes.mapper_utils import model_field_to_node_input
+from zetamotion_comfyui.comfy_api_nodes.mapper_utils import model_field_to_node_input
 
-from comfy_api.input.video_types import VideoInput
-from comfy.comfy_types.node_typing import IO
-from comfy_api.input_impl import VideoFromFile
+from zetamotion_comfyui.comfy_api.input.video_types import VideoInput
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO
+from zetamotion_comfyui.comfy_api.input_impl import VideoFromFile
 import av
 import io
 

@@ -5,11 +5,11 @@ import torch.nn.functional as F
 from typing import Optional, Tuple
 from einops import repeat
 
-from comfy.ldm.lightricks.model import TimestepEmbedding, Timesteps
-from comfy.ldm.modules.attention import optimized_attention_masked
-from comfy.ldm.flux.layers import EmbedND
-import comfy.ldm.common_dit
-import comfy.patcher_extension
+from zetamotion_comfyui.comfy.ldm.lightricks.model import TimestepEmbedding, Timesteps
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention_masked
+from zetamotion_comfyui.comfy.ldm.flux.layers import EmbedND
+import zetamotion_comfyui.comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.patcher_extension
 
 class GELU(nn.Module):
     def __init__(self, dim_in: int, dim_out: int, approximate: str = "none", bias: bool = True, dtype=None, device=None, operations=None):
@@ -339,7 +339,7 @@ class QwenImageTransformer2DModel(nn.Module):
     def process_img(self, x, index=0, h_offset=0, w_offset=0):
         bs, c, t, h, w = x.shape
         patch_size = self.patch_size
-        hidden_states = comfy.ldm.common_dit.pad_to_patch_size(x, (1, self.patch_size, self.patch_size))
+        hidden_states = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, (1, self.patch_size, self.patch_size))
         orig_shape = hidden_states.shape
         hidden_states = hidden_states.view(orig_shape[0], orig_shape[1], orig_shape[-2] // 2, 2, orig_shape[-1] // 2, 2)
         hidden_states = hidden_states.permute(0, 2, 4, 1, 3, 5)
@@ -357,10 +357,10 @@ class QwenImageTransformer2DModel(nn.Module):
         return hidden_states, repeat(img_ids, "h w c -> b (h w) c", b=bs), orig_shape
 
     def forward(self, x, timestep, context, attention_mask=None, guidance=None, ref_latents=None, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, attention_mask, guidance, ref_latents, transformer_options, **kwargs)
 
     def _forward(

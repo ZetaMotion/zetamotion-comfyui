@@ -4,11 +4,11 @@ import torch
 from contextlib import contextmanager
 from typing import Any, Dict, Tuple, Union
 
-from comfy.ldm.modules.distributions.distributions import DiagonalGaussianDistribution
+from zetamotion_comfyui.comfy.ldm.modules.distributions.distributions import DiagonalGaussianDistribution
 
-from comfy.ldm.util import get_obj_from_str, instantiate_from_config
-from comfy.ldm.modules.ema import LitEma
-import comfy.ops
+from zetamotion_comfyui.comfy.ldm.util import get_obj_from_str, instantiate_from_config
+from zetamotion_comfyui.comfy.ldm.modules.ema import LitEma
+import zetamotion_comfyui.comfy.ops
 
 class DiagonalGaussianRegularizer(torch.nn.Module):
     def __init__(self, sample: bool = False):
@@ -160,9 +160,9 @@ class AutoencodingEngineLegacy(AutoencodingEngine):
         )
 
         if ddconfig.get("conv3d", False):
-            conv_op = comfy.ops.disable_weight_init.Conv3d
+            conv_op = zetamotion_comfyui.comfy.ops.disable_weight_init.Conv3d
         else:
-            conv_op = comfy.ops.disable_weight_init.Conv2d
+            conv_op = zetamotion_comfyui.comfy.ops.disable_weight_init.Conv2d
 
         self.quant_conv = conv_op(
             (1 + ddconfig["double_z"]) * ddconfig["z_channels"],

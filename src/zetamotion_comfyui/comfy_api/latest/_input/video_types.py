@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 import io
 import av
-from comfy_api.util import VideoContainer, VideoCodec, VideoComponents
+from zetamotion_comfyui.comfy_api.util import VideoContainer, VideoCodec, VideoComponents
 
 class VideoInput(ABC):
     """

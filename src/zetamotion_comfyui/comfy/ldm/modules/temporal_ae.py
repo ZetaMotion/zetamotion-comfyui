@@ -4,8 +4,8 @@ from typing import Iterable, Union
 import torch
 from einops import rearrange, repeat
 
-import comfy.ops
-ops = comfy.ops.disable_weight_init
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 from .diffusionmodules.model import (
     AttnBlock,

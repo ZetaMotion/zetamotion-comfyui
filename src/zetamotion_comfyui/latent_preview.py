@@ -13,9 +13,9 @@ def preview_to_image(latent_image):
         latents_ubyte = (((latent_image + 1.0) / 2.0).clamp(0, 1)  # change scale from -1..1 to 0..1
                             .mul(0xFF)  # to 0..255
                             )
-        if comfy.model_management.directml_enabled:
+        if zetamotion_comfyui.comfy.model_management.directml_enabled:
                 latents_ubyte = latents_ubyte.to(dtype=torch.uint8)
-        latents_ubyte = latents_ubyte.to(device="cpu", dtype=torch.uint8, non_blocking=comfy.model_management.device_supports_non_blocking(latent_image.device))
+        latents_ubyte = latents_ubyte.to(device="cpu", dtype=torch.uint8, non_blocking=zetamotion_comfyui.comfy.model_management.device_supports_non_blocking(latent_image.device))
 
         return Image.fromarray(latents_ubyte.numpy())
 
@@ -67,11 +67,11 @@ def get_previewer(device, latent_format):
         taesd_decoder_path = None
         if latent_format.taesd_decoder_name is not None:
             taesd_decoder_path = next(
-                (fn for fn in folder_paths.get_filename_list("vae_approx")
+                (fn for fn in zetamotion_comfyui.folder_paths.get_filename_list("vae_approx")
                     if fn.startswith(latent_format.taesd_decoder_name)),
                 ""
             )
-            taesd_decoder_path = folder_paths.get_full_path("vae_approx", taesd_decoder_path)
+            taesd_decoder_path = zetamotion_comfyui.folder_paths.get_full_path("vae_approx", taesd_decoder_path)
 
         if method == LatentPreviewMethod.Auto:
             method = LatentPreviewMethod.Latent2RGB
@@ -95,7 +95,7 @@ def prepare_callback(model, steps, x0_output_dict=None):
 
     previewer = get_previewer(model.load_device, model.model.latent_format)
 
-    pbar = comfy.utils.ProgressBar(steps)
+    pbar = zetamotion_comfyui.comfy.utils.ProgressBar(steps)
     def callback(step, x0, x, total_steps):
         if x0_output_dict is not None:
             x0_output_dict["x0"] = x0

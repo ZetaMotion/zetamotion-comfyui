@@ -455,7 +455,7 @@ class InpaintModelConditioning:
 
 class SaveLatent:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -471,7 +471,7 @@ class SaveLatent:
     CATEGORY = "_for_testing"
 
     def save(self, samples, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir)
 
         # support save metadata for latent sharing
         prompt_info = ""
@@ -507,7 +507,7 @@ class SaveLatent:
 class LoadLatent:
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f)) and f.endswith(".latent")]
         return {"required": {"latent": [sorted(files), ]}, }
 
@@ -517,7 +517,7 @@ class LoadLatent:
     FUNCTION = "load"
 
     def load(self, latent):
-        latent_path = folder_paths.get_annotated_filepath(latent)
+        latent_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(latent)
         latent = safetensors.torch.load_file(latent_path, device="cpu")
         multiplier = 1.0
         if "latent_format_version_0" not in latent:
@@ -527,7 +527,7 @@ class LoadLatent:
 
     @classmethod
     def IS_CHANGED(s, latent):
-        image_path = folder_paths.get_annotated_filepath(latent)
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(latent)
         m = hashlib.sha256()
         with open(image_path, 'rb') as f:
             m.update(f.read())
@@ -535,7 +535,7 @@ class LoadLatent:
 
     @classmethod
     def VALIDATE_INPUTS(s, latent):
-        if not folder_paths.exists_annotated_filepath(latent):
+        if not zetamotion_comfyui.folder_paths.exists_annotated_filepath(latent):
             return "Invalid latent file: {}".format(latent)
         return True
 
@@ -543,8 +543,8 @@ class LoadLatent:
 class CheckpointLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "config_name": (folder_paths.get_filename_list("configs"), ),
-                              "ckpt_name": (folder_paths.get_filename_list("checkpoints"), )}}
+        return {"required": { "config_name": (zetamotion_comfyui.folder_paths.get_filename_list("configs"), ),
+                              "ckpt_name": (zetamotion_comfyui.folder_paths.get_filename_list("checkpoints"), )}}
     RETURN_TYPES = ("MODEL", "CLIP", "VAE")
     FUNCTION = "load_checkpoint"
 
@@ -552,8 +552,8 @@ class CheckpointLoader:
     DEPRECATED = True
 
     def load_checkpoint(self, config_name, ckpt_name):
-        config_path = folder_paths.get_full_path("configs", config_name)
-        ckpt_path = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
+        config_path = zetamotion_comfyui.folder_paths.get_full_path("configs", config_name)
+        ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
         return zetamotion_comfyui.comfy.sd.load_checkpoint(config_path, ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
 
 class CheckpointLoaderSimple:
@@ -561,7 +561,7 @@ class CheckpointLoaderSimple:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), {"tooltip": "The name of the checkpoint (model) to load."}),
+                "ckpt_name": (zetamotion_comfyui.folder_paths.get_filename_list("checkpoints"), {"tooltip": "The name of the checkpoint (model) to load."}),
             }
         }
     RETURN_TYPES = ("MODEL", "CLIP", "VAE")
@@ -574,7 +574,7 @@ class CheckpointLoaderSimple:
     DESCRIPTION = "Loads a diffusion model checkpoint, diffusion models are used to denoise latents."
 
     def load_checkpoint(self, ckpt_name):
-        ckpt_path = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
+        ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
         out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         return out[:3]
 
@@ -582,7 +582,7 @@ class DiffusersLoader:
     @classmethod
     def INPUT_TYPES(cls):
         paths = []
-        for search_path in folder_paths.get_folder_paths("diffusers"):
+        for search_path in zetamotion_comfyui.folder_paths.get_folder_paths("diffusers"):
             if os.path.exists(search_path):
                 for root, subdir, files in os.walk(search_path, followlinks=True):
                     if "model_index.json" in files:
@@ -595,7 +595,7 @@ class DiffusersLoader:
     CATEGORY = "advanced/loaders/deprecated"
 
     def load_checkpoint(self, model_path, output_vae=True, output_clip=True):
-        for search_path in folder_paths.get_folder_paths("diffusers"):
+        for search_path in zetamotion_comfyui.folder_paths.get_folder_paths("diffusers"):
             if os.path.exists(search_path):
                 path = os.path.join(search_path, model_path)
                 if os.path.exists(path):
@@ -608,7 +608,7 @@ class DiffusersLoader:
 class unCLIPCheckpointLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
+        return {"required": { "ckpt_name": (zetamotion_comfyui.folder_paths.get_filename_list("checkpoints"), ),
                              }}
     RETURN_TYPES = ("MODEL", "CLIP", "VAE", "CLIP_VISION")
     FUNCTION = "load_checkpoint"
@@ -616,7 +616,7 @@ class unCLIPCheckpointLoader:
     CATEGORY = "loaders"
 
     def load_checkpoint(self, ckpt_name, output_vae=True, output_clip=True):
-        ckpt_path = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
+        ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
         out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, output_clipvision=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         return out
 
@@ -646,7 +646,7 @@ class LoraLoader:
             "required": {
                 "model": ("MODEL", {"tooltip": "The diffusion model the LoRA will be applied to."}),
                 "clip": ("CLIP", {"tooltip": "The CLIP model the LoRA will be applied to."}),
-                "lora_name": (folder_paths.get_filename_list("loras"), {"tooltip": "The name of the LoRA."}),
+                "lora_name": (zetamotion_comfyui.folder_paths.get_filename_list("loras"), {"tooltip": "The name of the LoRA."}),
                 "strength_model": ("FLOAT", {"default": 1.0, "min": -100.0, "max": 100.0, "step": 0.01, "tooltip": "How strongly to modify the diffusion model. This value can be negative."}),
                 "strength_clip": ("FLOAT", {"default": 1.0, "min": -100.0, "max": 100.0, "step": 0.01, "tooltip": "How strongly to modify the CLIP model. This value can be negative."}),
             }
@@ -663,7 +663,7 @@ class LoraLoader:
         if strength_model == 0 and strength_clip == 0:
             return (model, clip)
 
-        lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
+        lora_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("loras", lora_name)
         lora = None
         if self.loaded_lora is not None:
             if self.loaded_lora[0] == lora_path:
@@ -682,7 +682,7 @@ class LoraLoaderModelOnly(LoraLoader):
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "model": ("MODEL",),
-                              "lora_name": (folder_paths.get_filename_list("loras"), ),
+                              "lora_name": (zetamotion_comfyui.folder_paths.get_filename_list("loras"), ),
                               "strength_model": ("FLOAT", {"default": 1.0, "min": -100.0, "max": 100.0, "step": 0.01}),
                               }}
     RETURN_TYPES = ("MODEL",)
@@ -694,8 +694,8 @@ class LoraLoaderModelOnly(LoraLoader):
 class VAELoader:
     @staticmethod
     def vae_list():
-        vaes = folder_paths.get_filename_list("vae")
-        approx_vaes = folder_paths.get_filename_list("vae_approx")
+        vaes = zetamotion_comfyui.folder_paths.get_filename_list("vae")
+        approx_vaes = zetamotion_comfyui.folder_paths.get_filename_list("vae_approx")
         sdxl_taesd_enc = False
         sdxl_taesd_dec = False
         sd1_taesd_enc = False
@@ -735,16 +735,16 @@ class VAELoader:
     @staticmethod
     def load_taesd(name):
         sd = {}
-        approx_vaes = folder_paths.get_filename_list("vae_approx")
+        approx_vaes = zetamotion_comfyui.folder_paths.get_filename_list("vae_approx")
 
         encoder = next(filter(lambda a: a.startswith("{}_encoder.".format(name)), approx_vaes))
         decoder = next(filter(lambda a: a.startswith("{}_decoder.".format(name)), approx_vaes))
 
-        enc = zetamotion_comfyui.comfy.utils.load_torch_file(folder_paths.get_full_path_or_raise("vae_approx", encoder))
+        enc = zetamotion_comfyui.comfy.utils.load_torch_file(zetamotion_comfyui.folder_paths.get_full_path_or_raise("vae_approx", encoder))
         for k in enc:
             sd["taesd_encoder.{}".format(k)] = enc[k]
 
-        dec = zetamotion_comfyui.comfy.utils.load_torch_file(folder_paths.get_full_path_or_raise("vae_approx", decoder))
+        dec = zetamotion_comfyui.comfy.utils.load_torch_file(zetamotion_comfyui.folder_paths.get_full_path_or_raise("vae_approx", decoder))
         for k in dec:
             sd["taesd_decoder.{}".format(k)] = dec[k]
 
@@ -775,7 +775,7 @@ class VAELoader:
         if vae_name in ["taesd", "taesdxl", "taesd3", "taef1"]:
             sd = self.load_taesd(vae_name)
         else:
-            vae_path = folder_paths.get_full_path_or_raise("vae", vae_name)
+            vae_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("vae", vae_name)
             sd = zetamotion_comfyui.comfy.utils.load_torch_file(vae_path)
         vae = zetamotion_comfyui.comfy.sd.VAE(sd=sd)
         vae.throw_exception_if_invalid()
@@ -784,7 +784,7 @@ class VAELoader:
 class ControlNetLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "control_net_name": (folder_paths.get_filename_list("controlnet"), )}}
+        return {"required": { "control_net_name": (zetamotion_comfyui.folder_paths.get_filename_list("controlnet"), )}}
 
     RETURN_TYPES = ("CONTROL_NET",)
     FUNCTION = "load_controlnet"
@@ -792,7 +792,7 @@ class ControlNetLoader:
     CATEGORY = "loaders"
 
     def load_controlnet(self, control_net_name):
-        controlnet_path = folder_paths.get_full_path_or_raise("controlnet", control_net_name)
+        controlnet_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("controlnet", control_net_name)
         controlnet = zetamotion_comfyui.comfy.controlnet.load_controlnet(controlnet_path)
         if controlnet is None:
             raise RuntimeError("ERROR: controlnet file is invalid and does not contain a valid controlnet model.")
@@ -802,7 +802,7 @@ class DiffControlNetLoader:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "model": ("MODEL",),
-                              "control_net_name": (folder_paths.get_filename_list("controlnet"), )}}
+                              "control_net_name": (zetamotion_comfyui.folder_paths.get_filename_list("controlnet"), )}}
 
     RETURN_TYPES = ("CONTROL_NET",)
     FUNCTION = "load_controlnet"
@@ -810,7 +810,7 @@ class DiffControlNetLoader:
     CATEGORY = "loaders"
 
     def load_controlnet(self, model, control_net_name):
-        controlnet_path = folder_paths.get_full_path_or_raise("controlnet", control_net_name)
+        controlnet_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("controlnet", control_net_name)
         controlnet = (zetamotion_comfyui.
                       zetamotion_comfyui.comfy.controlnet.load_controlnet(controlnet_path, model))
         return (controlnet,)
@@ -900,7 +900,7 @@ class ControlNetApplyAdvanced:
 class UNETLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
+        return {"required": { "unet_name": (zetamotion_comfyui.folder_paths.get_filename_list("diffusion_models"), ),
                               "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
                              }}
     RETURN_TYPES = ("MODEL",)
@@ -918,14 +918,14 @@ class UNETLoader:
         elif weight_dtype == "fp8_e5m2":
             model_options["dtype"] = torch.float8_e5m2
 
-        unet_path = folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
+        unet_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
         model = zetamotion_comfyui.comfy.sd.load_diffusion_model(unet_path, model_options=model_options)
         return (model,)
 
 class CLIPLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "clip_name": (folder_paths.get_filename_list("text_encoders"), ),
+        return {"required": { "clip_name": (zetamotion_comfyui.folder_paths.get_filename_list("text_encoders"), ),
                               "type": (["stable_diffusion", "stable_cascade", "sd3", "stable_audio", "mochi", "ltxv", "pixart", "cosmos", "lumina2", "wan", "hidream", "chroma", "ace", "omnigen2", "qwen_image"], ),
                               },
                 "optional": {
@@ -945,15 +945,15 @@ class CLIPLoader:
         if device == "cpu":
             model_options["load_device"] = model_options["offload_device"] = torch.device("cpu")
 
-        clip_path = folder_paths.get_full_path_or_raise("text_encoders", clip_name)
+        clip_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name)
         clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path], embedding_directory=folder_paths.get_folder_paths("embeddings"), clip_type=clip_type, model_options=model_options)
         return (clip,)
 
 class DualCLIPLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "clip_name1": (folder_paths.get_filename_list("text_encoders"), ),
-                              "clip_name2": (folder_paths.get_filename_list("text_encoders"), ),
+        return {"required": { "clip_name1": (zetamotion_comfyui.folder_paths.get_filename_list("text_encoders"), ),
+                              "clip_name2": (zetamotion_comfyui.folder_paths.get_filename_list("text_encoders"), ),
                               "type": (["sdxl", "sd3", "flux", "hunyuan_video", "hidream"], ),
                               },
                 "optional": {
@@ -969,8 +969,8 @@ class DualCLIPLoader:
     def load_clip(self, clip_name1, clip_name2, type, device="default"):
         clip_type = getattr (zetamotion_comfyui.comfy.sd.CLIPType, type.upper(), zetamotion_comfyui.comfy.sd.CLIPType.STABLE_DIFFUSION)
 
-        clip_path1 = folder_paths.get_full_path_or_raise("text_encoders", clip_name1)
-        clip_path2 = folder_paths.get_full_path_or_raise("text_encoders", clip_name2)
+        clip_path1 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name1)
+        clip_path2 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name2)
 
         model_options = {}
         if device == "cpu":
@@ -982,7 +982,7 @@ class DualCLIPLoader:
 class CLIPVisionLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "clip_name": (folder_paths.get_filename_list("clip_vision"), ),
+        return {"required": { "clip_name": (zetamotion_comfyui.folder_paths.get_filename_list("clip_vision"), ),
                              }}
     RETURN_TYPES = ("CLIP_VISION",)
     FUNCTION = "load_clip"
@@ -990,7 +990,7 @@ class CLIPVisionLoader:
     CATEGORY = "loaders"
 
     def load_clip(self, clip_name):
-        clip_path = folder_paths.get_full_path_or_raise("clip_vision", clip_name)
+        clip_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("clip_vision", clip_name)
         clip_vision = zetamotion_comfyui.comfy.clip_vision.load(clip_path)
         if clip_vision is None:
             raise RuntimeError("ERROR: clip vision file is invalid and does not contain a valid vision model.")
@@ -1018,7 +1018,7 @@ class CLIPVisionEncode:
 class StyleModelLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "style_model_name": (folder_paths.get_filename_list("style_models"), )}}
+        return {"required": { "style_model_name": (zetamotion_comfyui.folder_paths.get_filename_list("style_models"), )}}
 
     RETURN_TYPES = ("STYLE_MODEL",)
     FUNCTION = "load_style_model"
@@ -1026,7 +1026,7 @@ class StyleModelLoader:
     CATEGORY = "loaders"
 
     def load_style_model(self, style_model_name):
-        style_model_path = folder_paths.get_full_path_or_raise("style_models", style_model_name)
+        style_model_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("style_models", style_model_name)
         style_model = zetamotion_comfyui.comfy.sd.load_style_model(style_model_path)
         return (style_model,)
 
@@ -1115,7 +1115,7 @@ class unCLIPConditioning:
 class GLIGENLoader:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "gligen_name": (folder_paths.get_filename_list("gligen"), )}}
+        return {"required": { "gligen_name": (zetamotion_comfyui.folder_paths.get_filename_list("gligen"), )}}
 
     RETURN_TYPES = ("GLIGEN",)
     FUNCTION = "load_gligen"
@@ -1123,7 +1123,7 @@ class GLIGENLoader:
     CATEGORY = "loaders"
 
     def load_gligen(self, gligen_name):
-        gligen_path = folder_paths.get_full_path_or_raise("gligen", gligen_name)
+        gligen_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("gligen", gligen_name)
         gligen = zetamotion_comfyui.comfy.sd.load_gligen(gligen_path)
         return (gligen,)
 
@@ -1588,7 +1588,7 @@ class KSamplerAdvanced:
 
 class SaveImage:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
         self.compress_level = 4
@@ -1615,7 +1615,7 @@ class SaveImage:
 
     def save_images(self, images, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
         for (batch_number, image) in enumerate(images):
             i = 255. * image.cpu().numpy()
@@ -1643,7 +1643,7 @@ class SaveImage:
 
 class PreviewImage(SaveImage):
     def __init__(self):
-        self.output_dir = folder_paths.get_temp_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
         self.type = "temp"
         self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
         self.compress_level = 1
@@ -1658,9 +1658,9 @@ class PreviewImage(SaveImage):
 class LoadImage:
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
-        files = folder_paths.filter_files_content_types(files, ["image"])
+        files = zetamotion_comfyui.folder_paths.filter_files_content_types(files, ["image"])
         return {"required":
                     {"image": (sorted(files), {"image_upload": True})},
                 }
@@ -1670,7 +1670,7 @@ class LoadImage:
     RETURN_TYPES = ("IMAGE", "MASK")
     FUNCTION = "load_image"
     def load_image(self, image):
-        image_path = folder_paths.get_annotated_filepath(image)
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image)
 
         img = node_helpers.pillow(Image.open, image_path)
 
@@ -1718,7 +1718,7 @@ class LoadImage:
 
     @classmethod
     def IS_CHANGED(s, image):
-        image_path = folder_paths.get_annotated_filepath(image)
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image)
         m = hashlib.sha256()
         with open(image_path, 'rb') as f:
             m.update(f.read())
@@ -1726,7 +1726,7 @@ class LoadImage:
 
     @classmethod
     def VALIDATE_INPUTS(s, image):
-        if not folder_paths.exists_annotated_filepath(image):
+        if not zetamotion_comfyui.folder_paths.exists_annotated_filepath(image):
             return "Invalid image file: {}".format(image)
 
         return True
@@ -1735,7 +1735,7 @@ class LoadImageMask:
     _color_channels = ["alpha", "red", "green", "blue"]
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = folder_paths.get_input_directory()
+        input_dir = zetamotion_comfyui.folder_paths.get_input_directory()
         files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
         return {"required":
                     {"image": (sorted(files), {"image_upload": True}),
@@ -1747,7 +1747,7 @@ class LoadImageMask:
     RETURN_TYPES = ("MASK",)
     FUNCTION = "load_image"
     def load_image(self, image, channel):
-        image_path = folder_paths.get_annotated_filepath(image)
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image)
         i = node_helpers.pillow(Image.open, image_path)
         i = node_helpers.pillow(ImageOps.exif_transpose, i)
         if i.getbands() != ("R", "G", "B", "A"):
@@ -1767,7 +1767,7 @@ class LoadImageMask:
 
     @classmethod
     def IS_CHANGED(s, image, channel):
-        image_path = folder_paths.get_annotated_filepath(image)
+        image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image)
         m = hashlib.sha256()
         with open(image_path, 'rb') as f:
             m.update(f.read())
@@ -1775,7 +1775,7 @@ class LoadImageMask:
 
     @classmethod
     def VALIDATE_INPUTS(s, image):
-        if not folder_paths.exists_annotated_filepath(image):
+        if not zetamotion_comfyui.folder_paths.exists_annotated_filepath(image):
             return "Invalid image file: {}".format(image)
 
         return True
@@ -2244,7 +2244,7 @@ async def init_external_custom_nodes():
         None
     """
     base_node_names = set(NODE_CLASS_MAPPINGS.keys())
-    node_paths = folder_paths.get_folder_paths("custom_nodes")
+    node_paths = zetamotion_comfyui.folder_paths.get_folder_paths("custom_nodes")
     node_import_times = []
     for custom_node_path in node_paths:
         possible_modules = os.listdir(os.path.realpath(custom_node_path))

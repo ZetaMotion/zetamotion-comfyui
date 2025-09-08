@@ -1,10 +1,10 @@
 #Based on Flux code because of weird hunyuan video code license.
 
 import torch
-import comfy.patcher_extension
-import comfy.ldm.flux.layers
-import comfy.ldm.modules.diffusionmodules.mmdit
-from comfy.ldm.modules.attention import optimized_attention
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.ldm.flux.layers
+import zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention
 
 
 from dataclasses import dataclass
@@ -12,7 +12,7 @@ from einops import repeat
 
 from torch import Tensor, nn
 
-from comfy.ldm.flux.layers import (
+from zetamotion_comfyui.comfy.ldm.flux.layers import (
     DoubleStreamBlock,
     EmbedND,
     LastLayer,
@@ -21,7 +21,7 @@ from comfy.ldm.flux.layers import (
     timestep_embedding
 )
 
-import comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.ldm.common_dit
 
 
 @dataclass
@@ -185,7 +185,7 @@ class HunyuanVideo(nn.Module):
         self.num_heads = params.num_heads
         self.pe_embedder = EmbedND(dim=pe_dim, theta=params.theta, axes_dim=params.axes_dim)
 
-        self.img_in = comfy.ldm.modules.diffusionmodules.mmdit.PatchEmbed(None, self.patch_size, self.in_channels, self.hidden_size, conv3d=True, dtype=dtype, device=device, operations=operations)
+        self.img_in = zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit.PatchEmbed(None, self.patch_size, self.in_channels, self.hidden_size, conv3d=True, dtype=dtype, device=device, operations=operations)
         self.time_in = MLPEmbedder(in_dim=256, hidden_dim=self.hidden_size, dtype=dtype, device=device, operations=operations)
         self.vector_in = MLPEmbedder(params.vec_in_dim, self.hidden_size, dtype=dtype, device=device, operations=operations)
         self.guidance_in = (
@@ -349,10 +349,10 @@ class HunyuanVideo(nn.Module):
         return repeat(img_ids, "t h w c -> b (t h w) c", b=bs)
 
     def forward(self, x, timestep, context, y, guidance=None, attention_mask=None, guiding_frame_index=None, ref_latent=None, control=None, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, y, guidance, attention_mask, guiding_frame_index, ref_latent, control, transformer_options, **kwargs)
 
     def _forward(self, x, timestep, context, y, guidance=None, attention_mask=None, guiding_frame_index=None, ref_latent=None, control=None, transformer_options={}, **kwargs):

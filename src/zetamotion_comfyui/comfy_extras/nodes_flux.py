@@ -1,5 +1,5 @@
-import node_helpers
-import comfy.utils
+import zetamotion_comfyui.node_helpers
+import zetamotion_comfyui.comfy.utils
 
 class CLIPTextEncodeFlux:
     @classmethod
@@ -96,7 +96,7 @@ class FluxKontextImageScale:
         height = image.shape[1]
         aspect_ratio = width / height
         _, width, height = min((abs(aspect_ratio - w / h), w, h) for w, h in PREFERED_KONTEXT_RESOLUTIONS)
-        image = comfy.utils.common_upscale(image.movedim(-1, 1), width, height, "lanczos", "center").movedim(1, -1)
+        image = zetamotion_comfyui.comfy.utils.common_upscale(image.movedim(-1, 1), width, height, "lanczos", "center").movedim(1, -1)
         return (image, )
 
 

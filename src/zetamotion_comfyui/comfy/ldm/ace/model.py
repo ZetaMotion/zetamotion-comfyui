@@ -18,10 +18,10 @@ from typing import Optional, List, Union
 import torch
 from torch import nn
 
-import comfy.model_management
-import comfy.patcher_extension
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
 
-from comfy.ldm.lightricks.model import TimestepEmbedding, Timesteps
+from zetamotion_comfyui.comfy.ldm.lightricks.model import TimestepEmbedding, Timesteps
 from .attention import LinearTransformerBlock, t2i_modulate
 from .lyric_encoder import ConformerEncoder as LyricEncoder
 
@@ -105,7 +105,7 @@ class T2IFinalLayer(nn.Module):
         return output
 
     def forward(self, x, t, output_length):
-        shift, scale = (comfy.model_management.cast_to(self.scale_shift_table[None], device=t.device, dtype=t.dtype) + t[:, None]).chunk(2, dim=1)
+        shift, scale = (zetamotion_comfyui.comfy.model_management.cast_to(self.scale_shift_table[None], device=t.device, dtype=t.dtype) + t[:, None]).chunk(2, dim=1)
         x = t2i_modulate(self.norm_final(x), shift, scale)
         x = self.linear(x)
         # unpatchify
@@ -358,10 +358,10 @@ class ACEStepTransformer2DModel(nn.Module):
         lyrics_strength=1.0,
         **kwargs
     ):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
         ).execute(x, timestep, attention_mask, context, text_attention_mask, speaker_embeds, lyric_token_idx, lyric_mask, block_controlnet_hidden_states,
                   controlnet_scale, lyrics_strength, **kwargs)
 

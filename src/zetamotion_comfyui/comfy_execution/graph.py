@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import Type, Literal
 
-import nodes
+import zetamotion_comfyui.nodes
 import asyncio
 import inspect
-from comfy_execution.graph_utils import is_link, ExecutionBlocker
-from comfy.comfy_types.node_typing import ComfyNodeABC, InputTypeDict, InputTypeOptions
+from zetamotion_comfyui.comfy_execution.graph_utils import is_link, ExecutionBlocker
+from zetamotion_comfyui.comfy.comfy_types.node_typing import ComfyNodeABC, InputTypeDict, InputTypeOptions
 
 # NOTE: ExecutionBlocker code got moved to graph_utils.py to prevent torch being imported too soon during unit tests
 ExecutionBlocker = ExecutionBlocker
@@ -110,7 +110,7 @@ class TopologicalSort:
 
     def get_input_info(self, unique_id, input_name):
         class_type = self.dynprompt.get_node(unique_id)["class_type"]
-        class_def = nodes.NODE_CLASS_MAPPINGS[class_type]
+        class_def = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
         return get_input_info(class_def, input_name)
 
     def make_input_strong_link(self, to_node_id, to_input):
@@ -238,7 +238,7 @@ class ExecutionList(TopologicalSort):
         # Some other heuristics could probably be used here to improve the UX further.
         def is_output(node_id):
             class_type = self.dynprompt.get_node(node_id)["class_type"]
-            class_def = nodes.NODE_CLASS_MAPPINGS[class_type]
+            class_def = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
             if hasattr(class_def, 'OUTPUT_NODE') and class_def.OUTPUT_NODE == True:
                 return True
             return False
@@ -247,7 +247,7 @@ class ExecutionList(TopologicalSort):
         # This will execute the asynchronous function earlier, reducing the overall time.
         def is_async(node_id):
             class_type = self.dynprompt.get_node(node_id)["class_type"]
-            class_def = nodes.NODE_CLASS_MAPPINGS[class_type]
+            class_def = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[class_type]
             return inspect.iscoroutinefunction(getattr(class_def, class_def.FUNCTION))
 
         for node_id in node_list:

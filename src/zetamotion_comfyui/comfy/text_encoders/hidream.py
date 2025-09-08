@@ -1,8 +1,8 @@
 from . import hunyuan_video
 from . import sd3_clip
-from comfy import sd1_clip
-from comfy import sdxl_clip
-import comfy.model_management
+from zetamotion_comfyui.comfy import sd1_clip
+from zetamotion_comfyui.comfy import sdxl_clip
+import zetamotion_comfyui.comfy.model_management
 import torch
 import logging
 
@@ -47,14 +47,14 @@ class HiDreamTEModel(torch.nn.Module):
             self.clip_g = None
 
         if t5:
-            dtype_t5 = comfy.model_management.pick_weight_dtype(dtype_t5, dtype, device)
+            dtype_t5 = zetamotion_comfyui.comfy.model_management.pick_weight_dtype(dtype_t5, dtype, device)
             self.t5xxl = sd3_clip.T5XXLModel(device=device, dtype=dtype_t5, model_options=model_options, attention_mask=True)
             self.dtypes.add(dtype_t5)
         else:
             self.t5xxl = None
 
         if llama:
-            dtype_llama = comfy.model_management.pick_weight_dtype(dtype_llama, dtype, device)
+            dtype_llama = zetamotion_comfyui.comfy.model_management.pick_weight_dtype(dtype_llama, dtype, device)
             if "vocab_size" not in model_options:
                 model_options["vocab_size"] = 128256
             self.llama = hunyuan_video.LLAMAModel(device=device, dtype=dtype_llama, model_options=model_options, layer="all", layer_idx=None, special_tokens={"start": 128000, "pad": 128009})
@@ -97,12 +97,12 @@ class HiDreamTEModel(torch.nn.Module):
             if self.clip_l is not None:
                 lg_out, l_pooled = self.clip_l.encode_token_weights(token_weight_pairs_l)
             else:
-                l_pooled = torch.zeros((1, 768), device=comfy.model_management.intermediate_device())
+                l_pooled = torch.zeros((1, 768), device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
             if self.clip_g is not None:
                 g_out, g_pooled = self.clip_g.encode_token_weights(token_weight_pairs_g)
             else:
-                g_pooled = torch.zeros((1, 1280), device=comfy.model_management.intermediate_device())
+                g_pooled = torch.zeros((1, 1280), device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
             pooled = torch.cat((l_pooled, g_pooled), dim=-1)
 
@@ -120,13 +120,13 @@ class HiDreamTEModel(torch.nn.Module):
             ll_out = None
 
         if t5_out is None:
-            t5_out = torch.zeros((1, 128, 4096), device=comfy.model_management.intermediate_device())
+            t5_out = torch.zeros((1, 128, 4096), device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         if ll_out is None:
-            ll_out = torch.zeros((1, 32, 1, 4096), device=comfy.model_management.intermediate_device())
+            ll_out = torch.zeros((1, 32, 1, 4096), device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         if pooled is None:
-            pooled = torch.zeros((1, 768 + 1280), device=comfy.model_management.intermediate_device())
+            pooled = torch.zeros((1, 768 + 1280), device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         extra["conditioning_llama3"] = ll_out
         return t5_out, pooled, extra

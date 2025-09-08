@@ -5,8 +5,8 @@ from dataclasses import dataclass
 import torch
 from torch import Tensor, nn
 from einops import rearrange, repeat
-import comfy.ldm.common_dit
-import comfy.patcher_extension
+import zetamotion_comfyui.comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.patcher_extension
 
 from .layers import (
     DoubleStreamBlock,
@@ -208,7 +208,7 @@ class Flux(nn.Module):
     def process_img(self, x, index=0, h_offset=0, w_offset=0):
         bs, c, h, w = x.shape
         patch_size = self.patch_size
-        x = comfy.ldm.common_dit.pad_to_patch_size(x, (patch_size, patch_size))
+        x = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, (patch_size, patch_size))
 
         img = rearrange(x, "b c (h ph) (w pw) -> b (h w) (c ph pw)", ph=patch_size, pw=patch_size)
         h_len = ((h + (patch_size // 2)) // patch_size)
@@ -224,10 +224,10 @@ class Flux(nn.Module):
         return img, repeat(img_ids, "h w c -> b (h w) c", b=bs)
 
     def forward(self, x, timestep, context, y=None, guidance=None, ref_latents=None, control=None, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, y, guidance, ref_latents, control, transformer_options, **kwargs)
 
     def _forward(self, x, timestep, context, y=None, guidance=None, ref_latents=None, control=None, transformer_options={}, **kwargs):

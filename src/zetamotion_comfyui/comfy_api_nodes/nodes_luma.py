@@ -1,9 +1,9 @@
 from __future__ import annotations
 from inspect import cleandoc
 from typing import Optional
-from comfy.comfy_types.node_typing import IO, ComfyNodeABC
-from comfy_api.input_impl.video_types import VideoFromFile
-from comfy_api_nodes.apis.luma_api import (
+from zetamotion_comfyui.comfy.comfy_types.node_typing import IO, ComfyNodeABC
+from zetamotion_comfyui.comfy_api.input_impl.video_types import VideoFromFile
+from zetamotion_comfyui.comfy_api_nodes.apis.luma_api import (
     LumaImageModel,
     LumaVideoModel,
     LumaVideoOutputResolution,
@@ -24,14 +24,14 @@ from comfy_api_nodes.apis.luma_api import (
     LumaIO,
     get_luma_concepts,
 )
-from comfy_api_nodes.apis.client import (
+from zetamotion_comfyui.comfy_api_nodes.apis.client import (
     ApiEndpoint,
     HttpMethod,
     SynchronousOperation,
     PollingOperation,
     EmptyRequest,
 )
-from comfy_api_nodes.apinode_utils import (
+from zetamotion_comfyui.comfy_api_nodes.apinode_utils import (
     upload_images_to_comfyapi,
     process_image_response,
     validate_string,

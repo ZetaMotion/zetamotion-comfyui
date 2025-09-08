@@ -19,9 +19,9 @@
 import torch
 from typing_extensions import override
 
-import comfy.utils
-import nodes
-from comfy_api.latest import ComfyExtension, io
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.nodes
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
 
 
 class StableCascade_EmptyLatentImage(io.ComfyNode):
@@ -31,8 +31,8 @@ class StableCascade_EmptyLatentImage(io.ComfyNode):
             node_id="StableCascade_EmptyLatentImage",
             category="latent/stable_cascade",
             inputs=[
-                io.Int.Input("width", default=1024, min=256, max=nodes.MAX_RESOLUTION, step=8),
-                io.Int.Input("height", default=1024, min=256, max=nodes.MAX_RESOLUTION, step=8),
+                io.Int.Input("width", default=1024, min=256, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=8),
+                io.Int.Input("height", default=1024, min=256, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=8),
                 io.Int.Input("compression", default=42, min=4, max=128, step=1),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
             ],
@@ -77,7 +77,7 @@ class StableCascade_StageC_VAEEncode(io.ComfyNode):
         out_width = (width // compression) * vae.downscale_ratio
         out_height = (height // compression) * vae.downscale_ratio
 
-        s = comfy.utils.common_upscale(image.movedim(-1,1), out_width, out_height, "bicubic", "center").movedim(1,-1)
+        s = zetamotion_comfyui.comfy.utils.common_upscale(image.movedim(-1,1), out_width, out_height, "bicubic", "center").movedim(1,-1)
 
         c_latent = vae.encode(s[:,:,:,:3])
         b_latent = torch.zeros([c_latent.shape[0], 4, (height // 8) * 2, (width // 8) * 2])

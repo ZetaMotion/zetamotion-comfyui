@@ -1,5 +1,5 @@
 import pytest
-from comfy_execution.validation import validate_node_input
+from zetamotion_comfyui.comfy_execution.validation import validate_node_input
 
 
 def test_exact_match():

@@ -14,19 +14,19 @@ import torch
 
 if TYPE_CHECKING:
     from spandrel import ImageModelDescriptor
-    from comfy.clip_vision import ClipVisionModel
-    from comfy.clip_vision import Output as ClipVisionOutput_
-    from comfy.controlnet import ControlNet
-    from comfy.hooks import HookGroup, HookKeyframeGroup
-    from comfy.model_patcher import ModelPatcher
-    from comfy.samplers import CFGGuider, Sampler
-    from comfy.sd import CLIP, VAE
-    from comfy.sd import StyleModel as StyleModel_
-    from comfy_api.input import VideoInput
-from comfy_api.internal import (_ComfyNodeInternal, _NodeOutputInternal, classproperty, copy_class, first_real_override, is_class,
+    from zetamotion_comfyui.comfy.clip_vision import ClipVisionModel
+    from zetamotion_comfyui.comfy.clip_vision import Output as ClipVisionOutput_
+    from zetamotion_comfyui.comfy.controlnet import ControlNet
+    from zetamotion_comfyui.comfy.hooks import HookGroup, HookKeyframeGroup
+    from zetamotion_comfyui.comfy.model_patcher import ModelPatcher
+    from zetamotion_comfyui.comfy.samplers import CFGGuider, Sampler
+    from zetamotion_comfyui.comfy.sd import CLIP, VAE
+    from zetamotion_comfyui.comfy.sd import StyleModel as StyleModel_
+    from zetamotion_comfyui.comfy_api.input import VideoInput
+from zetamotion_comfyui.comfy_api.internal import (_ComfyNodeInternal, _NodeOutputInternal, classproperty, copy_class, first_real_override, is_class,
     prune_dict, shallow_clone_class)
-from comfy_api.latest._resources import Resources, ResourcesLocal
-from comfy_execution.graph_utils import ExecutionBlocker
+from zetamotion_comfyui.comfy_api.latest._resources import Resources, ResourcesLocal
+from zetamotion_comfyui.comfy_execution.graph_utils import ExecutionBlocker
 
 # from comfy_extras.nodes_images import SVG as SVG_ # NOTE: needs to be moved before can be imported due to circular reference
 

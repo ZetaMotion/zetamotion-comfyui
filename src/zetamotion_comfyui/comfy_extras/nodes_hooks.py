@@ -5,12 +5,12 @@ import torch
 from collections.abc import Iterable
 
 if TYPE_CHECKING:
-    from comfy.sd import CLIP
+    from zetamotion_comfyui.comfy.sd import CLIP
 
-import comfy.hooks
-import comfy.sd
-import comfy.utils
-import folder_paths
+import zetamotion_comfyui.comfy.hooks
+import zetamotion_comfyui.comfy.sd
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.folder_paths
 
 ###########################################
 # Mask, Combine, and Hook Conditioning
@@ -42,8 +42,8 @@ class PairConditioningSetProperties:
 
     def set_properties(self, positive_NEW, negative_NEW,
                        strength: float, set_cond_area: str,
-                       mask: torch.Tensor=None, hooks: comfy.hooks.HookGroup=None, timesteps: tuple=None):
-        final_positive, final_negative = comfy.hooks.set_conds_props(conds=[positive_NEW, negative_NEW],
+                       mask: torch.Tensor=None, hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None, timesteps: tuple=None):
+        final_positive, final_negative = zetamotion_comfyui.comfy.hooks.set_conds_props(conds=[positive_NEW, negative_NEW],
                                                                     strength=strength, set_cond_area=set_cond_area,
                                                                     mask=mask, hooks=hooks, timesteps_range=timesteps)
         return (final_positive, final_negative)
@@ -77,8 +77,8 @@ class PairConditioningSetPropertiesAndCombine:
 
     def set_properties(self, positive, negative, positive_NEW, negative_NEW,
                        strength: float, set_cond_area: str,
-                       mask: torch.Tensor=None, hooks: comfy.hooks.HookGroup=None, timesteps: tuple=None):
-        final_positive, final_negative = comfy.hooks.set_conds_props_and_combine(conds=[positive, negative], new_conds=[positive_NEW, negative_NEW],
+                       mask: torch.Tensor=None, hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None, timesteps: tuple=None):
+        final_positive, final_negative = zetamotion_comfyui.comfy.hooks.set_conds_props_and_combine(conds=[positive, negative], new_conds=[positive_NEW, negative_NEW],
                                                                                 strength=strength, set_cond_area=set_cond_area,
                                                                                 mask=mask, hooks=hooks, timesteps_range=timesteps)
         return (final_positive, final_negative)
@@ -108,8 +108,8 @@ class ConditioningSetProperties:
 
     def set_properties(self, cond_NEW,
                        strength: float, set_cond_area: str,
-                       mask: torch.Tensor=None, hooks: comfy.hooks.HookGroup=None, timesteps: tuple=None):
-        (final_cond,) = comfy.hooks.set_conds_props(conds=[cond_NEW],
+                       mask: torch.Tensor=None, hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None, timesteps: tuple=None):
+        (final_cond,) = zetamotion_comfyui.comfy.hooks.set_conds_props(conds=[cond_NEW],
                                                    strength=strength, set_cond_area=set_cond_area,
                                                    mask=mask, hooks=hooks, timesteps_range=timesteps)
         return (final_cond,)
@@ -140,8 +140,8 @@ class ConditioningSetPropertiesAndCombine:
 
     def set_properties(self, cond, cond_NEW,
                        strength: float, set_cond_area: str,
-                       mask: torch.Tensor=None, hooks: comfy.hooks.HookGroup=None, timesteps: tuple=None):
-        (final_cond,) = comfy.hooks.set_conds_props_and_combine(conds=[cond], new_conds=[cond_NEW],
+                       mask: torch.Tensor=None, hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None, timesteps: tuple=None):
+        (final_cond,) = zetamotion_comfyui.comfy.hooks.set_conds_props_and_combine(conds=[cond], new_conds=[cond_NEW],
                                                                strength=strength, set_cond_area=set_cond_area,
                                                                mask=mask, hooks=hooks, timesteps_range=timesteps)
         return (final_cond,)
@@ -167,7 +167,7 @@ class PairConditioningCombine:
     FUNCTION = "combine"
 
     def combine(self, positive_A, negative_A, positive_B, negative_B):
-        final_positive, final_negative = comfy.hooks.set_conds_props_and_combine(conds=[positive_A, negative_A], new_conds=[positive_B, negative_B],)
+        final_positive, final_negative = zetamotion_comfyui.comfy.hooks.set_conds_props_and_combine(conds=[positive_A, negative_A], new_conds=[positive_B, negative_B],)
         return (final_positive, final_negative,)
 
 class PairConditioningSetDefaultAndCombine:
@@ -194,8 +194,8 @@ class PairConditioningSetDefaultAndCombine:
     FUNCTION = "set_default_and_combine"
 
     def set_default_and_combine(self, positive, negative, positive_DEFAULT, negative_DEFAULT,
-                                hooks: comfy.hooks.HookGroup=None):
-        final_positive, final_negative = comfy.hooks.set_default_conds_and_combine(conds=[positive, negative], new_conds=[positive_DEFAULT, negative_DEFAULT],
+                                hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
+        final_positive, final_negative = zetamotion_comfyui.comfy.hooks.set_default_conds_and_combine(conds=[positive, negative], new_conds=[positive_DEFAULT, negative_DEFAULT],
                                                                                    hooks=hooks)
         return (final_positive, final_negative)
 
@@ -220,8 +220,8 @@ class ConditioningSetDefaultAndCombine:
     FUNCTION = "set_default_and_combine"
 
     def set_default_and_combine(self, cond, cond_DEFAULT,
-                                hooks: comfy.hooks.HookGroup=None):
-        (final_conditioning,) = comfy.hooks.set_default_conds_and_combine(conds=[cond], new_conds=[cond_DEFAULT],
+                                hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
+        (final_conditioning,) = zetamotion_comfyui.comfy.hooks.set_default_conds_and_combine(conds=[cond], new_conds=[cond_DEFAULT],
                                                                         hooks=hooks)
         return (final_conditioning,)
 
@@ -246,7 +246,7 @@ class SetClipHooks:
     CATEGORY = "advanced/hooks/clip"
     FUNCTION = "apply_hooks"
 
-    def apply_hooks(self, clip: CLIP, schedule_clip: bool, apply_to_conds: bool, hooks: comfy.hooks.HookGroup=None):
+    def apply_hooks(self, clip: CLIP, schedule_clip: bool, apply_to_conds: bool, hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         if hooks is not None:
             clip = clip.clone()
             if apply_to_conds:
@@ -255,7 +255,7 @@ class SetClipHooks:
             clip.use_clip_schedule = schedule_clip
             if not clip.use_clip_schedule:
                 clip.patcher.forced_hooks.set_keyframes_on_hooks(None)
-            clip.patcher.register_all_hook_patches(hooks, comfy.hooks.create_target_dict(comfy.hooks.EnumWeightTarget.Clip))
+            clip.patcher.register_all_hook_patches(hooks, zetamotion_comfyui.comfy.hooks.create_target_dict(zetamotion_comfyui.comfy.hooks.EnumWeightTarget.Clip))
         return (clip,)
 
 class ConditioningTimestepsRange:
@@ -295,7 +295,7 @@ class CreateHookLora:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "lora_name": (folder_paths.get_filename_list("loras"), ),
+                "lora_name": (zetamotion_comfyui.folder_paths.get_filename_list("loras"), ),
                 "strength_model": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
                 "strength_clip": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
             },
@@ -309,15 +309,15 @@ class CreateHookLora:
     CATEGORY = "advanced/hooks/create"
     FUNCTION = "create_hook"
 
-    def create_hook(self, lora_name: str, strength_model: float, strength_clip: float, prev_hooks: comfy.hooks.HookGroup=None):
+    def create_hook(self, lora_name: str, strength_model: float, strength_clip: float, prev_hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         if prev_hooks is None:
-            prev_hooks = comfy.hooks.HookGroup()
+            prev_hooks = zetamotion_comfyui.comfy.hooks.HookGroup()
         prev_hooks.clone()
 
         if strength_model == 0 and strength_clip == 0:
             return (prev_hooks,)
 
-        lora_path = folder_paths.get_full_path("loras", lora_name)
+        lora_path = zetamotion_comfyui.folder_paths.get_full_path("loras", lora_name)
         lora = None
         if self.loaded_lora is not None:
             if self.loaded_lora[0] == lora_path:
@@ -328,10 +328,10 @@ class CreateHookLora:
                 del temp
 
         if lora is None:
-            lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
+            lora = zetamotion_comfyui.comfy.utils.load_torch_file(lora_path, safe_load=True)
             self.loaded_lora = (lora_path, lora)
 
-        hooks = comfy.hooks.create_hook_lora(lora=lora, strength_model=strength_model, strength_clip=strength_clip)
+        hooks = zetamotion_comfyui.comfy.hooks.create_hook_lora(lora=lora, strength_model=strength_model, strength_clip=strength_clip)
         return (prev_hooks.clone_and_combine(hooks),)
 
 class CreateHookLoraModelOnly(CreateHookLora):
@@ -341,7 +341,7 @@ class CreateHookLoraModelOnly(CreateHookLora):
     def INPUT_TYPES(s):
         return {
             "required": {
-                "lora_name": (folder_paths.get_filename_list("loras"), ),
+                "lora_name": (zetamotion_comfyui.folder_paths.get_filename_list("loras"), ),
                 "strength_model": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
             },
             "optional": {
@@ -354,7 +354,7 @@ class CreateHookLoraModelOnly(CreateHookLora):
     CATEGORY = "advanced/hooks/create"
     FUNCTION = "create_hook_model_only"
 
-    def create_hook_model_only(self, lora_name: str, strength_model: float, prev_hooks: comfy.hooks.HookGroup=None):
+    def create_hook_model_only(self, lora_name: str, strength_model: float, prev_hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         return self.create_hook(lora_name=lora_name, strength_model=strength_model, strength_clip=0, prev_hooks=prev_hooks)
 
 class CreateHookModelAsLora:
@@ -370,7 +370,7 @@ class CreateHookModelAsLora:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
+                "ckpt_name": (zetamotion_comfyui.folder_paths.get_filename_list("checkpoints"), ),
                 "strength_model": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
                 "strength_clip": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
             },
@@ -385,12 +385,12 @@ class CreateHookModelAsLora:
     FUNCTION = "create_hook"
 
     def create_hook(self, ckpt_name: str, strength_model: float, strength_clip: float,
-                    prev_hooks: comfy.hooks.HookGroup=None):
+                    prev_hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         if prev_hooks is None:
-            prev_hooks = comfy.hooks.HookGroup()
+            prev_hooks = zetamotion_comfyui.comfy.hooks.HookGroup()
         prev_hooks.clone()
 
-        ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
+        ckpt_path = zetamotion_comfyui.folder_paths.get_full_path("checkpoints", ckpt_name)
         weights_model = None
         weights_clip = None
         if self.loaded_weights is not None:
@@ -403,12 +403,12 @@ class CreateHookModelAsLora:
                 del temp
 
         if weights_model is None:
-            out = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
-            weights_model = comfy.hooks.get_patch_weights_from_model(out[0])
-            weights_clip = comfy.hooks.get_patch_weights_from_model(out[1].patcher if out[1] else out[1])
+            out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+            weights_model = zetamotion_comfyui.comfy.hooks.get_patch_weights_from_model(out[0])
+            weights_clip = zetamotion_comfyui.comfy.hooks.get_patch_weights_from_model(out[1].patcher if out[1] else out[1])
             self.loaded_weights = (ckpt_path, weights_model, weights_clip)
 
-        hooks = comfy.hooks.create_hook_model_as_lora(weights_model=weights_model, weights_clip=weights_clip,
+        hooks = zetamotion_comfyui.comfy.hooks.create_hook_model_as_lora(weights_model=weights_model, weights_clip=weights_clip,
                                                       strength_model=strength_model, strength_clip=strength_clip)
         return (prev_hooks.clone_and_combine(hooks),)
 
@@ -419,7 +419,7 @@ class CreateHookModelAsLoraModelOnly(CreateHookModelAsLora):
     def INPUT_TYPES(s):
         return {
             "required": {
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),
+                "ckpt_name": (zetamotion_comfyui.folder_paths.get_filename_list("checkpoints"), ),
                 "strength_model": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
             },
             "optional": {
@@ -433,7 +433,7 @@ class CreateHookModelAsLoraModelOnly(CreateHookModelAsLora):
     FUNCTION = "create_hook_model_only"
 
     def create_hook_model_only(self, ckpt_name: str, strength_model: float,
-                               prev_hooks: comfy.hooks.HookGroup=None):
+                               prev_hooks: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         return self.create_hook(ckpt_name=ckpt_name, strength_model=strength_model, strength_clip=0.0, prev_hooks=prev_hooks)
 #------------------------------------------
 ###########################################
@@ -461,7 +461,7 @@ class SetHookKeyframes:
     CATEGORY = "advanced/hooks/scheduling"
     FUNCTION = "set_hook_keyframes"
 
-    def set_hook_keyframes(self, hooks: comfy.hooks.HookGroup, hook_kf: comfy.hooks.HookKeyframeGroup=None):
+    def set_hook_keyframes(self, hooks: zetamotion_comfyui.comfy.hooks.HookGroup, hook_kf: zetamotion_comfyui.comfy.hooks.HookKeyframeGroup=None):
         if hook_kf is not None:
             hooks = hooks.clone()
             hooks.set_keyframes_on_hooks(hook_kf=hook_kf)
@@ -488,11 +488,11 @@ class CreateHookKeyframe:
     CATEGORY = "advanced/hooks/scheduling"
     FUNCTION = "create_hook_keyframe"
 
-    def create_hook_keyframe(self, strength_mult: float, start_percent: float, prev_hook_kf: comfy.hooks.HookKeyframeGroup=None):
+    def create_hook_keyframe(self, strength_mult: float, start_percent: float, prev_hook_kf: zetamotion_comfyui.comfy.hooks.HookKeyframeGroup=None):
         if prev_hook_kf is None:
-            prev_hook_kf = comfy.hooks.HookKeyframeGroup()
+            prev_hook_kf = zetamotion_comfyui.comfy.hooks.HookKeyframeGroup()
         prev_hook_kf = prev_hook_kf.clone()
-        keyframe = comfy.hooks.HookKeyframe(strength=strength_mult, start_percent=start_percent)
+        keyframe = zetamotion_comfyui.comfy.hooks.HookKeyframe(strength=strength_mult, start_percent=start_percent)
         prev_hook_kf.add(keyframe)
         return (prev_hook_kf,)
 
@@ -505,7 +505,7 @@ class CreateHookKeyframesInterpolated:
             "required": {
                 "strength_start": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.001}, ),
                 "strength_end": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.001}, ),
-                "interpolation": (comfy.hooks.InterpolationMethod._LIST, ),
+                "interpolation": (zetamotion_comfyui.comfy.hooks.InterpolationMethod._LIST, ),
                 "start_percent": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.001}),
                 "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.001}),
                 "keyframes_count": ("INT", {"default": 5, "min": 2, "max": 100, "step": 1}),
@@ -524,13 +524,13 @@ class CreateHookKeyframesInterpolated:
 
     def create_hook_keyframes(self, strength_start: float, strength_end: float, interpolation: str,
                               start_percent: float, end_percent: float, keyframes_count: int,
-                              print_keyframes=False, prev_hook_kf: comfy.hooks.HookKeyframeGroup=None):
+                              print_keyframes=False, prev_hook_kf: zetamotion_comfyui.comfy.hooks.HookKeyframeGroup=None):
         if prev_hook_kf is None:
-            prev_hook_kf = comfy.hooks.HookKeyframeGroup()
+            prev_hook_kf = zetamotion_comfyui.comfy.hooks.HookKeyframeGroup()
         prev_hook_kf = prev_hook_kf.clone()
-        percents = comfy.hooks.InterpolationMethod.get_weights(num_from=start_percent, num_to=end_percent, length=keyframes_count,
-                                                               method=comfy.hooks.InterpolationMethod.LINEAR)
-        strengths = comfy.hooks.InterpolationMethod.get_weights(num_from=strength_start, num_to=strength_end, length=keyframes_count, method=interpolation)
+        percents = zetamotion_comfyui.comfy.hooks.InterpolationMethod.get_weights(num_from=start_percent, num_to=end_percent, length=keyframes_count,
+                                                               method=zetamotion_comfyui.comfy.hooks.InterpolationMethod.LINEAR)
+        strengths = zetamotion_comfyui.comfy.hooks.InterpolationMethod.get_weights(num_from=strength_start, num_to=strength_end, length=keyframes_count, method=interpolation)
 
         is_first = True
         for percent, strength in zip(percents, strengths):
@@ -538,7 +538,7 @@ class CreateHookKeyframesInterpolated:
             if is_first:
                 guarantee_steps = 1
                 is_first = False
-            prev_hook_kf.add(comfy.hooks.HookKeyframe(strength=strength, start_percent=percent, guarantee_steps=guarantee_steps))
+            prev_hook_kf.add(zetamotion_comfyui.comfy.hooks.HookKeyframe(strength=strength, start_percent=percent, guarantee_steps=guarantee_steps))
             if print_keyframes:
                 logging.info(f"Hook Keyframe - start_percent:{percent} = {strength}")
         return (prev_hook_kf,)
@@ -568,9 +568,9 @@ class CreateHookKeyframesFromFloats:
 
     def create_hook_keyframes(self, floats_strength: Union[float, list[float]],
                               start_percent: float, end_percent: float,
-                              prev_hook_kf: comfy.hooks.HookKeyframeGroup=None, print_keyframes=False):
+                              prev_hook_kf: zetamotion_comfyui.comfy.hooks.HookKeyframeGroup=None, print_keyframes=False):
         if prev_hook_kf is None:
-            prev_hook_kf = comfy.hooks.HookKeyframeGroup()
+            prev_hook_kf = zetamotion_comfyui.comfy.hooks.HookKeyframeGroup()
         prev_hook_kf = prev_hook_kf.clone()
         if type(floats_strength) in (float, int):
             floats_strength = [float(floats_strength)]
@@ -578,8 +578,8 @@ class CreateHookKeyframesFromFloats:
             pass
         else:
             raise Exception(f"floats_strength must be either an iterable input or a float, but was{type(floats_strength).__repr__}.")
-        percents = comfy.hooks.InterpolationMethod.get_weights(num_from=start_percent, num_to=end_percent, length=len(floats_strength),
-                                                               method=comfy.hooks.InterpolationMethod.LINEAR)
+        percents = zetamotion_comfyui.comfy.hooks.InterpolationMethod.get_weights(num_from=start_percent, num_to=end_percent, length=len(floats_strength),
+                                                               method=zetamotion_comfyui.comfy.hooks.InterpolationMethod.LINEAR)
 
         is_first = True
         for percent, strength in zip(percents, floats_strength):
@@ -587,7 +587,7 @@ class CreateHookKeyframesFromFloats:
             if is_first:
                 guarantee_steps = 1
                 is_first = False
-            prev_hook_kf.add(comfy.hooks.HookKeyframe(strength=strength, start_percent=percent, guarantee_steps=guarantee_steps))
+            prev_hook_kf.add(zetamotion_comfyui.comfy.hooks.HookKeyframe(strength=strength, start_percent=percent, guarantee_steps=guarantee_steps))
             if print_keyframes:
                 logging.info(f"Hook Keyframe - start_percent:{percent} = {strength}")
         return (prev_hook_kf,)
@@ -610,8 +610,8 @@ class SetModelHooksOnCond:
     CATEGORY = "advanced/hooks/manual"
     FUNCTION = "attach_hook"
 
-    def attach_hook(self, conditioning, hooks: comfy.hooks.HookGroup):
-        return (comfy.hooks.set_hooks_for_conditioning(conditioning, hooks),)
+    def attach_hook(self, conditioning, hooks: zetamotion_comfyui.comfy.hooks.HookGroup):
+        return (zetamotion_comfyui.comfy.hooks.set_hooks_for_conditioning(conditioning, hooks),)
 
 
 ###########################################
@@ -637,10 +637,10 @@ class CombineHooks:
     FUNCTION = "combine_hooks"
 
     def combine_hooks(self,
-                      hooks_A: comfy.hooks.HookGroup=None,
-                      hooks_B: comfy.hooks.HookGroup=None):
+                      hooks_A: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_B: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         candidates = [hooks_A, hooks_B]
-        return (comfy.hooks.HookGroup.combine_all_hooks(candidates),)
+        return (zetamotion_comfyui.comfy.hooks.HookGroup.combine_all_hooks(candidates),)
 
 class CombineHooksFour:
     NodeId = 'CombineHooks4'
@@ -664,12 +664,12 @@ class CombineHooksFour:
     FUNCTION = "combine_hooks"
 
     def combine_hooks(self,
-                      hooks_A: comfy.hooks.HookGroup=None,
-                      hooks_B: comfy.hooks.HookGroup=None,
-                      hooks_C: comfy.hooks.HookGroup=None,
-                      hooks_D: comfy.hooks.HookGroup=None):
+                      hooks_A: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_B: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_C: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_D: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         candidates = [hooks_A, hooks_B, hooks_C, hooks_D]
-        return (comfy.hooks.HookGroup.combine_all_hooks(candidates),)
+        return (zetamotion_comfyui.comfy.hooks.HookGroup.combine_all_hooks(candidates),)
 
 class CombineHooksEight:
     NodeId = 'CombineHooks8'
@@ -697,16 +697,16 @@ class CombineHooksEight:
     FUNCTION = "combine_hooks"
 
     def combine_hooks(self,
-                      hooks_A: comfy.hooks.HookGroup=None,
-                      hooks_B: comfy.hooks.HookGroup=None,
-                      hooks_C: comfy.hooks.HookGroup=None,
-                      hooks_D: comfy.hooks.HookGroup=None,
-                      hooks_E: comfy.hooks.HookGroup=None,
-                      hooks_F: comfy.hooks.HookGroup=None,
-                      hooks_G: comfy.hooks.HookGroup=None,
-                      hooks_H: comfy.hooks.HookGroup=None):
+                      hooks_A: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_B: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_C: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_D: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_E: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_F: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_G: zetamotion_comfyui.comfy.hooks.HookGroup=None,
+                      hooks_H: zetamotion_comfyui.comfy.hooks.HookGroup=None):
         candidates = [hooks_A, hooks_B, hooks_C, hooks_D, hooks_E, hooks_F, hooks_G, hooks_H]
-        return (comfy.hooks.HookGroup.combine_all_hooks(candidates),)
+        return (zetamotion_comfyui.comfy.hooks.HookGroup.combine_all_hooks(candidates),)
 #------------------------------------------
 ###########################################
 

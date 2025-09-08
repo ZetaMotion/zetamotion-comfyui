@@ -6,12 +6,12 @@ from typing import List, Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import comfy.ldm.common_dit
+import zetamotion_comfyui.comfy.ldm.common_dit
 
-from comfy.ldm.modules.diffusionmodules.mmdit import TimestepEmbedder
-from comfy.ldm.modules.attention import optimized_attention_masked
-from comfy.ldm.flux.layers import EmbedND
-import comfy.patcher_extension
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit import TimestepEmbedder
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention_masked
+from zetamotion_comfyui.comfy.ldm.flux.layers import EmbedND
+import zetamotion_comfyui.comfy.patcher_extension
 
 
 def modulate(x, scale):
@@ -592,10 +592,10 @@ class NextDiT(nn.Module):
         return padded_full_embed, mask, img_sizes, l_effective_cap_len, freqs_cis
 
     def forward(self, x, timesteps, context, num_tokens, attention_mask=None, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, kwargs.get("transformer_options", {}))
         ).execute(x, timesteps, context, num_tokens, attention_mask, **kwargs)
 
     # def forward(self, x, t, cap_feats, cap_mask):
@@ -604,7 +604,7 @@ class NextDiT(nn.Module):
         cap_feats = context
         cap_mask = attention_mask
         bs, c, h, w = x.shape
-        x = comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
+        x = zetamotion_comfyui.comfy.ldm.common_dit.pad_to_patch_size(x, (self.patch_size, self.patch_size))
         """
         Forward pass of NextDiT.
         t: (N,) tensor of diffusion timesteps

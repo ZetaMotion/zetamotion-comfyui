@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import nodes
-import folder_paths
-from comfy.cli_args import args
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.folder_paths
+from zetamotion_comfyui.comfy.cli_args import args
 
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
@@ -14,9 +14,9 @@ import re
 from io import BytesIO
 from inspect import cleandoc
 import torch
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 
-from comfy.comfy_types import FileLocator, IO
+from zetamotion_comfyui.comfy.comfy_types import FileLocator, IO
 from server import PromptServer
 
 MAX_RESOLUTION = nodes.MAX_RESOLUTION
@@ -97,7 +97,7 @@ class ImageAddNoise:
 
 class SaveAnimatedWEBP:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
 
@@ -126,7 +126,7 @@ class SaveAnimatedWEBP:
     def save_images(self, images, fps, filename_prefix, lossless, quality, method, num_frames=0, prompt=None, extra_pnginfo=None):
         method = self.methods.get(method)
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results: list[FileLocator] = []
         pil_images = []
         for image in images:
@@ -163,7 +163,7 @@ class SaveAnimatedWEBP:
 
 class SaveAnimatedPNG:
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
 
@@ -187,7 +187,7 @@ class SaveAnimatedPNG:
 
     def save_images(self, images, fps, compress_level, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
         pil_images = []
         for image in images:
@@ -300,7 +300,7 @@ Optional spacing can be added between images.
             else:  # up, down
                 target_w, target_h = w1, int(w1 / aspect_ratio)
 
-            image2 = comfy.utils.common_upscale(
+            image2 = zetamotion_comfyui.comfy.utils.common_upscale(
                 image2.movedim(-1, 1), target_w, target_h, "lanczos", "disabled"
             ).movedim(1, -1)
 
@@ -453,7 +453,7 @@ class ResizeAndPadImage:
 
         image_permuted = image.permute(0, 3, 1, 2)
 
-        resized = comfy.utils.common_upscale(image_permuted, new_width, new_height, interpolation, "disabled")
+        resized = zetamotion_comfyui.comfy.utils.common_upscale(image_permuted, new_width, new_height, interpolation, "disabled")
 
         pad_value = 0.0 if padding_color == "black" else 1.0
         padded = torch.full(
@@ -477,7 +477,7 @@ class SaveSVGNode:
     """
 
     def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
+        self.output_dir = zetamotion_comfyui.folder_paths.get_output_directory()
         self.type = "output"
         self.prefix_append = ""
 
@@ -502,7 +502,7 @@ class SaveSVGNode:
 
     def save_svg(self, svg: SVG, filename_prefix="svg/ComfyUI", prompt=None, extra_pnginfo=None):
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
+        full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path(filename_prefix, self.output_dir)
         results = list()
 
         # Prepare metadata JSON
@@ -653,7 +653,7 @@ class ImageScaleToMaxDimension:
             width = largest_size
 
         samples = image.movedim(-1, 1)
-        s = comfy.utils.common_upscale(samples, width, height, upscale_method, "disabled")
+        s = zetamotion_comfyui.comfy.utils.common_upscale(samples, width, height, upscale_method, "disabled")
         s = s.movedim(1, -1)
         return (s,)
 

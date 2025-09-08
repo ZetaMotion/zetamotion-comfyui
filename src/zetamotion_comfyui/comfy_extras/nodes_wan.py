@@ -1,16 +1,16 @@
 import math
-import nodes
-import node_helpers
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.node_helpers
 import torch
-import comfy.model_management
-import comfy.utils
-import comfy.latent_formats
-import comfy.clip_vision
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.latent_formats
+import zetamotion_comfyui.comfy.clip_vision
 import json
 import numpy as np
 from typing import Tuple
 from typing_extensions import override
-from comfy_api.latest import ComfyExtension, io
+from zetamotion_comfyui.comfy_api.latest import ComfyExtension, io
 
 class WanImageToVideo(io.ComfyNode):
     @classmethod
@@ -22,9 +22,9 @@ class WanImageToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.ClipVisionOutput.Input("clip_vision_output", optional=True),
                 io.Image.Input("start_image", optional=True),
@@ -38,9 +38,9 @@ class WanImageToVideo(io.ComfyNode):
 
     @classmethod
     def execute(cls, positive, negative, vae, width, height, length, batch_size, start_image=None, clip_vision_output=None) -> io.NodeOutput:
-        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             image = torch.ones((length, height, width, start_image.shape[-1]), device=start_image.device, dtype=start_image.dtype) * 0.5
             image[:start_image.shape[0]] = start_image
 
@@ -70,9 +70,9 @@ class WanFunControlToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.ClipVisionOutput.Input("clip_vision_output", optional=True),
                 io.Image.Input("start_image", optional=True),
@@ -87,18 +87,18 @@ class WanFunControlToVideo(io.ComfyNode):
 
     @classmethod
     def execute(cls, positive, negative, vae, width, height, length, batch_size, start_image=None, clip_vision_output=None, control_video=None) -> io.NodeOutput:
-        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
-        concat_latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
-        concat_latent = comfy.latent_formats.Wan21().process_out(concat_latent)
+        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
+        concat_latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
+        concat_latent = zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(concat_latent)
         concat_latent = concat_latent.repeat(1, 2, 1, 1, 1)
 
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             concat_latent_image = vae.encode(start_image[:, :, :, :3])
             concat_latent[:,16:,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
 
         if control_video is not None:
-            control_video = comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            control_video = zetamotion_comfyui.comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             concat_latent_image = vae.encode(control_video[:, :, :, :3])
             concat_latent[:,:16,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
 
@@ -123,9 +123,9 @@ class Wan22FunControlToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.Image.Input("ref_image", optional=True),
                 io.Image.Input("control_video", optional=True),
@@ -141,28 +141,28 @@ class Wan22FunControlToVideo(io.ComfyNode):
     def execute(cls, positive, negative, vae, width, height, length, batch_size, ref_image=None, start_image=None, control_video=None) -> io.NodeOutput:
         spacial_scale = vae.spacial_compression_encode()
         latent_channels = vae.latent_channels
-        latent = torch.zeros([batch_size, latent_channels, ((length - 1) // 4) + 1, height // spacial_scale, width // spacial_scale], device=comfy.model_management.intermediate_device())
-        concat_latent = torch.zeros([batch_size, latent_channels, ((length - 1) // 4) + 1, height // spacial_scale, width // spacial_scale], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, latent_channels, ((length - 1) // 4) + 1, height // spacial_scale, width // spacial_scale], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
+        concat_latent = torch.zeros([batch_size, latent_channels, ((length - 1) // 4) + 1, height // spacial_scale, width // spacial_scale], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         if latent_channels == 48:
-            concat_latent = comfy.latent_formats.Wan22().process_out(concat_latent)
+            concat_latent = zetamotion_comfyui.comfy.latent_formats.Wan22().process_out(concat_latent)
         else:
-            concat_latent = comfy.latent_formats.Wan21().process_out(concat_latent)
+            concat_latent = zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(concat_latent)
         concat_latent = concat_latent.repeat(1, 2, 1, 1, 1)
         mask = torch.ones((1, 1, latent.shape[2] * 4, latent.shape[-2], latent.shape[-1]))
 
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             concat_latent_image = vae.encode(start_image[:, :, :, :3])
             concat_latent[:,latent_channels:,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
             mask[:, :, :start_image.shape[0] + 3] = 0.0
 
         ref_latent = None
         if ref_image is not None:
-            ref_image = comfy.utils.common_upscale(ref_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            ref_image = zetamotion_comfyui.comfy.utils.common_upscale(ref_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             ref_latent = vae.encode(ref_image[:, :, :, :3])
 
         if control_video is not None:
-            control_video = comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            control_video = zetamotion_comfyui.comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             concat_latent_image = vae.encode(control_video[:, :, :, :3])
             concat_latent[:,:latent_channels,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
 
@@ -188,9 +188,9 @@ class WanFirstLastFrameToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.ClipVisionOutput.Input("clip_vision_start_image", optional=True),
                 io.ClipVisionOutput.Input("clip_vision_end_image", optional=True),
@@ -207,11 +207,11 @@ class WanFirstLastFrameToVideo(io.ComfyNode):
     @classmethod
     def execute(cls, positive, negative, vae, width, height, length, batch_size, start_image=None, end_image=None, clip_vision_start_image=None, clip_vision_end_image=None) -> io.NodeOutput:
         spacial_scale = vae.spacial_compression_encode()
-        latent = torch.zeros([batch_size, vae.latent_channels, ((length - 1) // 4) + 1, height // spacial_scale, width // spacial_scale], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, vae.latent_channels, ((length - 1) // 4) + 1, height // spacial_scale, width // spacial_scale], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
         if end_image is not None:
-            end_image = comfy.utils.common_upscale(end_image[-length:].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            end_image = zetamotion_comfyui.comfy.utils.common_upscale(end_image[-length:].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
 
         image = torch.ones((length, height, width, 3)) * 0.5
         mask = torch.ones((1, 1, latent.shape[2] * 4, latent.shape[-2], latent.shape[-1]))
@@ -236,7 +236,7 @@ class WanFirstLastFrameToVideo(io.ComfyNode):
         if clip_vision_end_image is not None:
             if clip_vision_output is not None:
                 states = torch.cat([clip_vision_output.penultimate_hidden_states, clip_vision_end_image.penultimate_hidden_states], dim=-2)
-                clip_vision_output = comfy.clip_vision.Output()
+                clip_vision_output = zetamotion_comfyui.comfy.clip_vision.Output()
                 clip_vision_output.penultimate_hidden_states = states
             else:
                 clip_vision_output = clip_vision_end_image
@@ -260,9 +260,9 @@ class WanFunInpaintToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.ClipVisionOutput.Input("clip_vision_output", optional=True),
                 io.Image.Input("start_image", optional=True),
@@ -292,9 +292,9 @@ class WanVaceToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.Float.Input("strength", default=1.0, min=0.0, max=1000.0, step=0.01),
                 io.Image.Input("control_video", optional=True),
@@ -313,16 +313,16 @@ class WanVaceToVideo(io.ComfyNode):
     def execute(cls, positive, negative, vae, width, height, length, batch_size, strength, control_video=None, control_masks=None, reference_image=None) -> io.NodeOutput:
         latent_length = ((length - 1) // 4) + 1
         if control_video is not None:
-            control_video = comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            control_video = zetamotion_comfyui.comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             if control_video.shape[0] < length:
                 control_video = torch.nn.functional.pad(control_video, (0, 0, 0, 0, 0, 0, 0, length - control_video.shape[0]), value=0.5)
         else:
             control_video = torch.ones((length, height, width, 3)) * 0.5
 
         if reference_image is not None:
-            reference_image = comfy.utils.common_upscale(reference_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            reference_image = zetamotion_comfyui.comfy.utils.common_upscale(reference_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             reference_image = vae.encode(reference_image[:, :, :, :3])
-            reference_image = torch.cat([reference_image, comfy.latent_formats.Wan21().process_out(torch.zeros_like(reference_image))], dim=1)
+            reference_image = torch.cat([reference_image, zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(torch.zeros_like(reference_image))], dim=1)
 
         if control_masks is None:
             mask = torch.ones((length, height, width, 1))
@@ -330,7 +330,7 @@ class WanVaceToVideo(io.ComfyNode):
             mask = control_masks
             if mask.ndim == 3:
                 mask = mask.unsqueeze(1)
-            mask = comfy.utils.common_upscale(mask[:length], width, height, "bilinear", "center").movedim(1, -1)
+            mask = zetamotion_comfyui.comfy.utils.common_upscale(mask[:length], width, height, "bilinear", "center").movedim(1, -1)
             if mask.shape[0] < length:
                 mask = torch.nn.functional.pad(mask, (0, 0, 0, 0, 0, 0, 0, length - mask.shape[0]), value=1.0)
 
@@ -364,7 +364,7 @@ class WanVaceToVideo(io.ComfyNode):
         positive = node_helpers.conditioning_set_values(positive, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
         negative = node_helpers.conditioning_set_values(negative, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
 
-        latent = torch.zeros([batch_size, 16, latent_length, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 16, latent_length, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         out_latent = {}
         out_latent["samples"] = latent
         return io.NodeOutput(positive, negative, out_latent, trim_latent)
@@ -403,9 +403,9 @@ class WanCameraImageToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.ClipVisionOutput.Input("clip_vision_output", optional=True),
                 io.Image.Input("start_image", optional=True),
@@ -420,12 +420,12 @@ class WanCameraImageToVideo(io.ComfyNode):
 
     @classmethod
     def execute(cls, positive, negative, vae, width, height, length, batch_size, start_image=None, clip_vision_output=None, camera_conditions=None) -> io.NodeOutput:
-        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
-        concat_latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
-        concat_latent = comfy.latent_formats.Wan21().process_out(concat_latent)
+        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
+        concat_latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
+        concat_latent = zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(concat_latent)
 
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             concat_latent_image = vae.encode(start_image[:, :, :, :3])
             concat_latent[:,:,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
             mask = torch.ones((1, 1, latent.shape[2] * 4, latent.shape[-2], latent.shape[-1]))
@@ -457,9 +457,9 @@ class WanPhantomSubjectToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.Image.Input("images", optional=True),
             ],
@@ -473,10 +473,10 @@ class WanPhantomSubjectToVideo(io.ComfyNode):
 
     @classmethod
     def execute(cls, positive, negative, vae, width, height, length, batch_size, images) -> io.NodeOutput:
-        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         cond2 = negative
         if images is not None:
-            images = comfy.utils.common_upscale(images[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            images = zetamotion_comfyui.comfy.utils.common_upscale(images[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             latent_images = []
             for i in images:
                 latent_images += [vae.encode(i.unsqueeze(0)[:, :, :, :3])]
@@ -484,7 +484,7 @@ class WanPhantomSubjectToVideo(io.ComfyNode):
 
             positive = node_helpers.conditioning_set_values(positive, {"time_dim_concat": concat_latent_image})
             cond2 = node_helpers.conditioning_set_values(negative, {"time_dim_concat": concat_latent_image})
-            negative = node_helpers.conditioning_set_values(negative, {"time_dim_concat": comfy.latent_formats.Wan21().process_out(torch.zeros_like(concat_latent_image))})
+            negative = node_helpers.conditioning_set_values(negative, {"time_dim_concat": zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(torch.zeros_like(concat_latent_image))})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -712,9 +712,9 @@ class WanTrackToVideo(io.ComfyNode):
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
                 io.String.Input("tracks", multiline=True, default="[]"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=81, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=81, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.Float.Input("temperature", default=220.0, min=1.0, max=1000.0, step=0.1),
                 io.Int.Input("topk", default=2, min=1, max=10),
@@ -738,7 +738,7 @@ class WanTrackToVideo(io.ComfyNode):
             return WanImageToVideo().execute(positive, negative, vae, width, height, length, batch_size, start_image=start_image, clip_vision_output=clip_vision_output)
 
         latent = torch.zeros([batch_size, 16, ((length - 1) // 4) + 1, height // 8, width // 8],
-                           device=comfy.model_management.intermediate_device())
+                           device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         if isinstance(tracks_data[0][0], dict):
             tracks_data = [tracks_data]
@@ -754,27 +754,27 @@ class WanTrackToVideo(io.ComfyNode):
             processed_tracks.append(process_tracks(tracks_np, (width, height), length - 1).unsqueeze(0))
 
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:batch_size].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:batch_size].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             videos = torch.ones((start_image.shape[0], length, height, width, start_image.shape[-1]), device=start_image.device, dtype=start_image.dtype) * 0.5
             for i in range(start_image.shape[0]):
                 videos[i, 0] = start_image[i]
 
             latent_videos = []
-            videos = comfy.utils.resize_to_batch_size(videos, batch_size)
+            videos = zetamotion_comfyui.comfy.utils.resize_to_batch_size(videos, batch_size)
             for i in range(batch_size):
                 latent_videos += [vae.encode(videos[i, :, :, :, :3])]
             y = torch.cat(latent_videos, dim=0)
 
             # Scale latent since patch_motion is non-linear
-            y = comfy.latent_formats.Wan21().process_in(y)
+            y = zetamotion_comfyui.comfy.latent_formats.Wan21().process_in(y)
 
-            processed_tracks = comfy.utils.resize_list_to_batch_size(processed_tracks, batch_size)
+            processed_tracks = zetamotion_comfyui.comfy.utils.resize_list_to_batch_size(processed_tracks, batch_size)
             res = patch_motion(
                 processed_tracks, y, temperature=temperature, topk=topk, vae_divide=(4, 16)
             )
 
             mask, concat_latent_image = res
-            concat_latent_image = comfy.latent_formats.Wan21().process_out(concat_latent_image)
+            concat_latent_image = zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(concat_latent_image)
             mask = -mask + 1.0  # Invert mask to match expected format
             positive = node_helpers.conditioning_set_values(positive,
                                                             {"concat_mask": mask,
@@ -905,7 +905,7 @@ def wan_sound_to_video(positive, negative, vae, width, height, length, batch_siz
             frame_offset += batch_frames
 
     if ref_image is not None:
-        ref_image = comfy.utils.common_upscale(ref_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+        ref_image = zetamotion_comfyui.comfy.utils.common_upscale(ref_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
         ref_latent = vae.encode(ref_image[:, :, :, :3])
         positive = node_helpers.conditioning_set_values(positive, {"reference_latents": [ref_latent]}, append=True)
         negative = node_helpers.conditioning_set_values(negative, {"reference_latents": [ref_latent]}, append=True)
@@ -914,7 +914,7 @@ def wan_sound_to_video(positive, negative, vae, width, height, length, batch_siz
         if ref_motion.shape[0] > 73:
             ref_motion = ref_motion[-73:]
 
-        ref_motion = comfy.utils.common_upscale(ref_motion.movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+        ref_motion = zetamotion_comfyui.comfy.utils.common_upscale(ref_motion.movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
 
         if ref_motion.shape[0] < 73:
             r = torch.ones([73, height, width, 3]) * 0.5
@@ -928,11 +928,11 @@ def wan_sound_to_video(positive, negative, vae, width, height, length, batch_siz
         positive = node_helpers.conditioning_set_values(positive, {"reference_motion": ref_motion_latent})
         negative = node_helpers.conditioning_set_values(negative, {"reference_motion": ref_motion_latent})
 
-    latent = torch.zeros([batch_size, 16, latent_t, height // 8, width // 8], device=comfy.model_management.intermediate_device())
+    latent = torch.zeros([batch_size, 16, latent_t, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
-    control_video_out = comfy.latent_formats.Wan21().process_out(torch.zeros_like(latent))
+    control_video_out = zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(torch.zeros_like(latent))
     if control_video is not None:
-        control_video = comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+        control_video = zetamotion_comfyui.comfy.utils.common_upscale(control_video[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
         control_video = vae.encode(control_video[:, :, :, :3])
         control_video_out[:, :, :control_video.shape[2]] = control_video
 
@@ -955,9 +955,9 @@ class WanSoundImageToVideo(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=832, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("height", default=480, min=16, max=nodes.MAX_RESOLUTION, step=16),
-                io.Int.Input("length", default=77, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=832, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("height", default=480, min=16, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=16),
+                io.Int.Input("length", default=77, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.AudioEncoderOutput.Input("audio_encoder_output", optional=True),
                 io.Image.Input("ref_image", optional=True),
@@ -989,7 +989,7 @@ class WanSoundImageToVideoExtend(io.ComfyNode):
                 io.Conditioning.Input("positive"),
                 io.Conditioning.Input("negative"),
                 io.Vae.Input("vae"),
-                io.Int.Input("length", default=77, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("length", default=77, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Latent.Input("video_latent"),
                 io.AudioEncoderOutput.Input("audio_encoder_output", optional=True),
                 io.Image.Input("ref_image", optional=True),
@@ -1023,9 +1023,9 @@ class Wan22ImageToVideoLatent(io.ComfyNode):
             category="conditioning/inpaint",
             inputs=[
                 io.Vae.Input("vae"),
-                io.Int.Input("width", default=1280, min=32, max=nodes.MAX_RESOLUTION, step=32),
-                io.Int.Input("height", default=704, min=32, max=nodes.MAX_RESOLUTION, step=32),
-                io.Int.Input("length", default=49, min=1, max=nodes.MAX_RESOLUTION, step=4),
+                io.Int.Input("width", default=1280, min=32, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=32),
+                io.Int.Input("height", default=704, min=32, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=32),
+                io.Int.Input("length", default=49, min=1, max=zetamotion_comfyui.nodes.MAX_RESOLUTION, step=4),
                 io.Int.Input("batch_size", default=1, min=1, max=4096),
                 io.Image.Input("start_image", optional=True),
             ],
@@ -1036,23 +1036,23 @@ class Wan22ImageToVideoLatent(io.ComfyNode):
 
     @classmethod
     def execute(cls, vae, width, height, length, batch_size, start_image=None) -> io.NodeOutput:
-        latent = torch.zeros([1, 48, ((length - 1) // 4) + 1, height // 16, width // 16], device=comfy.model_management.intermediate_device())
+        latent = torch.zeros([1, 48, ((length - 1) // 4) + 1, height // 16, width // 16], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         if start_image is None:
             out_latent = {}
             out_latent["samples"] = latent
             return io.NodeOutput(out_latent)
 
-        mask = torch.ones([latent.shape[0], 1, ((length - 1) // 4) + 1, latent.shape[-2], latent.shape[-1]], device=comfy.model_management.intermediate_device())
+        mask = torch.ones([latent.shape[0], 1, ((length - 1) // 4) + 1, latent.shape[-2], latent.shape[-1]], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
         if start_image is not None:
-            start_image = comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
+            start_image = zetamotion_comfyui.comfy.utils.common_upscale(start_image[:length].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
             latent_temp = vae.encode(start_image)
             latent[:, :, :latent_temp.shape[-3]] = latent_temp
             mask[:, :, :latent_temp.shape[-3]] *= 0.0
 
         out_latent = {}
-        latent_format = comfy.latent_formats.Wan22()
+        latent_format = zetamotion_comfyui.comfy.latent_formats.Wan22()
         latent = latent_format.process_out(latent) * mask + latent * (1.0 - mask)
         out_latent["samples"] = latent.repeat((batch_size, ) + (1,) * (latent.ndim - 1))
         out_latent["noise_mask"] = mask.repeat((batch_size, ) + (1,) * (mask.ndim - 1))

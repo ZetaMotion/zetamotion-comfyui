@@ -2,7 +2,7 @@
 
 import torch
 
-from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from zetamotion_comfyui.comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 
 def score_tangential_damping(cond_score: torch.Tensor, uncond_score: torch.Tensor) -> torch.Tensor:

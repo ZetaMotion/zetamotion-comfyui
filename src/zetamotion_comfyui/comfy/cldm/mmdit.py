@@ -1,8 +1,8 @@
 import torch
 from typing import Optional
-import comfy.ldm.modules.diffusionmodules.mmdit
+import zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit
 
-class ControlNet(comfy.ldm.modules.diffusionmodules.mmdit.MMDiT):
+class ControlNet(zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit.MMDiT):
     def __init__(
         self,
         num_blocks = None,
@@ -21,7 +21,7 @@ class ControlNet(comfy.ldm.modules.diffusionmodules.mmdit.MMDiT):
         if control_latent_channels is None:
             control_latent_channels = self.in_channels
 
-        self.pos_embed_input = comfy.ldm.modules.diffusionmodules.mmdit.PatchEmbed(
+        self.pos_embed_input = zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit.PatchEmbed(
             None,
             self.patch_size,
             control_latent_channels,

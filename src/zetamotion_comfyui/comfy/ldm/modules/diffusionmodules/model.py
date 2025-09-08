@@ -5,9 +5,9 @@ import torch.nn as nn
 import numpy as np
 import logging
 
-from comfy import model_management
-import comfy.ops
-ops = comfy.ops.disable_weight_init
+from zetamotion_comfyui.comfy import model_management
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.disable_weight_init
 
 if model_management.xformers_enabled_vae():
     import xformers
@@ -285,7 +285,7 @@ def pytorch_attention(q, k, v):
     )
 
     try:
-        out = comfy.ops.scaled_dot_product_attention(q, k, v, attn_mask=None, dropout_p=0.0, is_causal=False)
+        out = zetamotion_comfyui.comfy.ops.scaled_dot_product_attention(q, k, v, attn_mask=None, dropout_p=0.0, is_causal=False)
         out = out.transpose(2, 3).reshape(orig_shape)
     except model_management.OOM_EXCEPTION:
         logging.warning("scaled_dot_product_attention OOMed: switched to slice attention")

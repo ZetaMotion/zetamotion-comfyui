@@ -3,8 +3,8 @@ import sys
 import asyncio
 import traceback
 
-import nodes
-import folder_paths
+import zetamotion_comfyui.nodes
+import zetamotion_comfyui.folder_paths
 import execution
 import uuid
 import urllib
@@ -23,21 +23,21 @@ from aiohttp import web
 import logging
 
 import mimetypes
-from comfy.cli_args import args
-import comfy.utils
-import comfy.model_management
-from comfy_api import feature_flags
-import node_helpers
+from zetamotion_comfyui.comfy.cli_args import args
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.model_management
+from zetamotion_comfyui.comfy_api import feature_flags
+import zetamotion_comfyui.node_helpers
 from comfyui_version import __version__
 from app.frontend_management import FrontendManager
-from comfy_api.internal import _ComfyNodeInternal
+from zetamotion_comfyui.comfy_api.internal import _ComfyNodeInternal
 
 from app.user_manager import UserManager
 from app.model_manager import ModelFileManager
 from app.custom_node_manager import CustomNodeManager
 from typing import Optional, Union
 from api_server.routes.internal.internal_routes import InternalRoutes
-from protocol import BinaryEventTypes
+from zetamotion_comfyui.protocol import BinaryEventTypes
 
 async def send_socket_catch_exception(function, message):
     try:
@@ -260,21 +260,21 @@ class PromptServer():
 
         @routes.get("/embeddings")
         def get_embeddings(request):
-            embeddings = folder_paths.get_filename_list("embeddings")
+            embeddings = zetamotion_comfyui.folder_paths.get_filename_list("embeddings")
             return web.json_response(list(map(lambda a: os.path.splitext(a)[0], embeddings)))
 
         @routes.get("/models")
         def list_model_types(request):
-            model_types = list(folder_paths.folder_names_and_paths.keys())
+            model_types = list(zetamotion_comfyui.folder_paths.folder_names_and_paths.keys())
 
             return web.json_response(model_types)
 
         @routes.get("/models/{folder}")
         async def get_models(request):
             folder = request.match_info.get("folder", None)
-            if not folder in folder_paths.folder_names_and_paths:
+            if not folder in zetamotion_comfyui.folder_paths.folder_names_and_paths:
                 return web.Response(status=404)
-            files = folder_paths.get_filename_list(folder)
+            files = zetamotion_comfyui.folder_paths.get_filename_list(folder)
             return web.json_response(files)
 
         @routes.get("/extensions")
@@ -284,7 +284,7 @@ class PromptServer():
 
             extensions = list(map(lambda f: "/" + os.path.relpath(f, self.web_root).replace("\\", "/"), files))
 
-            for name, dir in nodes.EXTENSION_WEB_DIRS.items():
+            for name, dir in zetamotion_comfyui.nodes.EXTENSION_WEB_DIRS.items():
                 files = glob.glob(os.path.join(glob.escape(dir), '**/*.js'), recursive=True)
                 extensions.extend(list(map(lambda f: "/extensions/" + urllib.parse.quote(
                     name) + "/" + os.path.relpath(f, dir).replace("\\", "/"), files)))
@@ -296,11 +296,11 @@ class PromptServer():
                 dir_type = "input"
 
             if dir_type == "input":
-                type_dir = folder_paths.get_input_directory()
+                type_dir = zetamotion_comfyui.folder_paths.get_input_directory()
             elif dir_type == "temp":
-                type_dir = folder_paths.get_temp_directory()
+                type_dir = zetamotion_comfyui.folder_paths.get_temp_directory()
             elif dir_type == "output":
-                type_dir = folder_paths.get_output_directory()
+                type_dir = zetamotion_comfyui.folder_paths.get_output_directory()
 
             return type_dir, dir_type
 
@@ -378,7 +378,7 @@ class PromptServer():
 
             def image_save_function(image, post, filepath):
                 original_ref = json.loads(post.get("original_ref"))
-                filename, output_dir = folder_paths.annotated_filepath(original_ref['filename'])
+                filename, output_dir = zetamotion_comfyui.folder_paths.annotated_filepath(original_ref['filename'])
 
                 if not filename:
                     return web.Response(status=400)
@@ -389,7 +389,7 @@ class PromptServer():
 
                 if output_dir is None:
                     type = original_ref.get("type", "output")
-                    output_dir = folder_paths.get_directory_by_type(type)
+                    output_dir = zetamotion_comfyui.folder_paths.get_directory_by_type(type)
 
                 if output_dir is None:
                     return web.Response(status=400)
@@ -422,7 +422,7 @@ class PromptServer():
         async def view_image(request):
             if "filename" in request.rel_url.query:
                 filename = request.rel_url.query["filename"]
-                filename, output_dir = folder_paths.annotated_filepath(filename)
+                filename, output_dir = zetamotion_comfyui.folder_paths.annotated_filepath(filename)
 
                 if not filename:
                     return web.Response(status=400)
@@ -433,7 +433,7 @@ class PromptServer():
 
                 if output_dir is None:
                     type = request.rel_url.query.get("type", "output")
-                    output_dir = folder_paths.get_directory_by_type(type)
+                    output_dir = zetamotion_comfyui.folder_paths.get_directory_by_type(type)
 
                 if output_dir is None:
                     return web.Response(status=400)
@@ -534,10 +534,10 @@ class PromptServer():
             if not filename.endswith(".safetensors"):
                 return web.Response(status=404)
 
-            safetensors_path = folder_paths.get_full_path(folder_name, filename)
+            safetensors_path = zetamotion_comfyui.folder_paths.get_full_path(folder_name, filename)
             if safetensors_path is None:
                 return web.Response(status=404)
-            out = comfy.utils.safetensors_header(safetensors_path, max_size=1024*1024)
+            out = zetamotion_comfyui.comfy.utils.safetensors_header(safetensors_path, max_size=1024*1024)
             if out is None:
                 return web.Response(status=404)
             dt = json.loads(out)
@@ -547,13 +547,13 @@ class PromptServer():
 
         @routes.get("/system_stats")
         async def system_stats(request):
-            device = comfy.model_management.get_torch_device()
-            device_name = comfy.model_management.get_torch_device_name(device)
-            cpu_device = comfy.model_management.torch.device("cpu")
-            ram_total = comfy.model_management.get_total_memory(cpu_device)
-            ram_free = comfy.model_management.get_free_memory(cpu_device)
-            vram_total, torch_vram_total = comfy.model_management.get_total_memory(device, torch_total_too=True)
-            vram_free, torch_vram_free = comfy.model_management.get_free_memory(device, torch_free_too=True)
+            device = zetamotion_comfyui.comfy.model_management.get_torch_device()
+            device_name = zetamotion_comfyui.comfy.model_management.get_torch_device_name(device)
+            cpu_device = zetamotion_comfyui.comfy.model_management.torch.device("cpu")
+            ram_total = zetamotion_comfyui.comfy.model_management.get_total_memory(cpu_device)
+            ram_free = zetamotion_comfyui.comfy.model_management.get_free_memory(cpu_device)
+            vram_total, torch_vram_total = zetamotion_comfyui.comfy.model_management.get_total_memory(device, torch_total_too=True)
+            vram_free, torch_vram_free = zetamotion_comfyui.comfy.model_management.get_free_memory(device, torch_free_too=True)
             required_frontend_version = FrontendManager.get_required_frontend_version()
 
             system_stats = {
@@ -564,7 +564,7 @@ class PromptServer():
                     "comfyui_version": __version__,
                     "required_frontend_version": required_frontend_version,
                     "python_version": sys.version,
-                    "pytorch_version": comfy.model_management.torch_version,
+                    "pytorch_version": zetamotion_comfyui.comfy.model_management.torch_version,
                     "embedded_python": os.path.split(os.path.split(sys.executable)[0])[1] == "python_embeded",
                     "argv": sys.argv
                 },
@@ -591,7 +591,7 @@ class PromptServer():
             return web.json_response(self.get_queue_info())
 
         def node_info(node_class):
-            obj_class = nodes.NODE_CLASS_MAPPINGS[node_class]
+            obj_class = zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS[node_class]
             if issubclass(obj_class, _ComfyNodeInternal):
                 return obj_class.GET_NODE_INFO_V1()
             info = {}
@@ -601,7 +601,7 @@ class PromptServer():
             info['output_is_list'] = obj_class.OUTPUT_IS_LIST if hasattr(obj_class, 'OUTPUT_IS_LIST') else [False] * len(obj_class.RETURN_TYPES)
             info['output_name'] = obj_class.RETURN_NAMES if hasattr(obj_class, 'RETURN_NAMES') else info['output']
             info['name'] = node_class
-            info['display_name'] = nodes.NODE_DISPLAY_NAME_MAPPINGS[node_class] if node_class in nodes.NODE_DISPLAY_NAME_MAPPINGS.keys() else node_class
+            info['display_name'] = zetamotion_comfyui.nodes.NODE_DISPLAY_NAME_MAPPINGS[node_class] if node_class in zetamotion_comfyui.nodes.NODE_DISPLAY_NAME_MAPPINGS.keys() else node_class
             info['description'] = obj_class.DESCRIPTION if hasattr(obj_class,'DESCRIPTION') else ''
             info['python_module'] = getattr(obj_class, "RELATIVE_PYTHON_MODULE", "nodes")
             info['category'] = 'sd'
@@ -627,9 +627,9 @@ class PromptServer():
 
         @routes.get("/object_info")
         async def get_object_info(request):
-            with folder_paths.cache_helper:
+            with zetamotion_comfyui.folder_paths.cache_helper:
                 out = {}
-                for x in nodes.NODE_CLASS_MAPPINGS:
+                for x in zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS:
                     try:
                         out[x] = node_info(x)
                     except Exception:
@@ -641,7 +641,7 @@ class PromptServer():
         async def get_object_info_node(request):
             node_class = request.match_info.get("node_class", None)
             out = {}
-            if (node_class is not None) and (node_class in nodes.NODE_CLASS_MAPPINGS):
+            if (node_class is not None) and (node_class in zetamotion_comfyui.nodes.NODE_CLASS_MAPPINGS):
                 out[node_class] = node_info(node_class)
             return web.json_response(out)
 
@@ -808,7 +808,7 @@ class PromptServer():
         self.app.add_routes(self.routes)
 
         # Add routes from web extensions.
-        for name, dir in nodes.EXTENSION_WEB_DIRS.items():
+        for name, dir in zetamotion_comfyui.nodes.EXTENSION_WEB_DIRS.items():
             self.app.add_routes([web.static('/extensions/' + name, dir)])
 
         workflow_templates_path = FrontendManager.templates_path()

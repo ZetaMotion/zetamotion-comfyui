@@ -1,5 +1,5 @@
-import node_helpers
-import comfy.utils
+import zetamotion_comfyui.node_helpers
+import zetamotion_comfyui.comfy.utils
 import math
 
 
@@ -30,7 +30,7 @@ class TextEncodeQwenImageEdit:
             width = round(samples.shape[3] * scale_by)
             height = round(samples.shape[2] * scale_by)
 
-            s = comfy.utils.common_upscale(samples, width, height, "area", "disabled")
+            s = zetamotion_comfyui.comfy.utils.common_upscale(samples, width, height, "area", "disabled")
             image = s.movedim(1, -1)
             images = [image[:, :, :, :3]]
             if vae is not None:

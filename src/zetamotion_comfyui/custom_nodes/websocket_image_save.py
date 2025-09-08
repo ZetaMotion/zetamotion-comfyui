@@ -1,6 +1,6 @@
 from PIL import Image
 import numpy as np
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 import time
 
 #You can use this node to save full size images through the websocket, the
@@ -25,7 +25,7 @@ class SaveImageWebsocket:
     CATEGORY = "api/image"
 
     def save_images(self, images):
-        pbar = comfy.utils.ProgressBar(images.shape[0])
+        pbar = zetamotion_comfyui.comfy.utils.ProgressBar(images.shape[0])
         step = 0
         for image in images:
             i = 255. * image.cpu().numpy()

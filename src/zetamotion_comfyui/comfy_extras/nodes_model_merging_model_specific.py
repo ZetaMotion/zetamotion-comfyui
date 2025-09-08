@@ -1,4 +1,4 @@
-import comfy_extras.nodes_model_merging
+import zetamotion_comfyui.comfy_extras.nodes_model_merging
 
 class ModelMergeSD1(comfy_extras.nodes_model_merging.ModelMergeBlocks):
     CATEGORY = "advanced/model_merging/model_specific"

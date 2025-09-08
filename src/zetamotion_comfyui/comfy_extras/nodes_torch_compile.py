@@ -1,4 +1,4 @@
-from comfy_api.torch_helpers import set_torch_compile_wrapper
+from zetamotion_comfyui.comfy_api.torch_helpers import set_torch_compile_wrapper
 
 
 class TorchCompileModel:

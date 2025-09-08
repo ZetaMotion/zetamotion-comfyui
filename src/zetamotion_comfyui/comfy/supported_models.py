@@ -114,7 +114,7 @@ class SD20(supported_models_base.BASE):
         return state_dict
 
     def clip_target(self, state_dict={}):
-        return supported_models_base.ClipTarget(comfy.text_encoders.sd2_clip.SD2Tokenizer, comfy.text_encoders.sd2_clip.SD2ClipModel)
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.sd2_clip.SD2Tokenizer, zetamotion_comfyui.comfy.text_encoders.sd2_clip.SD2ClipModel)
 
 class SD21UnclipL(SD20):
     unet_config = {
@@ -555,11 +555,11 @@ class SD3(supported_models_base.BASE):
             clip_l = True
         if "{}clip_g.transformer.text_model.final_layer_norm.weight".format(pref) in state_dict:
             clip_g = True
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
         if "dtype_t5" in t5_detect:
             t5 = True
 
-        return supported_models_base.ClipTarget(comfy.text_encoders.sd3_clip.SD3Tokenizer, comfy.text_encoders.sd3_clip.sd3_clip(clip_l=clip_l, clip_g=clip_g, t5=t5, **t5_detect))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.sd3_clip.SD3Tokenizer, zetamotion_comfyui.comfy.text_encoders.sd3_clip.sd3_clip(clip_l=clip_l, clip_g=clip_g, t5=t5, **t5_detect))
 
 class StableAudio(supported_models_base.BASE):
     unet_config = {
@@ -590,7 +590,7 @@ class StableAudio(supported_models_base.BASE):
         return utils.state_dict_prefix_replace(state_dict, replace_prefix)
 
     def clip_target(self, state_dict={}):
-        return supported_models_base.ClipTarget(comfy.text_encoders.sa_t5.SAT5Tokenizer, comfy.text_encoders.sa_t5.SAT5Model)
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.sa_t5.SAT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.sa_t5.SAT5Model)
 
 class AuraFlow(supported_models_base.BASE):
     unet_config = {
@@ -613,7 +613,7 @@ class AuraFlow(supported_models_base.BASE):
         return out
 
     def clip_target(self, state_dict={}):
-        return supported_models_base.ClipTarget(comfy.text_encoders.aura_t5.AuraT5Tokenizer, comfy.text_encoders.aura_t5.AuraT5Model)
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.aura_t5.AuraT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.aura_t5.AuraT5Model)
 
 class PixArtAlpha(supported_models_base.BASE):
     unet_config = {
@@ -640,7 +640,7 @@ class PixArtAlpha(supported_models_base.BASE):
         return out.eval()
 
     def clip_target(self, state_dict={}):
-        return supported_models_base.ClipTarget(comfy.text_encoders.pixart_t5.PixArtTokenizer, comfy.text_encoders.pixart_t5.PixArtT5XXL)
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.pixart_t5.PixArtTokenizer, zetamotion_comfyui.comfy.text_encoders.pixart_t5.PixArtT5XXL)
 
 class PixArtSigma(PixArtAlpha):
     unet_config = {
@@ -674,7 +674,7 @@ class HunyuanDiT(supported_models_base.BASE):
         return out
 
     def clip_target(self, state_dict={}):
-        return supported_models_base.ClipTarget(comfy.text_encoders.hydit.HyditTokenizer, comfy.text_encoders.hydit.HyditModel)
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.hydit.HyditTokenizer, zetamotion_comfyui.comfy.text_encoders.hydit.HyditModel)
 
 class HunyuanDiT1(HunyuanDiT):
     unet_config = {
@@ -713,8 +713,8 @@ class Flux(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.flux.FluxTokenizer, comfy.text_encoders.flux.flux_clip(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.flux.FluxTokenizer, zetamotion_comfyui.comfy.text_encoders.flux.flux_clip(**t5_detect))
 
 class FluxInpaint(Flux):
     unet_config = {
@@ -766,8 +766,8 @@ class GenmoMochi(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.genmo.MochiT5Tokenizer, comfy.text_encoders.genmo.mochi_te(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.genmo.MochiT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.genmo.mochi_te(**t5_detect))
 
 class LTXV(supported_models_base.BASE):
     unet_config = {
@@ -798,8 +798,8 @@ class LTXV(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.lt.LTXVT5Tokenizer, comfy.text_encoders.lt.ltxv_te(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.lt.LTXVT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.lt.ltxv_te(**t5_detect))
 
 class HunyuanVideo(supported_models_base.BASE):
     unet_config = {
@@ -846,8 +846,8 @@ class HunyuanVideo(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        hunyuan_detect = comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}llama.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.hunyuan_video.HunyuanVideoTokenizer, comfy.text_encoders.hunyuan_video.hunyuan_video_clip(**hunyuan_detect))
+        hunyuan_detect = zetamotion_comfyui.comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}llama.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.hunyuan_video.HunyuanVideoTokenizer, zetamotion_comfyui.comfy.text_encoders.hunyuan_video.hunyuan_video_clip(**hunyuan_detect))
 
 class HunyuanVideoI2V(HunyuanVideo):
     unet_config = {
@@ -897,8 +897,8 @@ class CosmosT2V(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.cosmos.CosmosT5Tokenizer, comfy.text_encoders.cosmos.te(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.cosmos.CosmosT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.cosmos.te(**t5_detect))
 
 class CosmosI2V(CosmosT2V):
     unet_config = {
@@ -939,8 +939,8 @@ class CosmosT2IPredict2(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.cosmos.CosmosT5Tokenizer, comfy.text_encoders.cosmos.te(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.cosmos.CosmosT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.cosmos.te(**t5_detect))
 
 class CosmosI2VPredict2(CosmosT2IPredict2):
     unet_config = {
@@ -978,8 +978,8 @@ class Lumina2(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        hunyuan_detect = comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}gemma2_2b.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.lumina2.LuminaTokenizer, comfy.text_encoders.lumina2.te(**hunyuan_detect))
+        hunyuan_detect = zetamotion_comfyui.comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}gemma2_2b.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.lumina2.LuminaTokenizer, zetamotion_comfyui.comfy.text_encoders.lumina2.te(**hunyuan_detect))
 
 class WAN21_T2V(supported_models_base.BASE):
     unet_config = {
@@ -1011,8 +1011,8 @@ class WAN21_T2V(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}umt5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.wan.WanT5Tokenizer, comfy.text_encoders.wan.te(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}umt5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.wan.WanT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.wan.te(**t5_detect))
 
 class WAN21_I2V(WAN21_T2V):
     unet_config = {
@@ -1188,7 +1188,7 @@ class Chroma(supported_models_base.BASE):
         "multiplier": 1.0,
     }
 
-    latent_format = comfy.latent_formats.Flux
+    latent_format = zetamotion_comfyui.comfy.latent_formats.Flux
 
     memory_usage_factor = 3.2
 
@@ -1201,8 +1201,8 @@ class Chroma(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        t5_detect = comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.pixart_t5.PixArtTokenizer, comfy.text_encoders.pixart_t5.pixart_te(**t5_detect))
+        t5_detect = zetamotion_comfyui.comfy.text_encoders.sd3_clip.t5_xxl_detect(state_dict, "{}t5xxl.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.pixart_t5.PixArtTokenizer, zetamotion_comfyui.comfy.text_encoders.pixart_t5.pixart_te(**t5_detect))
 
 class ACEStep(supported_models_base.BASE):
     unet_config = {
@@ -1216,7 +1216,7 @@ class ACEStep(supported_models_base.BASE):
         "shift": 3.0,
     }
 
-    latent_format = comfy.latent_formats.ACEAudio
+    latent_format = zetamotion_comfyui.comfy.latent_formats.ACEAudio
 
     memory_usage_factor = 0.5
 
@@ -1230,7 +1230,7 @@ class ACEStep(supported_models_base.BASE):
         return out
 
     def clip_target(self, state_dict={}):
-        return supported_models_base.ClipTarget(comfy.text_encoders.ace.AceT5Tokenizer, comfy.text_encoders.ace.AceT5Model)
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.ace.AceT5Tokenizer, zetamotion_comfyui.comfy.text_encoders.ace.AceT5Model)
 
 class Omnigen2(supported_models_base.BASE):
     unet_config = {
@@ -1254,7 +1254,7 @@ class Omnigen2(supported_models_base.BASE):
 
     def __init__(self, unet_config):
         super().__init__(unet_config)
-        if comfy.model_management.extended_fp16_support():
+        if zetamotion_comfyui.comfy.model_management.extended_fp16_support():
             self.supported_inference_dtypes = [torch.float16] + self.supported_inference_dtypes
 
     def get_model(self, state_dict, prefix="", device=None):
@@ -1263,8 +1263,8 @@ class Omnigen2(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        hunyuan_detect = comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}qwen25_3b.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.omnigen2.Omnigen2Tokenizer, comfy.text_encoders.omnigen2.te(**hunyuan_detect))
+        hunyuan_detect = zetamotion_comfyui.comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}qwen25_3b.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.omnigen2.Omnigen2Tokenizer, zetamotion_comfyui.comfy.text_encoders.omnigen2.te(**hunyuan_detect))
 
 class QwenImage(supported_models_base.BASE):
     unet_config = {
@@ -1292,8 +1292,8 @@ class QwenImage(supported_models_base.BASE):
 
     def clip_target(self, state_dict={}):
         pref = self.text_encoder_key_prefix[0]
-        hunyuan_detect = comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}qwen25_7b.transformer.".format(pref))
-        return supported_models_base.ClipTarget(comfy.text_encoders.qwen_image.QwenImageTokenizer, comfy.text_encoders.qwen_image.te(**hunyuan_detect))
+        hunyuan_detect = zetamotion_comfyui.comfy.text_encoders.hunyuan_video.llama_detect(state_dict, "{}qwen25_7b.transformer.".format(pref))
+        return supported_models_base.ClipTarget(zetamotion_comfyui.comfy.text_encoders.qwen_image.QwenImageTokenizer, zetamotion_comfyui.comfy.text_encoders.qwen_image.te(**hunyuan_detect))
 
 
 models = [LotusD, Stable_Zero123, SD15_instructpix2pix, SD15, SD20, SD21UnclipL, SD21UnclipH, SDXL_instructpix2pix, SDXLRefiner, SDXL, SSD1B, KOALA_700M, KOALA_1B, Segmind_Vega, SD_X4Upscaler, Stable_Cascade_C, Stable_Cascade_B, SV3D_u, SV3D_p, SD3, StableAudio, AuraFlow, PixArtAlpha, PixArtSigma, HunyuanDiT, HunyuanDiT1, FluxInpaint, Flux, FluxSchnell, GenmoMochi, LTXV, HunyuanVideoSkyreelsI2V, HunyuanVideoI2V, HunyuanVideo, CosmosT2V, CosmosI2V, CosmosT2IPredict2, CosmosI2VPredict2, Lumina2, WAN22_T2V, WAN21_T2V, WAN21_I2V, WAN21_FunControl2V, WAN21_Vace, WAN21_Camera, WAN22_Camera, WAN22_S2V, Hunyuan3Dv2mini, Hunyuan3Dv2, Hunyuan3Dv2_1, HiDream, Chroma, ACEStep, Omnigen2, QwenImage]

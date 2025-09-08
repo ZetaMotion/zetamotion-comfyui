@@ -1,13 +1,13 @@
 import torch
 from torch import nn
-from comfy.ldm.flux.layers import (
+from zetamotion_comfyui.comfy.ldm.flux.layers import (
     DoubleStreamBlock,
     LastLayer,
     MLPEmbedder,
     SingleStreamBlock,
     timestep_embedding,
 )
-import comfy.patcher_extension
+import zetamotion_comfyui.comfy.patcher_extension
 
 
 class Hunyuan3Dv2(nn.Module):
@@ -68,10 +68,10 @@ class Hunyuan3Dv2(nn.Module):
         self.final_layer = LastLayer(hidden_size, 1, in_channels, dtype=dtype, device=device, operations=operations)
 
     def forward(self, x, timestep, context, guidance=None, transformer_options={}, **kwargs):
-        return comfy.patcher_extension.WrapperExecutor.new_class_executor(
+        return zetamotion_comfyui.comfy.patcher_extension.WrapperExecutor.new_class_executor(
             self._forward,
             self,
-            comfy.patcher_extension.get_all_wrappers(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
+            zetamotion_comfyui.comfy.patcher_extension.get_all_wrappers(zetamotion_comfyui.comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, transformer_options)
         ).execute(x, timestep, context, guidance, transformer_options, **kwargs)
 
     def _forward(self, x, timestep, context, guidance=None, transformer_options={}, **kwargs):
