@@ -17,10 +17,10 @@
 """
 
 from __future__ import annotations
-import comfy.utils
-import comfy.model_management
-import comfy.model_base
-import comfy.weight_adapter as weight_adapter
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.model_base
+import zetamotion_comfyui.comfy.weight_adapter as weight_adapter
 import logging
 import torch
 

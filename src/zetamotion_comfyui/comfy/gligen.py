@@ -2,8 +2,8 @@ import math
 import torch
 from torch import nn
 from .ldm.modules.attention import CrossAttention, FeedForward
-import comfy.ops
-ops = comfy.ops.manual_cast
+import zetamotion_comfyui.comfy.ops
+ops = zetamotion_comfyui.comfy.ops.manual_cast
 
 
 class GatedCrossAttentionDense(nn.Module):

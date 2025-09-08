@@ -1,6 +1,6 @@
 import os
 
-import comfy.sd
+import zetamotion_comfyui.comfy.sd
 
 def first_file(path, filenames):
     for f in filenames:

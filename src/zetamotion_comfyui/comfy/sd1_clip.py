@@ -6,7 +6,7 @@ import torch
 import traceback
 import zipfile
 from . import model_management
-import comfy.clip_model
+import zetamotion_comfyui.comfy.clip_model
 import json
 import logging
 import numbers

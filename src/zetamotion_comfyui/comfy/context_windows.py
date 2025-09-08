@@ -6,12 +6,12 @@ import collections
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import logging
-import comfy.model_management
-import comfy.patcher_extension
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
 if TYPE_CHECKING:
-    from comfy.model_base import BaseModel
-    from comfy.model_patcher import ModelPatcher
-    from comfy.controlnet import ControlBase
+    from zetamotion_comfyui.comfy.model_base import BaseModel
+    from zetamotion_comfyui.comfy.model_patcher import ModelPatcher
+    from zetamotion_comfyui.comfy.controlnet import ControlBase
 
 
 class ContextWindowABC(ABC):

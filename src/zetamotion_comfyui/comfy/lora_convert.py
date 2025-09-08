@@ -1,5 +1,5 @@
 import torch
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 
 
 def convert_lora_bfl_control(sd): #BFL loras for Flux

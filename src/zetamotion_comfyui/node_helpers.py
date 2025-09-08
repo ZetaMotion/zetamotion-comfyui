@@ -1,7 +1,7 @@
 import hashlib
 import torch
 
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.cli_args import args
 
 from PIL import ImageFile, UnidentifiedImageError
 

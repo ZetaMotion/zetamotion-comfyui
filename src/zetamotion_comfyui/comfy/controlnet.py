@@ -22,25 +22,25 @@ from enum import Enum
 import math
 import os
 import logging
-import comfy.utils
-import comfy.model_management
-import comfy.model_detection
-import comfy.model_patcher
-import comfy.ops
-import comfy.latent_formats
-import comfy.model_base
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.model_detection
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.ops
+import zetamotion_comfyui.comfy.latent_formats
+import zetamotion_comfyui.comfy.model_base
 
-import comfy.cldm.cldm
-import comfy.t2i_adapter.adapter
-import comfy.ldm.cascade.controlnet
-import comfy.cldm.mmdit
-import comfy.ldm.hydit.controlnet
-import comfy.ldm.flux.controlnet
-import comfy.ldm.qwen_image.controlnet
-import comfy.cldm.dit_embedder
+import zetamotion_comfyui.comfy.cldm.cldm
+import zetamotion_comfyui.comfy.t2i_adapter.adapter
+import zetamotion_comfyui.comfy.ldm.cascade.controlnet
+import zetamotion_comfyui.comfy.cldm.mmdit
+import zetamotion_comfyui.comfy.ldm.hydit.controlnet
+import zetamotion_comfyui.comfy.ldm.flux.controlnet
+import zetamotion_comfyui.comfy.ldm.qwen_image.controlnet
+import zetamotion_comfyui.comfy.cldm.dit_embedder
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from comfy.hooks import HookGroup
+    from zetamotion_comfyui.comfy.hooks import HookGroup
 
 
 def broadcast_image_to(tensor, target_batch_size, batched_number):

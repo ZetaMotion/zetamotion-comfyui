@@ -2,19 +2,19 @@ from __future__ import annotations
 import uuid
 import math
 import collections
-import comfy.model_management
-import comfy.conds
-import comfy.utils
-import comfy.hooks
-import comfy.patcher_extension
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.conds
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.hooks
+import zetamotion_comfyui.comfy.patcher_extension
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from comfy.model_patcher import ModelPatcher
-    from comfy.model_base import BaseModel
-    from comfy.controlnet import ControlBase
+    from zetamotion_comfyui.comfy.model_patcher import ModelPatcher
+    from zetamotion_comfyui.comfy.model_base import BaseModel
+    from zetamotion_comfyui.comfy.controlnet import ControlBase
 
 def prepare_mask(noise_mask, shape, device):
-    return comfy.utils.reshape_mask(noise_mask, shape).to(device)
+    return zetamotion_comfyui.comfy.utils.reshape_mask(noise_mask, shape).to(device)
 
 def get_models_from_cond(cond, model_type):
     models = []

@@ -19,7 +19,7 @@
 import psutil
 import logging
 from enum import Enum
-from comfy.cli_args import args, PerformanceFeature
+from zetamotion_comfyui.comfy.cli_args import args, PerformanceFeature
 import torch
 import sys
 import platform

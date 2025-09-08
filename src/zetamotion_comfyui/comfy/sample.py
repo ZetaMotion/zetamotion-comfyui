@@ -1,7 +1,7 @@
 import torch
-import comfy.model_management
-import comfy.samplers
-import comfy.utils
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.samplers
+import zetamotion_comfyui.comfy.utils
 import numpy as np
 import logging
 

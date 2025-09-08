@@ -3,21 +3,21 @@ from .k_diffusion import sampling as k_diffusion_sampling
 from .extra_samplers import uni_pc
 from typing import TYPE_CHECKING, Callable, NamedTuple
 if TYPE_CHECKING:
-    from comfy.model_patcher import ModelPatcher
-    from comfy.model_base import BaseModel
-    from comfy.controlnet import ControlBase
+    from zetamotion_comfyui.comfy.model_patcher import ModelPatcher
+    from zetamotion_comfyui.comfy.model_base import BaseModel
+    from zetamotion_comfyui.comfy.controlnet import ControlBase
 import torch
 from functools import partial
 import collections
-from comfy import model_management
+from zetamotion_comfyui.comfy import model_management
 import math
 import logging
-import comfy.sampler_helpers
-import comfy.model_patcher
-import comfy.patcher_extension
-import comfy.hooks
-import comfy.context_windows
-import comfy.utils
+import zetamotion_comfyui.comfy.sampler_helpers
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.hooks
+import zetamotion_comfyui.comfy.context_windows
+import zetamotion_comfyui.comfy.utils
 import scipy.stats
 import numpy
 

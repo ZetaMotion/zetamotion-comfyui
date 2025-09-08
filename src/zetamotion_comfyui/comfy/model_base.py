@@ -16,48 +16,48 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import comfy.ldm.hunyuan3dv2_1
-import comfy.ldm.hunyuan3dv2_1.hunyuandit
+import zetamotion_comfyui.comfy.ldm.hunyuan3dv2_1
+import zetamotion_comfyui.comfy.ldm.hunyuan3dv2_1.hunyuandit
 import torch
 import logging
-from comfy.ldm.modules.diffusionmodules.openaimodel import UNetModel, Timestep
-from comfy.ldm.cascade.stage_c import StageC
-from comfy.ldm.cascade.stage_b import StageB
-from comfy.ldm.modules.encoders.noise_aug_modules import CLIPEmbeddingNoiseAugmentation
-from comfy.ldm.modules.diffusionmodules.upscaling import ImageConcatWithNoiseAugmentation
-from comfy.ldm.modules.diffusionmodules.mmdit import OpenAISignatureMMDITWrapper
-import comfy.ldm.genmo.joint_model.asymm_models_joint
-import comfy.ldm.aura.mmdit
-import comfy.ldm.pixart.pixartms
-import comfy.ldm.hydit.models
-import comfy.ldm.audio.dit
-import comfy.ldm.audio.embedders
-import comfy.ldm.flux.model
-import comfy.ldm.lightricks.model
-import comfy.ldm.hunyuan_video.model
-import comfy.ldm.cosmos.model
-import comfy.ldm.cosmos.predict2
-import comfy.ldm.lumina.model
-import comfy.ldm.wan.model
-import comfy.ldm.hunyuan3d.model
-import comfy.ldm.hidream.model
-import comfy.ldm.chroma.model
-import comfy.ldm.ace.model
-import comfy.ldm.omnigen.omnigen2
-import comfy.ldm.qwen_image.model
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.openaimodel import UNetModel, Timestep
+from zetamotion_comfyui.comfy.ldm.cascade.stage_c import StageC
+from zetamotion_comfyui.comfy.ldm.cascade.stage_b import StageB
+from zetamotion_comfyui.comfy.ldm.modules.encoders.noise_aug_modules import CLIPEmbeddingNoiseAugmentation
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.upscaling import ImageConcatWithNoiseAugmentation
+from zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.mmdit import OpenAISignatureMMDITWrapper
+import zetamotion_comfyui.comfy.ldm.genmo.joint_model.asymm_models_joint
+import zetamotion_comfyui.comfy.ldm.aura.mmdit
+import zetamotion_comfyui.comfy.ldm.pixart.pixartms
+import zetamotion_comfyui.comfy.ldm.hydit.models
+import zetamotion_comfyui.comfy.ldm.audio.dit
+import zetamotion_comfyui.comfy.ldm.audio.embedders
+import zetamotion_comfyui.comfy.ldm.flux.model
+import zetamotion_comfyui.comfy.ldm.lightricks.model
+import zetamotion_comfyui.comfy.ldm.hunyuan_video.model
+import zetamotion_comfyui.comfy.ldm.cosmos.model
+import zetamotion_comfyui.comfy.ldm.cosmos.predict2
+import zetamotion_comfyui.comfy.ldm.lumina.model
+import zetamotion_comfyui.comfy.ldm.wan.model
+import zetamotion_comfyui.comfy.ldm.hunyuan3d.model
+import zetamotion_comfyui.comfy.ldm.hidream.model
+import zetamotion_comfyui.comfy.ldm.chroma.model
+import zetamotion_comfyui.comfy.ldm.ace.model
+import zetamotion_comfyui.comfy.ldm.omnigen.omnigen2
+import zetamotion_comfyui.comfy.ldm.qwen_image.model
 
-import comfy.model_management
-import comfy.patcher_extension
-import comfy.conds
-import comfy.ops
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.conds
+import zetamotion_comfyui.comfy.ops
 from enum import Enum
 from . import utils
-import comfy.latent_formats
-import comfy.model_sampling
+import zetamotion_comfyui.comfy.latent_formats
+import zetamotion_comfyui.comfy.model_sampling
 import math
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from comfy.model_patcher import ModelPatcher
+    from zetamotion_comfyui.comfy.model_patcher import ModelPatcher
 
 class ModelType(Enum):
     EPS = 1

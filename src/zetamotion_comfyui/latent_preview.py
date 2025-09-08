@@ -1,10 +1,10 @@
 import torch
 from PIL import Image
-from comfy.cli_args import args, LatentPreviewMethod
-from comfy.taesd.taesd import TAESD
-import comfy.model_management
-import folder_paths
-import comfy.utils
+from zetamotion_comfyui.comfy.cli_args import args, LatentPreviewMethod
+from zetamotion_comfyui.comfy.taesd.taesd import TAESD
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.folder_paths
+import zetamotion_comfyui.comfy.utils
 import logging
 
 MAX_PREVIEW_RESOLUTION = args.preview_size

@@ -18,10 +18,10 @@
 
 import torch
 import logging
-import comfy.model_management
-from comfy.cli_args import args, PerformanceFeature
-import comfy.float
-import comfy.rmsnorm
+import zetamotion_comfyui.zetamotion_comfyui.comfy.model_management
+from zetamotion_comfyui.comfy.cli_args import args, PerformanceFeature
+import zetamotion_comfyui.comfy.float
+import zetamotion_comfyui.comfy.rmsnorm
 import contextlib
 
 

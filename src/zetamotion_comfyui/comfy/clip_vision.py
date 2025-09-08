@@ -4,12 +4,12 @@ import torch
 import json
 import logging
 
-import comfy.ops
-import comfy.model_patcher
-import comfy.model_management
-import comfy.utils
-import comfy.clip_model
-import comfy.image_encoders.dino2
+import zetamotion_comfyui.comfy.ops
+import zetamotion_comfyui.comfy.model_patcher
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.utils
+import zetamotion_comfyui.comfy.clip_model
+import zetamotion_comfyui.comfy.image_encoders.dino2
 
 class Output:
     def __getitem__(self, key):

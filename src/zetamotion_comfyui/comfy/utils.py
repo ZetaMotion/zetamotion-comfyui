@@ -20,7 +20,7 @@
 import torch
 import math
 import struct
-import comfy.checkpoint_pickle
+import zetamotion_comfyui.comfy.checkpoint_pickle
 import safetensors.torch
 import numpy as np
 from PIL import Image
@@ -28,7 +28,7 @@ import logging
 import itertools
 from torch.nn.functional import interpolate
 from einops import rearrange
-from comfy.cli_args import args
+from zetamotion_comfyui.comfy.cli_args import args
 
 MMAP_TORCH_FILES = args.mmap_torch_files
 DISABLE_MMAP = args.disable_mmap

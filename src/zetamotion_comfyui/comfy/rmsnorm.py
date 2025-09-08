@@ -1,5 +1,5 @@
 import torch
-import comfy.model_management
+import zetamotion_comfyui.comfy.model_management
 import numbers
 import logging
 

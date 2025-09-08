@@ -4,22 +4,22 @@ from . import utils
 
 from . import sd1_clip
 from . import sdxl_clip
-import comfy.text_encoders.sd2_clip
-import comfy.text_encoders.sd3_clip
-import comfy.text_encoders.sa_t5
-import comfy.text_encoders.aura_t5
-import comfy.text_encoders.pixart_t5
-import comfy.text_encoders.hydit
-import comfy.text_encoders.flux
-import comfy.text_encoders.genmo
-import comfy.text_encoders.lt
-import comfy.text_encoders.hunyuan_video
-import comfy.text_encoders.cosmos
-import comfy.text_encoders.lumina2
-import comfy.text_encoders.wan
-import comfy.text_encoders.ace
-import comfy.text_encoders.omnigen2
-import comfy.text_encoders.qwen_image
+import zetamotion_comfyui.comfy.text_encoders.sd2_clip
+import zetamotion_comfyui.comfy.text_encoders.sd3_clip
+import zetamotion_comfyui.comfy.text_encoders.sa_t5
+import zetamotion_comfyui.comfy.text_encoders.aura_t5
+import zetamotion_comfyui.comfy.text_encoders.pixart_t5
+import zetamotion_comfyui.comfy.text_encoders.hydit
+import zetamotion_comfyui.comfy.text_encoders.flux
+import zetamotion_comfyui.comfy.text_encoders.genmo
+import zetamotion_comfyui.comfy.text_encoders.lt
+import zetamotion_comfyui.comfy.text_encoders.hunyuan_video
+import zetamotion_comfyui.comfy.text_encoders.cosmos
+import zetamotion_comfyui.comfy.text_encoders.lumina2
+import zetamotion_comfyui.comfy.text_encoders.wan
+import zetamotion_comfyui.comfy.text_encoders.ace
+import zetamotion_comfyui.comfy.text_encoders.omnigen2
+import zetamotion_comfyui.comfy.text_encoders.qwen_image
 
 from . import supported_models_base
 from . import latent_formats

@@ -8,12 +8,12 @@ import itertools
 import logging
 
 if TYPE_CHECKING:
-    from comfy.model_patcher import ModelPatcher, PatcherInjection
-    from comfy.model_base import BaseModel
-    from comfy.sd import CLIP
-import comfy.lora
-import comfy.model_management
-import comfy.patcher_extension
+    from zetamotion_comfyui.comfy.model_patcher import ModelPatcher, PatcherInjection
+    from zetamotion_comfyui.comfy.model_base import BaseModel
+    from zetamotion_comfyui.comfy.sd import CLIP
+import zetamotion_comfyui.comfy.lora
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
 from node_helpers import conditioning_set_values
 
 # #######################################################################################################

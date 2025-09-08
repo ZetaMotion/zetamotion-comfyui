@@ -1,7 +1,7 @@
 import json
-import comfy.supported_models
-import comfy.supported_models_base
-import comfy.utils
+import zetamotion_comfyui.comfy.supported_models
+import zetamotion_comfyui.comfy.supported_models_base
+import zetamotion_comfyui.comfy.utils
 import math
 import logging
 import torch

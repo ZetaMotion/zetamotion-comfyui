@@ -1,6 +1,6 @@
 import torch
-from comfy.ldm.modules.attention import optimized_attention_for_device
-import comfy.ops
+from zetamotion_comfyui.comfy.ldm.modules.attention import optimized_attention_for_device
+import zetamotion_comfyui.comfy.ops
 
 class CLIPAttention(torch.nn.Module):
     def __init__(self, embed_dim, heads, dtype, device, operations):

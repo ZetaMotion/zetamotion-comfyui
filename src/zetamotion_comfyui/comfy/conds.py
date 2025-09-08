@@ -1,6 +1,6 @@
 import torch
 import math
-import comfy.utils
+import zetamotion_comfyui.comfy.utils
 import logging
 
 

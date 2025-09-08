@@ -28,14 +28,14 @@ from typing import Callable, Optional
 
 import torch
 
-import comfy.float
-import comfy.hooks
-import comfy.lora
-import comfy.model_management
-import comfy.patcher_extension
-import comfy.utils
-from comfy.comfy_types import UnetWrapperFunction
-from comfy.patcher_extension import CallbacksMP, PatcherInjection, WrappersMP
+import zetamotion_comfyui.comfy.float
+import zetamotion_comfyui.comfy.hooks
+import zetamotion_comfyui.comfy.lora
+import zetamotion_comfyui.comfy.model_management
+import zetamotion_comfyui.comfy.patcher_extension
+import zetamotion_comfyui.comfy.utils
+from zetamotion_comfyui.comfy.comfy_types import UnetWrapperFunction
+from zetamotion_comfyui.comfy.patcher_extension import CallbacksMP, PatcherInjection, WrappersMP
 
 
 def string_to_seed(data):
