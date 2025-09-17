@@ -20,7 +20,7 @@ def generate_stubs_for_module(module_name: str) -> None:
     """Generate stub files for a specific module that exports ComfyAPI and ComfyAPISync."""
     try:
         # Import the module
-        module = importlib import_module(module_name)
+        module = importlib.import_module(module_name)
 
         # Check if module has ComfyAPISync (the sync wrapper)
         if hasattr(module, "ComfyAPISync"):
