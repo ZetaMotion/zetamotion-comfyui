@@ -652,7 +652,7 @@ class SamplerCustom:
             noise_mask = latent["noise_mask"]
 
         x0_output = {}
-        callback = latent_preview.prepare_callback(model, sigmas.shape[-1] - 1, x0_output)
+        callback = zetamotion_comfyui.latent_preview.prepare_callback(model, sigmas.shape[-1] - 1, x0_output)
 
         disable_pbar = not zetamotion_comfyui.comfy.utils.PROGRESS_BAR_ENABLED
         samples = zetamotion_comfyui.comfy.sample.sample_custom(model, noise, cfg, sampler, sigmas, positive, negative, latent_image, noise_mask=noise_mask, callback=callback, disable_pbar=disable_pbar, seed=noise_seed)
@@ -829,7 +829,7 @@ class SamplerCustomAdvanced:
             noise_mask = latent["noise_mask"]
 
         x0_output = {}
-        callback = latent_preview.prepare_callback(guider.model_patcher, sigmas.shape[-1] - 1, x0_output)
+        callback = zetamotion_comfyui.latent_preview.prepare_callback(guider.model_patcher, sigmas.shape[-1] - 1, x0_output)
 
         disable_pbar = not zetamotion_comfyui.comfy.utils.PROGRESS_BAR_ENABLED
         samples = guider.sample(noise.generate_noise(latent), latent_image, sampler, sigmas, denoise_mask=noise_mask, callback=callback, disable_pbar=disable_pbar, seed=noise.seed)
