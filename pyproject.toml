@@ -27,4 +27,4 @@ exclude = ["tests*"]
 
 # Include non-Python files (like JSON) in the packages
 [tool.setuptools.package-data]
-"*"= ["**/*.json"]    # all JSON files in all packages
+"*" = ["**/*.json", "**/*.txt"]   # include all JSON and TXT files in all packages
