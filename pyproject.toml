@@ -5,17 +5,21 @@ description = "ZetaMotion wrapper around ComfyUI"
 requires-python = ">=3.9"
 
 dependencies = [
-    # Torch with CUDA 12.6 wheels
-    #"torch @ https://download.pytorch.org/whl/cu126/torch-2.3.0%2Bcu126-cp310-cp310-linux_x86_64.whl",
-    # "#torchvision @ https://download.pytorch.org/whl/cu126/torchvision-0.18.0%2Bcu126-cp310-cp310-linux_x86_64.whl",
-
-    # Other dependencies
+    # Your dependencies here
 ]
 
 [project.optional-dependencies]
-extras = [
-]
+extras = []
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+# === Include JSON files in all packages ===
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+# Include all .json files recursively in all packages
+"*" = ["**/*.json"]
