@@ -99,15 +99,15 @@ def test_filter_files_extensions():
     assert zetamotion_comfyui.folder_paths.filter_files_extensions(files, [".jpg", ".png"]) == ["file2.jpg", "file3.png"]
     assert zetamotion_comfyui.folder_paths.filter_files_extensions(files, []) == files
 
-@patch("folder_paths.recursive_search")
-@patch("folder_paths.folder_names_and_paths")
+@patch("zetamotion_aitoolkit.folder_paths.recursive_search")
+@patch("zetamotion_aitoolkit.folder_paths.folder_names_and_paths")
 def test_get_filename_list(mock_folder_names_and_paths, mock_recursive_search):
     mock_folder_names_and_paths.__getitem__.return_value = (["/test/path"], {".txt"})
     mock_recursive_search.return_value = (["file1.txt", "file2.jpg"], {})
     assert zetamotion_comfyui.folder_paths.get_filename_list("test_folder") == ["file1.txt"]
 
 def test_get_save_image_path(temp_dir):
-    with patch("folder_paths.output_directory", temp_dir):
+    with patch("zetamotion_aitoolkit.folder_paths.output_directory", temp_dir):
         full_output_folder, filename, counter, subfolder, filename_prefix = zetamotion_comfyui.folder_paths.get_save_image_path("test", temp_dir, 100, 100)
         assert os.path.samefile(full_output_folder, temp_dir)
         assert filename == "test"

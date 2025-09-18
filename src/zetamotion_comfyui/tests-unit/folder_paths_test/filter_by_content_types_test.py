@@ -32,7 +32,7 @@ def patched_mimetype_cache(file_extensions):
     for extension in file_extensions["model"]:
         new_cache[extension] = "model"
 
-    with patch("folder_paths.extension_mimetypes_cache", new_cache):
+    with patch("zetamotion_aitoolkit.folder_paths.extension_mimetypes_cache", new_cache):
         yield
 
 
