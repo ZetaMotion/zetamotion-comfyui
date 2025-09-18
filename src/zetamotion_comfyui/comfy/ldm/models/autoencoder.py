@@ -149,11 +149,11 @@ class AutoencodingEngineLegacy(AutoencodingEngine):
         ddconfig = kwargs.pop("ddconfig")
         super().__init__(
             encoder_config={
-                "target": "comfy.ldm.modules.diffusionmodules.model.Encoder",
+                "target": "zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.model.Encoder",
                 "params": ddconfig,
             },
             decoder_config={
-                "target": "comfy.ldm.modules.diffusionmodules.model.Decoder",
+                "target": "zetamotion_comfyui.comfy.ldm.modules.diffusionmodules.model.Decoder",
                 "params": ddconfig,
             },
             **kwargs,
@@ -224,7 +224,7 @@ class AutoencoderKL(AutoencodingEngineLegacy):
         super().__init__(
             regularizer_config={
                 "target": (
-                    "comfy.ldm.models.autoencoder.DiagonalGaussianRegularizer"
+                    "zetamotion_comfyui.comfy.ldm.models.autoencoder.DiagonalGaussianRegularizer"
                 )
             },
             **kwargs,
