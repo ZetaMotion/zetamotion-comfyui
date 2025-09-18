@@ -19,3 +19,12 @@ extras = [
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+# Tell setuptools where to find packages
+[tool.setuptools.packages.find]
+where = ["src"]        # or "." if your package is in the root
+exclude = ["tests*"]
+
+# Include non-Python files (like JSON) in the packages
+[tool.setuptools.package-data]
+"*"= ["**/*.json"]    # all JSON files in all packages
