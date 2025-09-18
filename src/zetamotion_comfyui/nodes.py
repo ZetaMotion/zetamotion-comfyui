@@ -554,7 +554,7 @@ class CheckpointLoader:
     def load_checkpoint(self, config_name, ckpt_name):
         config_path = zetamotion_comfyui.folder_paths.get_full_path("configs", config_name)
         ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
-        return zetamotion_comfyui.comfy.sd.load_checkpoint(config_path, ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        return zetamotion_comfyui.comfy.sd.load_checkpoint(config_path, ckpt_path, output_vae=True, output_clip=True, embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
 
 class CheckpointLoaderSimple:
     @classmethod
@@ -575,7 +575,7 @@ class CheckpointLoaderSimple:
 
     def load_checkpoint(self, ckpt_name):
         ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
-        out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
         return out[:3]
 
 class DiffusersLoader:
@@ -602,7 +602,7 @@ class DiffusersLoader:
                     model_path = path
                     break
 
-        return zetamotion_comfyui.comfy.diffusers_load.load_diffusers(model_path, output_vae=output_vae, output_clip=output_clip, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        return zetamotion_comfyui.comfy.diffusers_load.load_diffusers(model_path, output_vae=output_vae, output_clip=output_clip, embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
 
 
 class unCLIPCheckpointLoader:
@@ -617,7 +617,7 @@ class unCLIPCheckpointLoader:
 
     def load_checkpoint(self, ckpt_name, output_vae=True, output_clip=True):
         ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
-        out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, output_clipvision=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, output_clipvision=True, embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
         return out
 
 class CLIPSetLastLayer:
@@ -946,7 +946,7 @@ class CLIPLoader:
             model_options["load_device"] = model_options["offload_device"] = torch.device("cpu")
 
         clip_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name)
-        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path], embedding_directory=folder_paths.get_folder_paths("embeddings"), clip_type=clip_type, model_options=model_options)
+        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path], embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"), clip_type=clip_type, model_options=model_options)
         return (clip,)
 
 class DualCLIPLoader:
@@ -976,7 +976,7 @@ class DualCLIPLoader:
         if device == "cpu":
             model_options["load_device"] = model_options["offload_device"] = torch.device("cpu")
 
-        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path1, clip_path2], embedding_directory=folder_paths.get_folder_paths("embeddings"), clip_type=clip_type, model_options=model_options)
+        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path1, clip_path2], embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"), clip_type=clip_type, model_options=model_options)
         return (clip,)
 
 class CLIPVisionLoader:

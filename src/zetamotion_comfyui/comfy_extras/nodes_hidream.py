@@ -23,7 +23,7 @@ class QuadrupleCLIPLoader:
         clip_path2 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name2)
         clip_path3 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name3)
         clip_path4 = zetamotion_comfyui.folder_paths.get_full_path_or_raise("text_encoders", clip_name4)
-        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path1, clip_path2, clip_path3, clip_path4], embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        clip = zetamotion_comfyui.comfy.sd.load_clip(ckpt_paths=[clip_path1, clip_path2, clip_path3, clip_path4], embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
         return (clip,)
 
 class CLIPTextEncodeHiDream:

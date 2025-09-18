@@ -403,7 +403,7 @@ class CreateHookModelAsLora:
                 del temp
 
         if weights_model is None:
-            out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+            out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
             weights_model = zetamotion_comfyui.comfy.hooks.get_patch_weights_from_model(out[0])
             weights_clip = zetamotion_comfyui.comfy.hooks.get_patch_weights_from_model(out[1].patcher if out[1] else out[1])
             self.loaded_weights = (ckpt_path, weights_model, weights_clip)

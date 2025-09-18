@@ -19,7 +19,7 @@ class ImageOnlyCheckpointLoader:
 
     def load_checkpoint(self, ckpt_name, output_vae=True, output_clip=True):
         ckpt_path = zetamotion_comfyui.folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
-        out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=False, output_clipvision=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        out = zetamotion_comfyui.comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=False, output_clipvision=True, embedding_directory=zetamotion_comfyui.folder_paths.get_folder_paths("embeddings"))
         return (out[0], out[3], out[2])
 
 
