@@ -718,7 +718,7 @@ class Guider_DualCFG(zetamotion_comfyui.comfy.samplers.CFGGuider):
         self.nested = nested
 
     def set_conds(self, positive, middle, negative):
-        middle = node_helpers.conditioning_set_values(middle, {"prompt_type": "negative"})
+        middle = zetamotion_comfyui.node_helpers.conditioning_set_values(middle, {"prompt_type": "negative"})
         self.inner_set_conds({"positive": positive, "middle": middle, "negative": negative})
 
     def predict_noise(self, x, timestep, model_options={}, seed=None):

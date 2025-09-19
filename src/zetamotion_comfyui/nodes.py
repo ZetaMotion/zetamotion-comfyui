@@ -168,7 +168,7 @@ class ConditioningSetArea:
     CATEGORY = "conditioning"
 
     def append(self, conditioning, width, height, x, y, strength):
-        c = node_helpers.conditioning_set_values(conditioning, {"area": (height // 8, width // 8, y // 8, x // 8),
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"area": (height // 8, width // 8, y // 8, x // 8),
                                                                 "strength": strength,
                                                                 "set_area_to_bounds": False})
         return (c, )
@@ -189,7 +189,7 @@ class ConditioningSetAreaPercentage:
     CATEGORY = "conditioning"
 
     def append(self, conditioning, width, height, x, y, strength):
-        c = node_helpers.conditioning_set_values(conditioning, {"area": ("percentage", height, width, y, x),
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"area": ("percentage", height, width, y, x),
                                                                 "strength": strength,
                                                                 "set_area_to_bounds": False})
         return (c, )
@@ -206,7 +206,7 @@ class ConditioningSetAreaStrength:
     CATEGORY = "conditioning"
 
     def append(self, conditioning, strength):
-        c = node_helpers.conditioning_set_values(conditioning, {"strength": strength})
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"strength": strength})
         return (c, )
 
 
@@ -230,7 +230,7 @@ class ConditioningSetMask:
         if len(mask.shape) < 3:
             mask = mask.unsqueeze(0)
 
-        c = node_helpers.conditioning_set_values(conditioning, {"mask": mask,
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"mask": mask,
                                                                 "set_area_to_bounds": set_area_to_bounds,
                                                                 "mask_strength": strength})
         return (c, )
@@ -271,7 +271,7 @@ class ConditioningSetTimestepRange:
     CATEGORY = "advanced/conditioning"
 
     def set_range(self, conditioning, start, end):
-        c = node_helpers.conditioning_set_values(conditioning, {"start_percent": start,
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"start_percent": start,
                                                                 "end_percent": end})
         return (c, )
 
@@ -447,7 +447,7 @@ class InpaintModelConditioning:
 
         out = []
         for conditioning in [positive, negative]:
-            c = node_helpers.conditioning_set_values(conditioning, {"concat_latent_image": concat_latent,
+            c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"concat_latent_image": concat_latent,
                                                                     "concat_mask": mask})
             out.append(c)
         return (out[0], out[1], out_latent)
@@ -1109,7 +1109,7 @@ class unCLIPConditioning:
         if strength == 0:
             return (conditioning, )
 
-        c = node_helpers.conditioning_set_values(conditioning, {"unclip_conditioning": [{"clip_vision_output": clip_vision_output, "strength": strength, "noise_augmentation": noise_augmentation}]}, append=True)
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"unclip_conditioning": [{"clip_vision_output": clip_vision_output, "strength": strength, "noise_augmentation": noise_augmentation}]}, append=True)
         return (c, )
 
 class GLIGENLoader:
@@ -1672,7 +1672,7 @@ class LoadImage:
     def load_image(self, image):
         image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image)
 
-        img = node_helpers.pillow(Image.open, image_path)
+        img = zetamotion_comfyui.node_helpers.pillow(Image.open, image_path)
 
         output_images = []
         output_masks = []
@@ -1681,7 +1681,7 @@ class LoadImage:
         excluded_formats = ['MPO']
 
         for i in ImageSequence.Iterator(img):
-            i = node_helpers.pillow(ImageOps.exif_transpose, i)
+            i = zetamotion_comfyui.node_helpers.pillow(ImageOps.exif_transpose, i)
 
             if i.mode == 'I':
                 i = i.point(lambda i: i * (1 / 255))
@@ -1748,8 +1748,8 @@ class LoadImageMask:
     FUNCTION = "load_image"
     def load_image(self, image, channel):
         image_path = zetamotion_comfyui.folder_paths.get_annotated_filepath(image)
-        i = node_helpers.pillow(Image.open, image_path)
-        i = node_helpers.pillow(ImageOps.exif_transpose, i)
+        i = zetamotion_comfyui.node_helpers.pillow(Image.open, image_path)
+        i = zetamotion_comfyui.node_helpers.pillow(ImageOps.exif_transpose, i)
         if i.getbands() != ("R", "G", "B", "A"):
             if i.mode == 'I':
                 i = i.point(lambda i: i * (1 / 255))

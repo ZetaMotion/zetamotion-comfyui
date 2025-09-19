@@ -48,12 +48,12 @@ class WanImageToVideo(io.ComfyNode):
             mask = torch.ones((1, 1, latent.shape[2], concat_latent_image.shape[-2], concat_latent_image.shape[-1]), device=start_image.device, dtype=start_image.dtype)
             mask[:, :, :((start_image.shape[0] - 1) // 4) + 1] = 0.0
 
-            positive = node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
-            negative = node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
 
         if clip_vision_output is not None:
-            positive = node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
-            negative = node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -102,12 +102,12 @@ class WanFunControlToVideo(io.ComfyNode):
             concat_latent_image = vae.encode(control_video[:, :, :, :3])
             concat_latent[:,:16,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
 
-        positive = node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent})
-        negative = node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent})
 
         if clip_vision_output is not None:
-            positive = node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
-            negative = node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -167,12 +167,12 @@ class Wan22FunControlToVideo(io.ComfyNode):
             concat_latent[:,:latent_channels,:concat_latent_image.shape[2]] = concat_latent_image[:,:,:concat_latent.shape[2]]
 
         mask = mask.view(1, mask.shape[2] // 4, 4, mask.shape[3], mask.shape[4]).transpose(1, 2)
-        positive = node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent, "concat_mask": mask, "concat_mask_index": latent_channels})
-        negative = node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent, "concat_mask": mask, "concat_mask_index": latent_channels})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent, "concat_mask": mask, "concat_mask_index": latent_channels})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent, "concat_mask": mask, "concat_mask_index": latent_channels})
 
         if ref_latent is not None:
-            positive = node_helpers.conditioning_set_values(positive, {"reference_latents": [ref_latent]}, append=True)
-            negative = node_helpers.conditioning_set_values(negative, {"reference_latents": [ref_latent]}, append=True)
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"reference_latents": [ref_latent]}, append=True)
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"reference_latents": [ref_latent]}, append=True)
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -226,8 +226,8 @@ class WanFirstLastFrameToVideo(io.ComfyNode):
 
         concat_latent_image = vae.encode(image[:, :, :, :3])
         mask = mask.view(1, mask.shape[2] // 4, 4, mask.shape[3], mask.shape[4]).transpose(1, 2)
-        positive = node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
-        negative = node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent_image, "concat_mask": mask})
 
         clip_vision_output = None
         if clip_vision_start_image is not None:
@@ -242,8 +242,8 @@ class WanFirstLastFrameToVideo(io.ComfyNode):
                 clip_vision_output = clip_vision_end_image
 
         if clip_vision_output is not None:
-            positive = node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
-            negative = node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -361,8 +361,8 @@ class WanVaceToVideo(io.ComfyNode):
 
         mask = mask.unsqueeze(0)
 
-        positive = node_helpers.conditioning_set_values(positive, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
-        negative = node_helpers.conditioning_set_values(negative, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
 
         latent = torch.zeros([batch_size, 16, latent_length, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
         out_latent = {}
@@ -432,16 +432,16 @@ class WanCameraImageToVideo(io.ComfyNode):
             mask[:, :, :start_image.shape[0] + 3] = 0.0
             mask = mask.view(1, mask.shape[2] // 4, 4, mask.shape[3], mask.shape[4]).transpose(1, 2)
 
-            positive = node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent, "concat_mask": mask})
-            negative = node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent, "concat_mask": mask})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"concat_latent_image": concat_latent, "concat_mask": mask})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"concat_latent_image": concat_latent, "concat_mask": mask})
 
         if camera_conditions is not None:
-            positive = node_helpers.conditioning_set_values(positive, {'camera_conditions': camera_conditions})
-            negative = node_helpers.conditioning_set_values(negative, {'camera_conditions': camera_conditions})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {'camera_conditions': camera_conditions})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {'camera_conditions': camera_conditions})
 
         if clip_vision_output is not None:
-            positive = node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
-            negative = node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -482,9 +482,9 @@ class WanPhantomSubjectToVideo(io.ComfyNode):
                 latent_images += [vae.encode(i.unsqueeze(0)[:, :, :, :3])]
             concat_latent_image = torch.cat(latent_images, dim=2)
 
-            positive = node_helpers.conditioning_set_values(positive, {"time_dim_concat": concat_latent_image})
-            cond2 = node_helpers.conditioning_set_values(negative, {"time_dim_concat": concat_latent_image})
-            negative = node_helpers.conditioning_set_values(negative, {"time_dim_concat": zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(torch.zeros_like(concat_latent_image))})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"time_dim_concat": concat_latent_image})
+            cond2 = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"time_dim_concat": concat_latent_image})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"time_dim_concat": zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(torch.zeros_like(concat_latent_image))})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -776,16 +776,16 @@ class WanTrackToVideo(io.ComfyNode):
             mask, concat_latent_image = res
             concat_latent_image = zetamotion_comfyui.comfy.latent_formats.Wan21().process_out(concat_latent_image)
             mask = -mask + 1.0  # Invert mask to match expected format
-            positive = node_helpers.conditioning_set_values(positive,
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive,
                                                             {"concat_mask": mask,
                                                             "concat_latent_image": concat_latent_image})
-            negative = node_helpers.conditioning_set_values(negative,
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative,
                                                             {"concat_mask": mask,
                                                             "concat_latent_image": concat_latent_image})
 
         if clip_vision_output is not None:
-            positive = node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
-            negative = node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"clip_vision_output": clip_vision_output})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"clip_vision_output": clip_vision_output})
 
         out_latent = {}
         out_latent["samples"] = latent
@@ -900,15 +900,15 @@ def wan_sound_to_video(positive, negative, vae, width, height, length, batch_siz
 
         audio_embed_bucket = audio_embed_bucket[:, :, :, frame_offset:frame_offset + batch_frames]
         if audio_embed_bucket.shape[3] > 0:
-            positive = node_helpers.conditioning_set_values(positive, {"audio_embed": audio_embed_bucket})
-            negative = node_helpers.conditioning_set_values(negative, {"audio_embed": audio_embed_bucket * 0.0})
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"audio_embed": audio_embed_bucket})
+            negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"audio_embed": audio_embed_bucket * 0.0})
             frame_offset += batch_frames
 
     if ref_image is not None:
         ref_image = zetamotion_comfyui.comfy.utils.common_upscale(ref_image[:1].movedim(-1, 1), width, height, "bilinear", "center").movedim(1, -1)
         ref_latent = vae.encode(ref_image[:, :, :, :3])
-        positive = node_helpers.conditioning_set_values(positive, {"reference_latents": [ref_latent]}, append=True)
-        negative = node_helpers.conditioning_set_values(negative, {"reference_latents": [ref_latent]}, append=True)
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"reference_latents": [ref_latent]}, append=True)
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"reference_latents": [ref_latent]}, append=True)
 
     if ref_motion is not None:
         if ref_motion.shape[0] > 73:
@@ -925,8 +925,8 @@ def wan_sound_to_video(positive, negative, vae, width, height, length, batch_siz
 
     if ref_motion_latent is not None:
         ref_motion_latent = ref_motion_latent[:, :, -19:]
-        positive = node_helpers.conditioning_set_values(positive, {"reference_motion": ref_motion_latent})
-        negative = node_helpers.conditioning_set_values(negative, {"reference_motion": ref_motion_latent})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"reference_motion": ref_motion_latent})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"reference_motion": ref_motion_latent})
 
     latent = torch.zeros([batch_size, 16, latent_t, height // 8, width // 8], device=zetamotion_comfyui.comfy.model_management.intermediate_device())
 
@@ -937,8 +937,8 @@ def wan_sound_to_video(positive, negative, vae, width, height, length, batch_siz
         control_video_out[:, :, :control_video.shape[2]] = control_video
 
     # TODO: check if zero is better than none if none provided
-    positive = node_helpers.conditioning_set_values(positive, {"control_video": control_video_out})
-    negative = node_helpers.conditioning_set_values(negative, {"control_video": control_video_out})
+    positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"control_video": control_video_out})
+    negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"control_video": control_video_out})
 
     out_latent = {}
     out_latent["samples"] = latent

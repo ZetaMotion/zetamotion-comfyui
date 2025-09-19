@@ -55,7 +55,7 @@ class PerpNeg:
 
 class Guider_PerpNeg(zetamotion_comfyui.comfy.samplers.CFGGuider):
     def set_conds(self, positive, negative, empty_negative_prompt):
-        empty_negative_prompt = node_helpers.conditioning_set_values(empty_negative_prompt, {"prompt_type": "negative"})
+        empty_negative_prompt = zetamotion_comfyui.node_helpers.conditioning_set_values(empty_negative_prompt, {"prompt_type": "negative"})
         self.inner_set_conds({"positive": positive, "empty_negative_prompt": empty_negative_prompt, "negative": negative})
 
     def set_cfg(self, cfg, neg_scale):

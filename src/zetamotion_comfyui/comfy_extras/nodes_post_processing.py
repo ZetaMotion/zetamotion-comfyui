@@ -34,7 +34,7 @@ class Blend:
     CATEGORY = "image/postprocessing"
 
     def blend_images(self, image1: torch.Tensor, image2: torch.Tensor, blend_factor: float, blend_mode: str):
-        image1, image2 = node_helpers.image_alpha_fix(image1, image2)
+        image1, image2 = zetamotion_comfyui.node_helpers.image_alpha_fix(image1, image2)
         image2 = image2.to(image1.device)
         if image1.shape != image2.shape:
             image2 = image2.permute(0, 3, 1, 2)

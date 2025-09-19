@@ -108,7 +108,7 @@ class HunyuanImageToVideo:
             elif guidance_type == "custom":
                 cond = {"ref_latent": concat_latent_image}
 
-            positive = node_helpers.conditioning_set_values(positive, cond)
+            positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, cond)
 
         out_latent["samples"] = latent
         return (positive, out_latent)

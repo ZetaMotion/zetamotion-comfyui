@@ -305,7 +305,7 @@ class PromptServer():
             return type_dir, dir_type
 
         def compare_image_hash(filepath, image):
-            hasher = node_helpers.hasher()
+            hasher = zetamotion_comfyui.node_helpers.hasher()
 
             # function to compare hashes of two images to see if it already exists, fix to #3465
             if os.path.exists(filepath):

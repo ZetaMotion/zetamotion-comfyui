@@ -150,7 +150,7 @@ class LTXVAddGuide:
             keyframe_idxs = pixel_coords
         else:
             keyframe_idxs = torch.cat([keyframe_idxs, pixel_coords], dim=2)
-        return node_helpers.conditioning_set_values(cond, {"keyframe_idxs": keyframe_idxs})
+        return zetamotion_comfyui.node_helpers.conditioning_set_values(cond, {"keyframe_idxs": keyframe_idxs})
 
     def append_keyframe(self, positive, negative, frame_idx, latent_image, noise_mask, guiding_latent, strength, scale_factors):
         _, latent_idx = self.get_latent_index(
@@ -265,8 +265,8 @@ class LTXVCropGuides:
         latent_image = latent_image[:, :, :-num_keyframes]
         noise_mask = noise_mask[:, :, :-num_keyframes]
 
-        positive = node_helpers.conditioning_set_values(positive, {"keyframe_idxs": None})
-        negative = node_helpers.conditioning_set_values(negative, {"keyframe_idxs": None})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"keyframe_idxs": None})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"keyframe_idxs": None})
 
         return (positive, negative, {"samples": latent_image, "noise_mask": noise_mask},)
 
@@ -285,8 +285,8 @@ class LTXVConditioning:
     CATEGORY = "conditioning/video_models"
 
     def append(self, positive, negative, frame_rate):
-        positive = node_helpers.conditioning_set_values(positive, {"frame_rate": frame_rate})
-        negative = node_helpers.conditioning_set_values(negative, {"frame_rate": frame_rate})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"frame_rate": frame_rate})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"frame_rate": frame_rate})
         return (positive, negative)
 
 

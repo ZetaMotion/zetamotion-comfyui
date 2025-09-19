@@ -50,8 +50,8 @@ class ConditioningStableAudio:
     CATEGORY = "conditioning"
 
     def append(self, positive, negative, seconds_start, seconds_total):
-        positive = node_helpers.conditioning_set_values(positive, {"seconds_start": seconds_start, "seconds_total": seconds_total})
-        negative = node_helpers.conditioning_set_values(negative, {"seconds_start": seconds_start, "seconds_total": seconds_total})
+        positive = zetamotion_comfyui.node_helpers.conditioning_set_values(positive, {"seconds_start": seconds_start, "seconds_total": seconds_total})
+        negative = zetamotion_comfyui.node_helpers.conditioning_set_values(negative, {"seconds_start": seconds_start, "seconds_total": seconds_total})
         return (positive, negative)
 
 class VAEEncodeAudio:

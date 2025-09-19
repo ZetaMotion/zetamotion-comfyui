@@ -141,7 +141,7 @@ class ConditioningSetAreaPercentageVideo:
     CATEGORY = "conditioning"
 
     def append(self, conditioning, width, height, temporal, x, y, z, strength):
-        c = node_helpers.conditioning_set_values(conditioning, {"area": ("percentage", temporal, height, width, z, y, x),
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"area": ("percentage", temporal, height, width, z, y, x),
                                                                 "strength": strength,
                                                                 "set_area_to_bounds": False})
         return (c, )

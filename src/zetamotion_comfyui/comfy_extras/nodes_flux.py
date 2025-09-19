@@ -35,7 +35,7 @@ class FluxGuidance:
     CATEGORY = "advanced/conditioning/flux"
 
     def append(self, conditioning, guidance):
-        c = node_helpers.conditioning_set_values(conditioning, {"guidance": guidance})
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"guidance": guidance})
         return (c, )
 
 
@@ -53,7 +53,7 @@ class FluxDisableGuidance:
     DESCRIPTION = "This node completely disables the guidance embed on Flux and Flux like models"
 
     def append(self, conditioning):
-        c = node_helpers.conditioning_set_values(conditioning, {"guidance": None})
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"guidance": None})
         return (c, )
 
 
@@ -117,7 +117,7 @@ class FluxKontextMultiReferenceLatentMethod:
     def append(self, conditioning, reference_latents_method):
         if "uxo" in reference_latents_method or "uso" in reference_latents_method:
             reference_latents_method = "uxo"
-        c = node_helpers.conditioning_set_values(conditioning, {"reference_latents_method": reference_latents_method})
+        c = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"reference_latents_method": reference_latents_method})
         return (c, )
 
 NODE_CLASS_MAPPINGS = {

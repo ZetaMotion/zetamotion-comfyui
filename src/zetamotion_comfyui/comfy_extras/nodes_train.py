@@ -134,7 +134,7 @@ def load_and_process_images(image_files, input_dir, resize_method="None", w=None
 
     for file in image_files:
         image_path = os.path.join(input_dir, file)
-        img = node_helpers.pillow(Image.open, image_path)
+        img = zetamotion_comfyui.node_helpers.pillow(Image.open, image_path)
 
         if img.mode == "I":
             img = img.point(lambda i: i * (1 / 255))
@@ -536,8 +536,8 @@ class TrainLoraNode:
         existing_lora,
     ):
         mp = model.clone()
-        dtype = node_helpers.string_to_torch_dtype(training_dtype)
-        lora_dtype = node_helpers.string_to_torch_dtype(lora_dtype)
+        dtype = zetamotion_comfyui.node_helpers.string_to_torch_dtype(training_dtype)
+        lora_dtype = zetamotion_comfyui.node_helpers.string_to_torch_dtype(lora_dtype)
         mp.set_model_compute_dtype(dtype)
 
         latents = latents["samples"].to(dtype)

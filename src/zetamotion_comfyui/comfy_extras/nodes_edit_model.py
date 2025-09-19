@@ -17,7 +17,7 @@ class ReferenceLatent:
 
     def append(self, conditioning, latent=None):
         if latent is not None:
-            conditioning = node_helpers.conditioning_set_values(conditioning, {"reference_latents": [latent["samples"]]}, append=True)
+            conditioning = zetamotion_comfyui.node_helpers.conditioning_set_values(conditioning, {"reference_latents": [latent["samples"]]}, append=True)
         return (conditioning, )
 
 
